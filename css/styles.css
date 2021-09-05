@@ -1,0 +1,192 @@
+body {
+    font-family: 'Montserrat';
+    text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat-Bold', sans-serif;;
+}
+
+p {
+    color: rgb(78, 74, 74);
+}
+
+
+/* Headings */
+
+.big-heading {
+    font-family: 'Montserrat-Black',  sans-serif;
+    font-size: 2.7rem;
+    font-weight: bolder;
+    line-height: 1.5;
+}
+
+.section-heading {
+    font-size: 3rem;
+    line-height: 1.5;
+}
+
+/* Containers  */
+
+.container-fluid {
+    padding: 7% 15%;
+}
+
+/* sections */
+
+.colored-section {
+    background-color: rgba(2, 2, 2, 0.938);
+    color: #fff;
+}
+
+.white-section {
+background-color: white;
+}
+
+/* Navigation Bar */
+
+.navbar {
+    padding:0 0 4.5rem;
+}
+
+.navbar-brand {
+    font-family: "Ubuntu";
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* Download Buttons */
+
+.download-btn {
+    margin: 5% 3% 5% 0%;
+}
+
+.nav-item {
+    padding: 10px 18px;
+}
+
+.nav-link {
+    font-size: 1.2rem;
+    font-family: "Montserrat-Light";
+}
+
+
+/* Title Section */
+
+#title .container-fluid {
+    padding: 3% 15% 18%;
+    text-align: left;
+}
+
+/* Title image */
+
+.title-image {
+    width: 80%;
+    position: absolute;
+    /* z-index: 0; */
+    right: 30%;
+}
+
+/* Features */
+
+.fas { 
+    color: #63a1db;
+    margin-bottom: 1rem;
+}
+.fab  { 
+    color: #63a1db;
+    margin-bottom: 1rem;
+}
+
+#features {
+    position: relative;
+    /* z-index: 1; */
+    
+}
+
+.feature-title {
+    font-size: 1.5rem;
+}
+
+
+.fas:hover {
+    color: #050505;
+}
+
+.slideIcon:hover{
+    color: #fff;
+}
+
+/* Testimonials Section */
+
+#testimonials {
+    background-color: #000000;
+    padding-top: 2%;
+    padding-bottom: 5%;
+}
+
+.testimonial-text {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.testimonials-image {
+    width: 10%;
+    border-radius: 100%;
+    margin: 20px;
+}
+
+
+
+/* My Work - Section  */
+
+.cards{
+    color: white;
+}
+#works {
+    padding: 100px;
+}
+
+.works-coloumn {
+    padding: 3% 2%;
+}
+
+.work-text {
+    font-size: 3rem;
+    line-height: 1.5;
+}
+
+.card-body{
+    text-align: left;
+    line-height: 3rem;
+}
+
+
+
+/*---- Footer Section ---- */
+
+
+.footer-icon {
+    color: black;
+    margin: 20px 10px;
+}
+
+.footer-icon:hover{
+    color: rgb(81, 148, 235)
+}
+
+/* Update for Mobile and Tablet size. */
+
+@media (max-width: 1028px) {
+
+    #title {
+        text-align: center;
+    }
+
+    .title-image {
+        position: static;
+        transform: rotate(0deg);
+    }
+
+
+} 
