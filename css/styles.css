@@ -125,6 +125,10 @@ background-color: white;
     padding-bottom: 5%;
 }
 
+.testing{
+    color: rgb(165, 163, 163);
+}
+
 .testimonial-text {
     font-size: 1rem;
     line-height: 1.5rem;
@@ -136,7 +140,9 @@ background-color: white;
     margin: 20px;
 }
 
-
+.links{
+    color: rgb(78, 74, 74);
+}
 
 /* My Work - Section  */
 
@@ -161,6 +167,10 @@ background-color: white;
     line-height: 3rem;
 }
 
+a:hover{
+    text-decoration: none;
+    color: blue;
+}
 
 
 /*---- Footer Section ---- */
@@ -175,6 +185,10 @@ background-color: white;
     color: rgb(81, 148, 235)
 }
 
+.footer-para{
+    color: rgb(117, 116, 116);
+}
+
 /* Update for Mobile and Tablet size. */
 
 @media (max-width: 1028px) {
@@ -187,6 +201,4 @@ background-color: white;
         position: static;
         transform: rotate(0deg);
     }
-
-
 } 
