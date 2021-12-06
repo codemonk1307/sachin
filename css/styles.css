@@ -81,10 +81,10 @@ background-color: white;
 /* Title image */
 
 .title-image {
-    width: 80%;
+    width: 130%;
     position: absolute;
     /* z-index: 0; */
-    right: 30%;
+    /* right: 5%; */
 }
 
 /* Features */
