@@ -1,204 +1,202 @@
 body {
-    font-family: 'Montserrat';
-    text-align: center;
+  font-family: "Montserrat";
+  text-align: center;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat-Bold', sans-serif;;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Montserrat-Bold", sans-serif;
 }
 
 p {
-    color: rgb(78, 74, 74);
+  color: rgb(78, 74, 74);
 }
-
 
 /* Headings */
 
 .big-heading {
-    font-family: 'Montserrat-Black',  sans-serif;
-    font-size: 2.7rem;
-    font-weight: bolder;
-    line-height: 1.5;
+  font-family: "Montserrat-Black", sans-serif;
+  font-size: 2.7rem;
+  font-weight: bolder;
+  line-height: 1.5;
 }
 
 .section-heading {
-    font-size: 3rem;
-    line-height: 1.5;
+  font-size: 3rem;
+  line-height: 1.5;
 }
 
 /* Containers  */
 
 .container-fluid {
-    padding: 7% 15%;
+  padding: 7% 15%;
 }
 
 /* sections */
 
 .colored-section {
-    background-color: rgba(2, 2, 2, 0.938);
-    color: #fff;
+  background-color: rgba(2, 2, 2, 0.938);
+  color: #fff;
 }
 
 .white-section {
-background-color: white;
+  background-color: white;
 }
 
 /* Navigation Bar */
 
 .navbar {
-    padding:0 0 4.5rem;
+  padding: 0 0 4.5rem;
 }
 
 .navbar-brand {
-    font-family: "Ubuntu";
-    font-size: 2.5rem;
-    font-weight: bold;
+  font-family: "Ubuntu";
+  font-size: 2.5rem;
+  font-weight: bold;
 }
 
 /* Download Buttons */
 
 .download-btn {
-    margin: 5% 3% 5% 0%;
+  margin: 5% 3% 5% 0%;
 }
 
 .nav-item {
-    padding: 10px 18px;
+  padding: 10px 18px;
 }
 
 .nav-link {
-    font-size: 1.2rem;
-    font-family: "Montserrat-Light";
+  font-size: 1.2rem;
+  font-family: "Montserrat-Light";
 }
-
 
 /* Title Section */
 
 #title .container-fluid {
-    padding: 3% 15% 18%;
-    text-align: left;
+  padding: 3% 15% 18%;
+  text-align: left;
 }
 
 /* Title image */
 
 .title-image {
-    width: 110%;
-    position: absolute;
-    /* z-index: 0; */
-    /* right: 5%; */
+  width: 110%;
+  position: absolute;
+  /* z-index: 0; */
+  /* right: 5%; */
 }
 
 /* Features */
 
-.fas { 
-    color: #63a1db;
-    margin-bottom: 1rem;
+.fas {
+  color: #63a1db;
+  margin-bottom: 1rem;
 }
-.fab  { 
-    color: #63a1db;
-    margin-bottom: 1rem;
+.fab {
+  color: #63a1db;
+  margin-bottom: 1rem;
 }
 
 #features {
-    position: relative;
-    /* z-index: 1; */
-    
+  position: relative;
+  /* z-index: 1; */
 }
 
 .feature-title {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
 }
-
 
 .fas:hover {
-    color: #050505;
+  color: #050505;
 }
 
-.slideIcon:hover{
-    color: #fff;
+.slideIcon:hover {
+  color: #fff;
 }
 
 /* Testimonials Section */
 
 #testimonials {
-    background-color: #000000;
-    padding-top: 2%;
-    padding-bottom: 5%;
+  background-color: #000000;
+  padding-top: 2%;
+  padding-bottom: 5%;
 }
 
-.testing{
-    color: rgb(165, 163, 163);
+.testing {
+  color: rgb(165, 163, 163);
 }
 
 .testimonial-text {
-    font-size: 1rem;
-    line-height: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 
 .testimonials-image {
-    width: 10%;
-    border-radius: 100%;
-    margin: 20px;
+  width: 10%;
+  border-radius: 100%;
+  margin: 20px;
 }
 
-.links{
-    color: rgb(78, 74, 74);
+.links {
+  color: rgb(78, 74, 74);
 }
 
 /* My Work - Section  */
 
-.cards{
-    color: white;
+.cards {
+  color: white;
 }
 #works {
-    padding: 100px;
+  padding: 100px;
 }
 
 .works-coloumn {
-    padding: 3% 2%;
+  padding: 3% 2%;
 }
 
 .work-text {
-    font-size: 3rem;
-    line-height: 1.5;
+  font-size: 3rem;
+  line-height: 1.5;
 }
 
-.card-body{
-    text-align: left;
-    line-height: 3rem;
+.card-body {
+  text-align: left;
+  line-height: 3rem;
 }
 
-a:hover{
-    text-decoration: none;
-    color: blue;
+a:hover {
+  text-decoration: none;
+  color: blue;
 }
-
 
 /*---- Footer Section ---- */
 
-
 .footer-icon {
-    color: black;
-    margin: 20px 10px;
+  color: black;
+  margin: 20px 10px;
 }
 
-.footer-icon:hover{
-    color: rgb(81, 148, 235)
+.footer-icon:hover {
+  color: rgb(81, 148, 235);
 }
 
-.footer-para{
-    color: rgb(117, 116, 116);
+.footer-para {
+  color: rgb(117, 116, 116);
 }
 
 /* Update for Mobile and Tablet size. */
 
 @media (max-width: 1028px) {
+  #title {
+    text-align: center;
+  }
 
-    #title {
-        text-align: center;
-    }
-
-    .title-image {
-        position: static;
-        transform: rotate(0deg);
-    }
-} 
+  .title-image {
+    position: static;
+    transform: rotate(0deg);
+  }
+}
