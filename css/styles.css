@@ -46,7 +46,7 @@ p {
 }
 
 .white-section {
-  background: url(https://codemonk1307.github.io/sachin/images/bg-design-crystals.png);
+  background: url(https://codemonk1307.github.io/sachin/images/back-icons.png);
 }
 
 /* Navigation Bar */
@@ -172,13 +172,13 @@ p {
 }
 
 .card {
-  box-shadow: 0 5px 15px 0 rgb(36 50 66 / 15%);
+  box-shadow: 0 10px 20px 0 rgb(36 50 66 / 20%);
   box-sizing: border-box;
   transition: box-shadow 500ms;
 }
 
 .card:hover {
-  box-shadow: 0 5px 30px 0 rgb(36 50 66 / 30%);
+  box-shadow: 0 10px 35px 0 rgb(36 50 66 / 40%);
     box-sizing: border-box;
     transition: box-shadow 230ms;
 }
