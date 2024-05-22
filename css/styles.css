@@ -88,8 +88,6 @@ p {
 .title-image {
   width: 110%;
   position: absolute;
-  z-index: 10px;
-  /* right: 5%; */
 }
 
 /* Features */
@@ -105,7 +103,6 @@ p {
 
 #features {
   position: relative;
-  /* z-index: 1; */
 }
 
 .feature-title {
@@ -214,4 +211,29 @@ a:hover {
     position: static;
     transform: rotate(0deg);
   }
+}
+
+.galaxy-gradient {
+  height: -webkit-fill-available;
+  width: 100%;
+  background: linear-gradient(70deg, rgba(58, 0, 211, 0.40) 0%, rgb(7 136 82 / 40%) 100%);
+  filter: blur(200px);
+}
+
+.glx-outer {
+  height: 50%;
+  left: 0;
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  bottom: 15rem;
+}
+
+.stars-night {
+  background-color: rgba(6.27%,6.27%,7.84%,1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
 }
