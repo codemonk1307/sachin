@@ -312,21 +312,15 @@
         <a href="https://www.linkedin.com/in/sachin-mishra-7508401b1/" target="_blank"> <i
             class="footer-icon fab fa-linkedin fa-2x"></i>
         </a>
-        <a href="https://twitter.com/ZyxsterD" target="_blank"> <i class="footer-icon fab fa-twitter fa-2x"></i>
-        </a>
-        <a href="https://www.instagram.com/bookmania1307/" target="_blank"> <i
-            class="footer-icon fab fa-instagram fa-2x"></i>
-        </a>
-        <a href="https://www.facebook.com/bookmania1307" target="_blank"> <i
-            class="footer-icon fab fa-facebook fa-2x"></i>
-        </a>
         <a href="https://github.com/codemonk1307" target="_blank"> <i class="footer-icon fab fa-github fa-2x"></i> </a>
         <a href="mailto:sachinmishra030@gmail.com" target="_blank"> <i class="footer-icon fas fa-envelope fa-2x"></i> </a>
         <p>Copyright © <span id="year"></span> Sachin Mishra | All rights reserved </p>
       </div>
     </footer>
     <script>
-      $("#year").innerHTML = new Date().getFullYear();
+      //$("#year").innerHTML = new Date().getFullYear();
+      // Using jQuery's .text() method
+      $("#year").text(new Date().getFullYear());
 
       // Function definition as provided above
       function generateStarryBackground(elementId, starsCount) {
@@ -352,8 +346,8 @@
 
       // Call the function on window load
       window.onload = function() {
-          // Adjust the '300' to change the number of stars, keyword argument
-          generateStarryBackground('starry-background', 300); 
+        // Adjust the '300' to change the number of stars, keyword argument
+        generateStarryBackground('starry-background', 300); 
       };
     </script>
   </body>
