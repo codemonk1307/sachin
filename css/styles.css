@@ -1,7 +1,7 @@
+/* Original Styles - Preserved for fallback */
 body {
   font-family: "Montserrat";
   text-align: center;
-  /* background-image: url(images/13.jpg); */
 }
 
 h1,
@@ -14,7 +14,7 @@ h6 {
 }
 
 p {
-  color: rgb(78, 74, 74);
+  color: rgb(180, 180, 180);
   word-break: keep-all;
 }
 
@@ -141,7 +141,7 @@ p {
 }
 
 .links {
-  color: rgb(78, 74, 74);
+  color: rgb(180, 180, 180);
 }
 
 /* My Work - Section  */
@@ -236,4 +236,95 @@ a:hover {
   left: 0;
   width: 1px;
   height: 1px;
+}
+
+.lazy-load {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease-in-out;
+}
+.lazy-load.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Enhanced Mobile Navbar Toggler */
+.navbar-toggler {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.25rem 0.5rem;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Ensure proper spacing on mobile */
+@media (max-width: 576px) {
+    .hero-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .stat-item {
+        margin-bottom: 1.5rem;
+    }
+    
+    section {
+        padding: 3rem 0;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .timeline-content {
+        padding: 1.5rem;
+    }
+    
+    .skill-category {
+        margin-bottom: 1rem;
+    }
+    
+    .achievement-card {
+        margin-bottom: 1rem;
+    }
+    
+    .social-links {
+        flex-wrap: wrap;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 577px) and (max-width: 991px) {
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+    }
+    
+    .timeline-content {
+        width: calc(100% - 80px);
+        margin-left: 80px !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    #particles-js,
+    .social-links {
+        display: none;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .section-title,
+    h1, h2, h3, h4, h5 {
+        color: black;
+    }
 }
