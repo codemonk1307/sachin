@@ -502,6 +502,22 @@
             text-shadow: 0 0 20px rgba(52, 211, 153, 0.8);
         }
 
+        /* Add performance optimizations for reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .about-image-wrapper::before,
+            .about-image-wrapper::after,
+            .morphing-layer-1,
+            .morphing-layer-2,
+            .morphing-layer-3,
+            .about-image {
+                animation: none !important;
+            }
+            
+            .about-image-wrapper::before {
+                border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .timeline::before {
@@ -538,6 +554,21 @@
 
             .achievement-card, .project-card, .skill-category {
                 margin-bottom: 1.5rem;
+            }
+
+            .about-image-wrapper {
+                padding: 30px;
+            }
+
+            .about-image {
+                width: 220px;
+                height: 220px;
+            }
+
+            .morphing-layer-1,
+            .morphing-layer-2,
+            .morphing-layer-3 {
+                animation-duration: 16s, 20s, 24s;
             }
         }
 
@@ -879,13 +910,16 @@
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">About Me</h2>
             
-            <div class="row align-items-center">
+            <div class="row align-items-center" style="display: flex; gap: 4rem; justify-content: space-between;">
                 <div class="col-lg-4" data-aos="fade-right">
                     <div class="about-image-wrapper">
+                        <div class="morphing-layer-1"></div>
+                        <div class="morphing-layer-2"></div>
+                        <div class="morphing-layer-3"></div>
                         <img src="images/portfolio image.jpg" alt="Sachin Mishra - Portfolio" class="about-image">
                     </div>
                 </div>
-                <div class="col-lg-8" data-aos="fade-left">
+                <div class="col-lg-7" data-aos="fade-left">
                     <div class="about-content">
                         <p class="lead mb-4">
                             Hey there! I'm a passionate Full Stack Developer and AI Engineer with 3+ years of experience building scalable solutions that make a real impact. Currently transforming healthcare at ZOHO Corporation, where I've helped reduce clinical documentation time by 75% for over 10,000 medical practitioners.
@@ -949,42 +983,239 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #f97316, #3b82f6, #10b981);
+            background: linear-gradient(135deg, #f97316, #3b82f6, #10b981, #dc2626);
             border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
-            z-index: -1;
-            filter: blur(2px);
-            opacity: 0.8;
-            transform: rotate(-3deg);
+            z-index: -3;
+            filter: blur(3px);
+            opacity: 0.9;
+            animation: morphing-border 8s ease-in-out infinite, floating 6s ease-in-out infinite;
         }
 
         .about-image-wrapper::after {
             content: '';
             position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            bottom: 8px;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
             background: #0a0a0a;
             border-radius: 58% 42% 52% 48% / 48% 58% 42% 52%;
             z-index: -1;
-            transform: rotate(-3deg);
+            animation: morphing-inner 10s ease-in-out infinite reverse, rotation 20s linear infinite;
+        }
+
+        .about-image-wrapper {
+            overflow: visible;
+        }
+
+        .about-image-wrapper::before {
+            box-shadow: 0 0 60px rgba(249, 115, 22, 0.6), 0 0 100px rgba(59, 130, 246, 0.4);
+        }
+
+        .about-image-wrapper .morphing-layer-1,
+        .about-image-wrapper .morphing-layer-2,
+        .about-image-wrapper .morphing-layer-3 {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            z-index: -2;
+            filter: blur(1px);
+        }
+
+        .about-image-wrapper .morphing-layer-1 {
+            background: linear-gradient(45deg, #f97316, #dc2626, #10b981);
+            border-radius: 65% 35% 60% 40% / 55% 45% 55% 45%;
+            animation: morphing-layer1 12s ease-in-out infinite, pulse-glow 4s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        .about-image-wrapper .morphing-layer-2 {
+            background: linear-gradient(225deg, #3b82f6, #10b981, #f97316);
+            border-radius: 40% 60% 45% 55% / 60% 40% 60% 40%;
+            animation: morphing-layer2 15s ease-in-out infinite reverse, pulse-glow 6s ease-in-out infinite;
+            opacity: 0.6;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+        }
+
+        .about-image-wrapper .morphing-layer-3 {
+            background: linear-gradient(315deg, #dc2626, #3b82f6, #f97316);
+            border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
+            animation: morphing-layer3 18s ease-in-out infinite, pulse-glow 8s ease-in-out infinite;
+            opacity: 0.5;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+        }
+
+        @keyframes morphing-border {
+            0%, 100% {
+                border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+                transform: rotate(-3deg) scale(1);
+            }
+            25% {
+                border-radius: 45% 55% 40% 60% / 65% 35% 55% 45%;
+                transform: rotate(2deg) scale(1.02);
+            }
+            50% {
+                border-radius: 70% 30% 60% 40% / 40% 60% 35% 65%;
+                transform: rotate(-1deg) scale(0.98);
+            }
+            75% {
+                border-radius: 35% 65% 45% 55% / 55% 45% 60% 40%;
+                transform: rotate(1deg) scale(1.01);
+            }
+        }
+
+        @keyframes morphing-inner {
+            0%, 100% {
+                border-radius: 58% 42% 52% 48% / 48% 58% 42% 52%;
+                transform: rotate(-2deg);
+            }
+            33% {
+                border-radius: 42% 58% 48% 52% / 62% 38% 58% 42%;
+                transform: rotate(1deg);
+            }
+            66% {
+                border-radius: 68% 32% 45% 55% / 35% 65% 45% 55%;
+                transform: rotate(-1deg);
+            }
+        }
+
+        @keyframes morphing-layer1 {
+            0%, 100% {
+                border-radius: 65% 35% 60% 40% / 55% 45% 55% 45%;
+                transform: rotate(0deg) scale(1);
+            }
+            20% {
+                border-radius: 40% 60% 35% 65% / 70% 30% 60% 40%;
+                transform: rotate(5deg) scale(1.03);
+            }
+            40% {
+                border-radius: 75% 25% 50% 50% / 45% 55% 35% 65%;
+                transform: rotate(-3deg) scale(0.97);
+            }
+            60% {
+                border-radius: 30% 70% 45% 55% / 60% 40% 70% 30%;
+                transform: rotate(4deg) scale(1.02);
+            }
+            80% {
+                border-radius: 55% 45% 65% 35% / 35% 65% 50% 50%;
+                transform: rotate(-2deg) scale(0.99);
+            }
+        }
+
+        @keyframes morphing-layer2 {
+            0%, 100% {
+                border-radius: 40% 60% 45% 55% / 60% 40% 60% 40%;
+                transform: rotate(0deg) scale(1);
+            }
+            25% {
+                border-radius: 65% 35% 30% 70% / 45% 55% 35% 65%;
+                transform: rotate(-4deg) scale(1.01);
+            }
+            50% {
+                border-radius: 25% 75% 55% 45% / 70% 30% 45% 55%;
+                transform: rotate(3deg) scale(0.98);
+            }
+            75% {
+                border-radius: 80% 20% 40% 60% / 30% 70% 60% 40%;
+                transform: rotate(-1deg) scale(1.02);
+            }
+        }
+
+        @keyframes morphing-layer3 {
+            0%, 100% {
+                border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
+                transform: rotate(0deg) scale(1);
+            }
+            16% {
+                border-radius: 30% 70% 35% 65% / 55% 45% 70% 30%;
+                transform: rotate(6deg) scale(1.04);
+            }
+            32% {
+                border-radius: 85% 15% 60% 40% / 25% 75% 40% 60%;
+                transform: rotate(-4deg) scale(0.96);
+            }
+            48% {
+                border-radius: 20% 80% 45% 55% / 65% 35% 55% 45%;
+                transform: rotate(3deg) scale(1.01);
+            }
+            64% {
+                border-radius: 60% 40% 80% 20% / 50% 50% 25% 75%;
+                transform: rotate(-5deg) scale(0.99);
+            }
+            80% {
+                border-radius: 45% 55% 25% 75% / 80% 20% 60% 40%;
+                transform: rotate(2deg) scale(1.03);
+            }
+        }
+
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0px) rotate(-3deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(-3deg);
+            }
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(-2deg);
+            }
+            100% {
+                transform: rotate(358deg);
+            }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(249, 115, 22, 0.4), 0 0 40px rgba(59, 130, 246, 0.3);
+                opacity: 0.7;
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(249, 115, 22, 0.6), 0 0 80px rgba(59, 130, 246, 0.5), 0 0 120px rgba(16, 185, 129, 0.3);
+                opacity: 0.9;
+            }
         }
 
         .about-image {
-            width: 100%;
-            max-width: 280px;
-            height: auto;
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
             position: relative;
             z-index: 1;
-            border-radius: 55% 45% 50% 50% / 45% 55% 45% 55%;
+            border-radius: 50%;
             filter: drop-shadow(0 10px 30px rgba(249, 115, 22, 0.4));
             transition: all 0.3s ease;
-            transform: rotate(-2deg);
+            animation: subtle-float 8s ease-in-out infinite;
         }
 
         .about-image:hover {
-            transform: rotate(-2deg) scale(1.02);
+            transform: scale(1.02);
             filter: drop-shadow(0 15px 40px rgba(249, 115, 22, 0.6));
+        }
+
+        @keyframes subtle-float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            25% {
+                transform: translateY(-8px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            75% {
+                transform: translateY(-12px);
+            }
         }
 
         @keyframes float {
