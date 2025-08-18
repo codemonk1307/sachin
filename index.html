@@ -231,7 +231,9 @@
             transition: all 0.3s ease;
             color: white;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             margin: 0.5rem;
             position: relative;
             overflow: hidden;
@@ -267,7 +269,9 @@
             transition: all 0.3s ease;
             color: #f97316;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             margin: 0.5rem;
             position: relative;
             background: rgba(249, 115, 22, 0.1);
@@ -504,17 +508,31 @@
 
         /* Add performance optimizations for reduced motion */
         @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            
             .about-image-wrapper::before,
             .about-image-wrapper::after,
             .morphing-layer-1,
             .morphing-layer-2,
             .morphing-layer-3,
-            .about-image {
+            .about-image,
+            .typing-effect {
                 animation: none !important;
             }
             
             .about-image-wrapper::before {
-                border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+                border-radius: 50%;
+            }
+            
+            #particles-js {
+                display: none;
             }
         }
 
@@ -534,17 +552,26 @@
             }
 
             .hero-stats {
-                gap: 2rem;
+                gap: 1.5rem;
                 flex-direction: column;
                 align-items: center;
             }
 
+            .hero-stats .stat-item {
+                width: 100%;
+                max-width: 280px;
+            }
+
             .stat-number {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+
+            .stat-label {
+                font-size: 0.85rem;
             }
 
             section {
-                padding: 3rem 0;
+                padding: 2.5rem 0;
                 align-items: stretch;
             }
 
@@ -557,18 +584,73 @@
             }
 
             .about-image-wrapper {
-                padding: 30px;
+                padding: 20px;
+                margin-bottom: 2rem;
             }
 
             .about-image {
-                width: 220px;
-                height: 220px;
+                width: 200px;
+                height: 200px;
             }
 
+            .hero-content h1 {
+                font-size: 2.5rem;
+                line-height: 1.2;
+            }
+
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .hero-description {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: center;
+            }
+
+            .btn-primary-custom, 
+            .btn-outline-custom {
+                width: 250px;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+                margin-bottom: 2rem;
+            }
+
+            .about-highlights {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .skills-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            /* Disable complex animations on mobile */
             .morphing-layer-1,
             .morphing-layer-2,
-            .morphing-layer-3 {
-                animation-duration: 16s, 20s, 24s;
+            .morphing-layer-3,
+            .about-image-wrapper::before,
+            .about-image-wrapper::after {
+                animation: none !important;
+            }
+
+            .about-image {
+                animation: none !important;
+                filter: drop-shadow(0 5px 15px rgba(249, 115, 22, 0.3));
             }
         }
 
@@ -735,6 +817,82 @@
             font-weight: 600;
         }
 
+        /* Experience Accordion Styles */
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .experience-header:hover {
+            background: rgba(249, 115, 22, 0.1);
+            transform: translateX(5px);
+        }
+
+        .experience-main-info {
+            flex: 1;
+        }
+
+        .expand-icon {
+            margin-left: 1rem;
+            transition: transform 0.3s ease;
+            color: #f97316;
+            font-size: 1.2rem;
+            min-width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .expand-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .experience-description {
+            overflow: hidden;
+            transition: all 0.4s ease;
+            margin-top: 1rem;
+        }
+
+        .experience-description.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .experience-description.expanded {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+
+        /* Add subtle indicator that content is expandable */
+        .timeline-content {
+            position: relative;
+        }
+
+        .timeline-content::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            width: 20px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.6));
+            border-radius: 2px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .timeline-content.expanded::after {
+            opacity: 0;
+        }
+
         /* Add custom scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
@@ -759,8 +917,13 @@
                 font-size: 3rem;
             }
 
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+
             .timeline-content {
-                width: 40%;
+                width: 42%;
             }
 
             .skills-container {
@@ -769,6 +932,55 @@
 
             .container {
                 max-width: 90%;
+            }
+
+            .about-image-wrapper {
+                padding: 30px;
+            }
+
+            .about-image {
+                width: 240px;
+                height: 240px;
+            }
+
+            .btn-primary-custom, 
+            .btn-outline-custom {
+                padding: 0.8rem 1.8rem;
+            }
+        }
+
+        /* Small tablet adjustments */
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .btn-primary-custom, 
+            .btn-outline-custom {
+                width: 220px;
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .about-image-wrapper {
+                padding: 15px;
+            }
+
+            .about-image {
+                width: 180px;
+                height: 180px;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .section-title {
+                font-size: 2rem;
             }
         }
 
@@ -782,6 +994,47 @@
             .nav-link, .btn-primary-custom, .btn-outline-custom, .social-link {
                 min-height: 44px;
                 min-width: 44px;
+            }
+
+            /* Optimize scrolling performance */
+            body {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Reduce complexity on mobile */
+            .project-card::before,
+            .skill-category::before,
+            .achievement-card::before {
+                display: none;
+            }
+
+            /* Better spacing for mobile content */
+            .timeline-content {
+                padding: 1.5rem;
+            }
+
+            .achievement-item {
+                padding: 0.6rem;
+            }
+
+            /* Optimize animations on mobile */
+            .typeahead-effect,
+            .typing-cursor {
+                animation-duration: 3s;
+            }
+
+            /* Mobile accordion adjustments */
+            .experience-header {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .expand-icon {
+                font-size: 1.1rem;
+                margin-left: 0.5rem;
+            }
+
+            .timeline-content::after {
+                display: none;
             }
         }
 
@@ -895,10 +1148,10 @@
 
                 <div class="hero-buttons" data-aos="fade-up" data-aos-delay="400">
                     <a href="mailto:sachinmishra030@gmail.com" class="btn-primary-custom">
-                        <i class="fas fa-envelope me-2"></i>Get In Touch
+                        <i class="fas fa-envelope me-2" style="margin-bottom: unset;"></i>Get In Touch
                     </a>
                     <a href="#projects" class="btn-outline-custom">
-                        <i class="fas fa-code me-2"></i>View Projects
+                        <i class="fas fa-code me-2" style="margin-bottom: unset;"></i>View Projects
                     </a>
                 </div>
             </div>
@@ -983,12 +1236,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #f97316, #3b82f6, #10b981, #dc2626);
-            border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+            background: linear-gradient(135deg, #f97316, #dc2626);
+            border-radius: 50%;
             z-index: -3;
-            filter: blur(3px);
-            opacity: 0.9;
-            animation: morphing-border 8s ease-in-out infinite, floating 6s ease-in-out infinite;
+            filter: blur(8px);
+            opacity: 0.6;
+            animation: floating 8s ease-in-out infinite;
         }
 
         .about-image-wrapper::after {
@@ -999,9 +1252,8 @@
             right: 12px;
             bottom: 12px;
             background: #0a0a0a;
-            border-radius: 58% 42% 52% 48% / 48% 58% 42% 52%;
+            border-radius: 50%;
             z-index: -1;
-            animation: morphing-inner 10s ease-in-out infinite reverse, rotation 20s linear infinite;
         }
 
         .about-image-wrapper {
@@ -1009,49 +1261,13 @@
         }
 
         .about-image-wrapper::before {
-            box-shadow: 0 0 60px rgba(249, 115, 22, 0.6), 0 0 100px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 40px rgba(249, 115, 22, 0.4);
         }
 
         .about-image-wrapper .morphing-layer-1,
         .about-image-wrapper .morphing-layer-2,
         .about-image-wrapper .morphing-layer-3 {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            z-index: -2;
-            filter: blur(1px);
-        }
-
-        .about-image-wrapper .morphing-layer-1 {
-            background: linear-gradient(45deg, #f97316, #dc2626, #10b981);
-            border-radius: 65% 35% 60% 40% / 55% 45% 55% 45%;
-            animation: morphing-layer1 12s ease-in-out infinite, pulse-glow 4s ease-in-out infinite;
-            opacity: 0.7;
-        }
-
-        .about-image-wrapper .morphing-layer-2 {
-            background: linear-gradient(225deg, #3b82f6, #10b981, #f97316);
-            border-radius: 40% 60% 45% 55% / 60% 40% 60% 40%;
-            animation: morphing-layer2 15s ease-in-out infinite reverse, pulse-glow 6s ease-in-out infinite;
-            opacity: 0.6;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-        }
-
-        .about-image-wrapper .morphing-layer-3 {
-            background: linear-gradient(315deg, #dc2626, #3b82f6, #f97316);
-            border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
-            animation: morphing-layer3 18s ease-in-out infinite, pulse-glow 8s ease-in-out infinite;
-            opacity: 0.5;
-            top: -15px;
-            left: -15px;
-            right: -15px;
-            bottom: -15px;
+            display: none;
         }
 
         @keyframes morphing-border {
@@ -1193,9 +1409,9 @@
             position: relative;
             z-index: 1;
             border-radius: 50%;
-            filter: drop-shadow(0 10px 30px rgba(249, 115, 22, 0.4));
+            filter: drop-shadow(0 8px 20px rgba(249, 115, 22, 0.3));
             transition: all 0.3s ease;
-            animation: subtle-float 8s ease-in-out infinite;
+            animation: subtle-float 12s ease-in-out infinite;
         }
 
         .about-image:hover {
@@ -1275,11 +1491,18 @@
                 <div class="timeline-item" data-aos="fade-right">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="company-name">ZOHO Corporation</div>
-                        <div class="role-title">Member Technical Staff</div>
-                        <div class="timeline-date">July 2022 - Present</div>
+                        <div class="experience-header" onclick="toggleExperience(this)">
+                            <div class="experience-main-info">
+                                <div class="company-name">ZOHO Corporation</div>
+                                <div class="role-title">Member Technical Staff</div>
+                                <div class="timeline-date">July 2022 - Present</div>
+                            </div>
+                            <div class="expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
                         
-                        <div class="experience-description">
+                        <div class="experience-description collapsed">
                             <p>Leading the development of cutting-edge AI solutions that revolutionize healthcare documentation and practice management. My work impacts thousands of medical practitioners daily, making their workflows more efficient and patient-focused.</p>
                             <div class="key-achievements mt-3">
                                 <div class="achievement-item">
@@ -1314,11 +1537,18 @@
                 <div class="timeline-item" data-aos="fade-left">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="company-name">Edvak Technologies Inc</div>
-                        <div class="role-title">AI/ML Engineering Intern</div>
-                        <div class="timeline-date">April 2022 - May 2022</div>
+                        <div class="experience-header" onclick="toggleExperience(this)">
+                            <div class="experience-main-info">
+                                <div class="company-name">Edvak Technologies Inc</div>
+                                <div class="role-title">AI/ML Engineering Intern</div>
+                                <div class="timeline-date">April 2022 - May 2022</div>
+                            </div>
+                            <div class="expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
                         
-                        <div class="experience-description">
+                        <div class="experience-description collapsed">
                             <p>Contributed to innovative healthcare AI solutions, focusing on intelligent matching algorithms and cost-effective computational services.</p>
                             <div class="key-achievements mt-3">
                                 <div class="achievement-item">
@@ -1337,11 +1567,18 @@
                 <div class="timeline-item" data-aos="fade-right">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="company-name">Incentius</div>
-                        <div class="role-title">Solutions Developer Intern</div>
-                        <div class="timeline-date">January 2022 - April 2022</div>
+                        <div class="experience-header" onclick="toggleExperience(this)">
+                            <div class="experience-main-info">
+                                <div class="company-name">Incentius</div>
+                                <div class="role-title">Solutions Developer Intern</div>
+                                <div class="timeline-date">January 2022 - April 2022</div>
+                            </div>
+                            <div class="expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
                         
-                        <div class="experience-description">
+                        <div class="experience-description collapsed">
                             <p>Delivered high-performance web solutions for the acoustic industry, focusing on B2B platform development with modern frontend frameworks.</p>
                             <div class="key-achievements mt-3">
                                 <div class="achievement-item">
@@ -1368,11 +1605,18 @@
                 <div class="timeline-item" data-aos="fade-left">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="company-name">SafeHouse Technologies | GPCSSI 2021</div>
-                        <div class="role-title">Cyber Security Analyst Intern</div>
-                        <div class="timeline-date">June 2021 - July 2021 | Gurugram, Haryana</div>
+                        <div class="experience-header" onclick="toggleExperience(this)">
+                            <div class="experience-main-info">
+                                <div class="company-name">SafeHouse Technologies | GPCSSI 2021</div>
+                                <div class="role-title">Cyber Security Analyst Intern</div>
+                                <div class="timeline-date">June 2021 - July 2021 | Gurugram, Haryana</div>
+                            </div>
+                            <div class="expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
                         
-                        <div class="experience-description">
+                        <div class="experience-description collapsed">
                             <p>Conducted in-depth cybersecurity research and analysis, focusing on emerging threats and defensive strategies.</p>
                             <div class="key-achievements mt-3">
                                 <div class="achievement-item">
@@ -1399,11 +1643,18 @@
                 <div class="timeline-item" data-aos="fade-right">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="company-name">KoiReader Technologies</div>
-                        <div class="role-title">Python Developer Intern</div>
-                        <div class="timeline-date">October 2020 - December 2020 | Bengaluru, Karnataka</div>
+                        <div class="experience-header" onclick="toggleExperience(this)">
+                            <div class="experience-main-info">
+                                <div class="company-name">KoiReader Technologies</div>
+                                <div class="role-title">Python Developer Intern</div>
+                                <div class="timeline-date">October 2020 - December 2020 | Bengaluru, Karnataka</div>
+                            </div>
+                            <div class="expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
                         
-                        <div class="experience-description">
+                        <div class="experience-description collapsed">
                             <p>Enhanced document processing capabilities through computer vision and performance optimization techniques.</p>
                             <div class="key-achievements mt-3">
                                 <div class="achievement-item">
@@ -1709,7 +1960,8 @@
             'Full Stack Developer',
             'AI Engineer',
             'Problem Solver',
-            'Tech Innovator'
+            'Tech Innovator',
+            'Artist'
         ];
         
         let roleIndex = 0;
@@ -1747,7 +1999,9 @@
         const welcomeMessages = [
             'Welcome to my digital space!',
             'Let\'s build something amazing together!',
-            'Turning ideas into reality, one line at a time.'
+            'Turning ideas into reality ;)',
+            'Crafting vision with passion and precision!',
+            'Empowering innovation through art!'
         ];
         
         let msgIndex = 0;
@@ -1786,6 +2040,27 @@
         typeRole();
         typeWelcome();
 
+        // Experience accordion toggle function
+        function toggleExperience(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            const timelineContent = header.closest('.timeline-content');
+            
+            if (content.classList.contains('collapsed')) {
+                // Expand
+                content.classList.remove('collapsed');
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                timelineContent.classList.add('expanded');
+            } else {
+                // Collapse
+                content.classList.remove('expanded');
+                content.classList.add('collapsed');
+                icon.classList.remove('rotated');
+                timelineContent.classList.remove('expanded');
+            }
+        }
+
         // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -1800,90 +2075,83 @@
             });
         });
 
-        // Particles.js configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: {
-                    value: 80,
-                    density: {
-                        enable: true,
-                        value_area: 800
-                    }
-                },
-                color: {
-                    value: '#f97316'
-                },
-                shape: {
-                    type: 'circle'
-                },
-                opacity: {
-                    value: 0.8,
-                    random: true,
-                    anim: {
-                        enable: true,
-                        speed: 1,
-                        opacity_min: 0.3,
-                        sync: false
-                    }
-                },
-                size: {
-                    value: 4,
-                    random: true,
-                    anim: {
-                        enable: true,
-                        speed: 2,
-                        size_min: 0.5,
-                        sync: false
-                    }
-                },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#f97316',
-                    opacity: 0.4,
-                    width: 2
-                },
-                move: {
-                    enable: true,
-                    speed: 3,
-                    direction: 'none',
-                    random: true,
-                    straight: false,
-                    out_mode: 'bounce',
-                    bounce: true,
-                    attract: {
-                        enable: true,
-                        rotateX: 600,
-                        rotateY: 1200
-                    }
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: {
-                        enable: true,
-                        mode: 'grab'
-                    },
-                    onclick: {
-                        enable: true,
-                        mode: 'push'
-                    }
-                },
-                modes: {
-                    grab: {
-                        distance: 140,
-                        line_linked: {
-                            opacity: 0.5
+        // Check if user prefers reduced motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        if (!prefersReducedMotion) {
+            // Particles.js configuration - optimized for performance
+            particlesJS('particles-js', {
+                particles: {
+                    number: {
+                        value: window.innerWidth > 768 ? 60 : 30,
+                        density: {
+                            enable: true,
+                            value_area: 1000
                         }
                     },
-                    push: {
-                        particles_nb: 4
+                    color: {
+                        value: '#f97316'
+                    },
+                    shape: {
+                        type: 'circle'
+                    },
+                    opacity: {
+                        value: 0.6,
+                        random: false,
+                        anim: {
+                            enable: false
+                        }
+                    },
+                    size: {
+                        value: 3,
+                        random: true,
+                        anim: {
+                            enable: false
+                        }
+                    },
+                    line_linked: {
+                        enable: true,
+                        distance: 120,
+                        color: '#f97316',
+                        opacity: 0.3,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 1.5,
+                        direction: 'none',
+                        random: true,
+                        straight: false,
+                        out_mode: 'bounce',
+                        bounce: false,
+                        attract: {
+                            enable: false
+                        }
                     }
-                }
-            },
-            retina_detect: true
-        });
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: {
+                            enable: window.innerWidth > 768,
+                            mode: 'grab'
+                        },
+                        onclick: {
+                            enable: false
+                        }
+                    },
+                    modes: {
+                        grab: {
+                            distance: 100,
+                            line_linked: {
+                                opacity: 0.4
+                            }
+                        }
+                    }
+                },
+                retina_detect: false
+            });
+        }
     </script>
 </body>
 
