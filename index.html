@@ -1902,6 +1902,746 @@
         </div>
     </section>
 
+    <style>
+        /* =========================================
+        CLIENT WEBSITES SHOWCASE - ENHANCED
+        ========================================= */
+
+        .websites-carousel-wrapper {
+            position: relative;
+            overflow: hidden;
+            padding: 30px 60px;
+        }
+
+        .websites-carousel {
+            display: flex;
+            gap: 40px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 30px;
+            scrollbar-width: thin;
+            scrollbar-color: #64ffda #1a1a2e;
+        }
+
+        .websites-carousel::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .websites-carousel::-webkit-scrollbar-track {
+            background: linear-gradient(90deg, #1a1a2e, #0f172a);
+            border-radius: 10px;
+        }
+
+        .websites-carousel::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #64ffda, #00bfa5);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .websites-carousel::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #00bfa5, #64ffda);
+        }
+
+        .website-showcase-card {
+            flex: 0 0 600px;
+            background: linear-gradient(145deg, rgba(30, 30, 50, 0.9), rgba(40, 40, 65, 0.8));
+            border-radius: 24px;
+            overflow: visible;
+            border: 2px solid rgba(100, 255, 218, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+                        0 0 80px rgba(100, 255, 218, 0.05);
+        }
+
+        .website-showcase-card::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #64ffda, #00bfa5, #3b82f6, #64ffda);
+            border-radius: 24px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.4s ease;
+            background-size: 400% 400%;
+            animation: gradient-shift 8s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .website-showcase-card:hover::before {
+            opacity: 0.4;
+        }
+
+        .website-showcase-card:hover {
+            transform: translateY(-20px) scale(1.02);
+            border-color: rgba(100, 255, 218, 0.5);
+            box-shadow:
+                0 40px 80px rgba(100, 255, 218, 0.25),
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 120px rgba(100, 255, 218, 0.15),
+                inset 0 0 30px rgba(100, 255, 218, 0.05);
+        }
+
+        .website-preview-container {
+            padding: 30px;
+        }
+
+        .browser-mockup {
+            background: linear-gradient(145deg, #2d2d42, #25253a);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                0 15px 30px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.05),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .browser-bar {
+            background: linear-gradient(135deg, #3a3a52, #2d2d42);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .browser-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .browser-dots span {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .website-showcase-card:hover .browser-dots span {
+            transform: scale(1.15);
+        }
+
+        .browser-dots span:nth-child(1) {
+            background: linear-gradient(135deg, #ff5f56, #ff3a30);
+            box-shadow: 0 3px 6px rgba(255, 95, 86, 0.4),
+                        inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .browser-dots span:nth-child(2) {
+            background: linear-gradient(135deg, #ffbd2e, #ff9f00);
+            box-shadow: 0 3px 6px rgba(255, 189, 46, 0.4),
+                        inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .browser-dots span:nth-child(3) {
+            background: linear-gradient(135deg, #27c93f, #00b742);
+            box-shadow: 0 3px 6px rgba(39, 201, 63, 0.4),
+                        inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .browser-dots span:hover {
+            filter: brightness(1.2);
+            transform: scale(1.2);
+        }
+
+        .browser-url {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(20, 20, 35, 0.6), rgba(30, 30, 45, 0.4));
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: #a0aec0;
+            font-size: 0.9rem;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+            border: 1px solid rgba(100, 255, 218, 0.15);
+            text-align: center;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .browser-url:hover {
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.1), rgba(0, 191, 165, 0.1));
+            border-color: rgba(100, 255, 218, 0.3);
+            color: #64ffda;
+        }
+
+        /* Enhanced Iframe Container */
+        .website-iframe-wrapper {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border-radius: 0 0 20px 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .website-iframe {
+            width: 1920px;
+            height: 1080px;
+            border: none;
+            background: white;
+            display: block;
+            transform: scale(0.2864583);
+            transform-origin: top left;
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Overlay and View Button */
+        .iframe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                transparent 60%,
+                rgba(26, 26, 46, 0.02) 75%,
+                rgba(26, 26, 46, 0.05) 85%,
+                rgba(26, 26, 46, 0.1) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .view-site-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.95), rgba(0, 191, 165, 0.95));
+            color: #0a192f;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 2px solid transparent;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 15px 35px rgba(100, 255, 218, 0.3),
+                        0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .website-iframe-wrapper:hover .view-site-btn {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .view-site-btn:hover {
+            background: linear-gradient(135deg, #64ffda, #00bfa5);
+            box-shadow: 0 20px 45px rgba(100, 255, 218, 0.5),
+                        0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translate(-50%, -50%) scale(1.05);
+            border-color: rgba(100, 255, 218, 0.3);
+        }
+
+        .view-site-btn i {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .view-site-btn:hover i {
+            transform: translateX(3px);
+        }
+
+        /* Client Info Section Enhanced */
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.05), rgba(0, 191, 165, 0.02));
+            border-radius: 16px;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .client-info:hover {
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.1), rgba(0, 191, 165, 0.05));
+            border-color: rgba(100, 255, 218, 0.2);
+            transform: translateX(5px);
+        }
+
+        .client-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid rgba(100, 255, 218, 0.4);
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3),
+                        0 0 30px rgba(100, 255, 218, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .client-avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(100, 255, 218, 0.4),
+                        0 0 40px rgba(100, 255, 218, 0.3);
+        }
+
+        .client-details {
+            flex: 1;
+        }
+
+        .client-details h4 {
+            color: #e6f1ff;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .client-details p {
+            color: #a0aec0;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .project-type {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(0, 191, 165, 0.15));
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            color: #64ffda;
+            border: 1.5px solid rgba(100, 255, 218, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .project-type:hover {
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.25), rgba(0, 191, 165, 0.25));
+            border-color: rgba(100, 255, 218, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2);
+        }
+
+        /* Navigation Arrows Enhanced */
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(0, 191, 165, 0.15));
+            border: 2px solid rgba(100, 255, 218, 0.4);
+            color: #64ffda;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3),
+                        0 0 25px rgba(100, 255, 218, 0.2);
+        }
+
+        .carousel-nav:hover {
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.3), rgba(0, 191, 165, 0.3));
+            transform: translateY(-50%) scale(1.15);
+            border-color: #64ffda;
+            box-shadow: 0 8px 25px rgba(100, 255, 218, 0.4),
+                        0 0 40px rgba(100, 255, 218, 0.3);
+        }
+
+        .carousel-nav i {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .carousel-nav:hover i {
+            transform: scale(1.2);
+        }
+
+        .carousel-prev {
+            left: 15px;
+        }
+
+        .carousel-prev:hover i {
+            transform: translateX(-3px);
+        }
+
+        .carousel-next {
+            right: 15px;
+        }
+
+        .carousel-next:hover i {
+            transform: translateX(3px);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .website-showcase-card {
+                flex: 0 0 350px;
+            }
+
+            .websites-carousel-wrapper {
+                padding: 20px 10px;
+            }
+
+            .carousel-nav {
+                width: 40px;
+                height: 40px;
+                opacity: 0.8;
+            }
+
+            .website-iframe-wrapper {
+                height: 350px;
+            }
+
+            .website-iframe {
+                transform: scale(0.182291667);
+            }
+
+            .view-site-btn {
+                padding: 12px 28px;
+                font-size: 0.95rem;
+            }
+
+            .client-avatar {
+                width: 55px;
+                height: 55px;
+            }
+
+            .client-details h4 {
+                font-size: 1.05rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .carousel-nav {
+                display: none;
+            }
+
+            .website-showcase-card {
+                flex: 0 0 300px;
+            }
+
+            .website-iframe-wrapper {
+                height: 280px;
+            }
+
+            .website-iframe {
+                transform: scale(0.15625);
+            }
+        }
+
+        /* Additional Animations and Effects continue from original styles... */
+
+        /* About Image Wrapper Styles */
+        .about-image-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: transparent;
+            overflow: visible;
+        }
+
+        .about-image-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f97316, #dc2626);
+            border-radius: 50%;
+            z-index: -3;
+            filter: blur(8px);
+            opacity: 0.6;
+            animation: floating 8s ease-in-out infinite;
+            box-shadow: 0 0 40px rgba(249, 115, 22, 0.4);
+        }
+
+        .about-image-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            background: #0a0a0a;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* About Image Animations */
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0px) rotate(-3deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(-3deg);
+            }
+        }
+
+        @keyframes subtle-float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            25% {
+                transform: translateY(-8px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            75% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .about-image {
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
+            position: relative;
+            z-index: 1;
+            border-radius: 50%;
+            filter: drop-shadow(0 8px 20px rgba(249, 115, 22, 0.3));
+            transition: all 0.3s ease;
+            animation: subtle-float 12s ease-in-out infinite;
+        }
+
+        .about-image:hover {
+            transform: scale(1.02);
+            filter: drop-shadow(0 15px 40px rgba(249, 115, 22, 0.6));
+        }
+
+        /* About Content Styles */
+        .about-content {
+            color: #e5e7eb;
+        }
+
+        .about-content .lead {
+            font-size: 1.2rem;
+            color: #f3f4f6;
+        }
+
+        .about-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .highlight-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .highlight-item:hover {
+            background: rgba(249, 115, 22, 0.2);
+            transform: translateX(5px);
+        }
+
+        .highlight-item i {
+            color: #f97316;
+            font-size: 1.2rem;
+        }
+
+        .highlight-item span {
+            color: #e5e7eb;
+            font-weight: 500;
+        }
+
+        /* Section, Footer and other styles continue from original... */
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #f97316, #3b82f6);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #fb923c, #60a5fa);
+        }
+
+        /* Performance optimizations for reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+
+    <!-- Client Websites Showcase -->
+    <section id="client-websites" style="padding: 80px 0; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(15, 15, 30, 0.98) 100%);">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up" style="margin-bottom: 20px;">Client Success Stories</h2>
+            <p class="text-center" style="color: #8892b0; margin-bottom: 50px; font-size: 1.1rem;" data-aos="fade-up" data-aos-delay="100">
+                Crafting Digital Experiences for Diverse Clientele
+            </p>
+
+            <div class="websites-carousel-wrapper" data-aos="fade-up" data-aos-delay="200">
+                <div class="websites-carousel">
+                    <!-- Harshita Mishra Website -->
+                    <div class="website-showcase-card">
+                        <div class="website-preview-container">
+                            <div class="browser-mockup">
+                                <div class="browser-bar">
+                                    <div class="browser-dots">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                    <div class="browser-url">harshitamishra.com</div>
+                                </div>
+                                <div class="website-iframe-wrapper">
+                                    <iframe src="https://harshitatengoku.vercel.app/" class="website-iframe" title="Harshita Mishra Portfolio" scrolling="no"></iframe>
+                                    <div class="iframe-overlay"></div>
+                                    <a href="https://harshitatengoku.vercel.app/" target="_blank" class="view-site-btn">
+                                        View Live Site <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="client-info">
+                                <img src="" alt="Harshita Mishra" class="client-avatar">
+                                <div class="client-details">
+                                    <h4>Harshita Mishra</h4>
+                                    <p>Emerging Writer</p>
+                                    <span class="project-type">Personal Portfolio</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neha Mishra Website -->
+                    <div class="website-showcase-card">
+                        <div class="website-preview-container">
+                            <div class="browser-mockup">
+                                <div class="browser-bar">
+                                    <div class="browser-dots">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                    <div class="browser-url">nehamishra.dev</div>
+                                </div>
+                                <div class="website-iframe-wrapper">
+                                    <iframe src="https://codemonk1307.github.io/neha-mishra-iet/" class="website-iframe" title="Neha Mishra Portfolio" scrolling="no"></iframe>
+                                    <div class="iframe-overlay"></div>
+                                    <a href="https://codemonk1307.github.io/neha-mishra-iet/" target="_blank" class="view-site-btn">
+                                        View Live Site <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="client-info">
+                                <img src="" alt="Neha Mishra" class="client-avatar">
+                                <div class="client-details">
+                                    <h4>Neha Mishra</h4>
+                                    <p>SDE-2 at Salesforce</p>
+                                    <span class="project-type">Professional Portfolio</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ICF Website -->
+                    <div class="website-showcase-card">
+                        <div class="website-preview-container">
+                            <div class="browser-mockup">
+                                <div class="browser-bar">
+                                    <div class="browser-dots">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                    <div class="browser-url">icfoundation.edu</div>
+                                </div>
+                                <div class="website-iframe-wrapper">
+                                    <iframe src="https://codemonk1307.github.io/ICF-Integrated-Career-Foundation/" class="website-iframe" title="ICF Foundation" scrolling="no"></iframe>
+                                    <div class="iframe-overlay"></div>
+                                    <a href="https://codemonk1307.github.io/ICF-Integrated-Career-Foundation/" target="_blank" class="view-site-btn">
+                                        View Live Site <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="client-info">
+                                <img src="" alt="Sarvesh Dwivedi" class="client-avatar">
+                                <div class="client-details">
+                                    <h4>ICF - Integrated Career Foundation</h4>
+                                    <p>Founder: Sarvesh Dwivedi</p>
+                                    <span class="project-type">E-Learning Platform</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Arrows -->
+                <button class="carousel-nav carousel-prev" onclick="scrollCarousel('prev')">
+                    <i class="fas fa-chevron-left" style="margin-bottom: unset;"></i>
+                </button>
+                <button class="carousel-nav carousel-next" onclick="scrollCarousel('next')">
+                    <i class="fas fa-chevron-right" style="margin-bottom: unset;"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <footer id="contact">
         <div class="container">
@@ -2158,6 +2898,47 @@
                 retina_detect: false
             });
         }
+
+        // Carousel Navigation
+        function scrollCarousel(direction) {
+            const carousel = document.querySelector('.websites-carousel');
+            const cardWidth = 640; // Updated for new wider cards (600px + 40px gap)
+
+            if (direction === 'prev') {
+                carousel.scrollLeft -= cardWidth;
+            } else {
+                carousel.scrollLeft += cardWidth;
+            }
+        }
+
+        // Auto-scroll carousel
+        let autoScrollInterval;
+        const carousel = document.querySelector('.websites-carousel');
+
+        function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+                if (carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth) {
+                    carousel.scrollLeft = 0;
+                } else {
+                    carousel.scrollLeft += 1;
+                }
+            }, 30);
+        }
+
+        function stopAutoScroll() {
+            clearInterval(autoScrollInterval);
+        }
+
+        // Start auto-scroll on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const carouselWrapper = document.querySelector('.websites-carousel-wrapper');
+            if (carouselWrapper && window.innerWidth > 768) {
+                // Auto-scroll only on desktop
+                carouselWrapper.addEventListener('mouseenter', stopAutoScroll);
+                carouselWrapper.addEventListener('mouseleave', startAutoScroll);
+                startAutoScroll();
+            }
+        });
     </script>
 </body>
 
