@@ -21,6 +21,9 @@
     
     <!-- AOS Animation Library -->
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     
     <!-- Favicon -->
     <link rel="icon" href="among_us_youtube_icon_156933.png">
@@ -1076,6 +1079,87 @@
         .achievement-card:hover::before {
             opacity: 1;
         }
+
+        /* DSA Lab Section */
+        .dsa-nav-link {
+            background: linear-gradient(135deg, #a855f7, #06b6d4) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            font-weight: 600 !important;
+            position: relative;
+        }
+
+        .dsa-nav-link::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+            border-radius: 8px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .dsa-nav-link:hover::before {
+            opacity: 0.15;
+        }
+
+        #dsa-lab {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: #07080c;
+        }
+
+        #dsa-lab.active {
+            display: block;
+        }
+
+        .dsa-close-btn {
+            position: fixed;
+            top: 70px;
+            right: 30px;
+            z-index: 10001;
+            background: linear-gradient(135deg, #e94560, #a855f7);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .dsa-close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(168, 85, 247, 0.5);
+        }
+
+        .dsa-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .dsa-close-btn {
+                top: 10px;
+                right: 15px;
+                padding: 10px 18px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 
@@ -1087,6 +1171,32 @@
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-B8F5QE6K7Y');
+    </script>
+
+    <!-- DSA Lab Toggle Script -->
+    <script>
+        function toggleDSALab(event) {
+            event.preventDefault();
+            const dsaLab = document.getElementById('dsa-lab');
+            dsaLab.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDSALab() {
+            const dsaLab = document.getElementById('dsa-lab');
+            dsaLab.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close DSA Lab with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dsaLab = document.getElementById('dsa-lab');
+                if (dsaLab.classList.contains('active')) {
+                    closeDSALab();
+                }
+            }
+        });
     </script>
 
     <!-- Particles Background -->
@@ -1106,11 +1216,20 @@
                     <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
                     <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
                     <li class="nav-item"><a class="nav-link" href="#achievements">Achievements</a></li>
+                    <li class="nav-item"><a class="nav-link dsa-nav-link" href="#dsa-lab" onclick="toggleDSALab(event)">⚡ DSA Lab</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- DSA Lab Section -->
+    <div id="dsa-lab">
+        <button class="dsa-close-btn" onclick="closeDSALab()">
+            <span>✕</span> Back to Portfolio
+        </button>
+        <iframe class="dsa-iframe" src="dsa-master.html" title="DSA Mastery - 30 Day Challenge"></iframe>
+    </div>
 
     <!-- Hero Section -->
     <section id="hero">
@@ -1904,46 +2023,85 @@
 
     <style>
         /* =========================================
-        CLIENT WEBSITES SHOWCASE - ENHANCED
+        CLIENT WEBSITES SHOWCASE - SWIPER ENHANCED
         ========================================= */
 
-        .websites-carousel-wrapper {
-            position: relative;
-            overflow: hidden;
-            padding: 30px 60px;
+        .client-websites-swiper {
+            width: 100%;
+            padding: 40px 0 60px;
+            overflow: visible;
         }
 
-        .websites-carousel {
-            display: flex;
-            gap: 40px;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding-bottom: 30px;
-            scrollbar-width: thin;
-            scrollbar-color: #64ffda #1a1a2e;
+        .client-websites-swiper .swiper-wrapper {
+            align-items: center;
         }
 
-        .websites-carousel::-webkit-scrollbar {
-            height: 10px;
+        .client-websites-swiper .swiper-slide {
+            width: 600px;
+            transition: all 0.4s ease;
+            opacity: 0.4;
+            transform: scale(0.85);
         }
 
-        .websites-carousel::-webkit-scrollbar-track {
-            background: linear-gradient(90deg, #1a1a2e, #0f172a);
-            border-radius: 10px;
+        .client-websites-swiper .swiper-slide-active {
+            opacity: 1;
+            transform: scale(1);
         }
 
-        .websites-carousel::-webkit-scrollbar-thumb {
-            background: linear-gradient(90deg, #64ffda, #00bfa5);
-            border-radius: 10px;
+        .client-websites-swiper .swiper-slide-prev,
+        .client-websites-swiper .swiper-slide-next {
+            opacity: 0.7;
+            transform: scale(0.9);
+        }
+
+        /* Swiper Navigation Arrows */
+        .client-websites-swiper .swiper-button-prev,
+        .client-websites-swiper .swiper-button-next {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.2), rgba(59, 130, 246, 0.2));
+            border-radius: 50%;
+            border: 2px solid rgba(100, 255, 218, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .client-websites-swiper .swiper-button-prev:hover,
+        .client-websites-swiper .swiper-button-next:hover {
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.4), rgba(59, 130, 246, 0.4));
+            border-color: rgba(100, 255, 218, 0.6);
+            transform: scale(1.1);
+        }
+
+        .client-websites-swiper .swiper-button-prev::after,
+        .client-websites-swiper .swiper-button-next::after {
+            font-size: 18px;
+            font-weight: bold;
+            color: #64ffda;
+        }
+
+        /* Swiper Pagination */
+        .client-websites-swiper .swiper-pagination {
+            bottom: 0;
+        }
+
+        .client-websites-swiper .swiper-pagination-bullet {
+            width: 12px;
+            height: 12px;
+            background: rgba(100, 255, 218, 0.3);
+            border: 2px solid rgba(100, 255, 218, 0.5);
+            opacity: 1;
             transition: all 0.3s ease;
         }
 
-        .websites-carousel::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(90deg, #00bfa5, #64ffda);
+        .client-websites-swiper .swiper-pagination-bullet-active {
+            background: linear-gradient(135deg, #64ffda, #00bfa5);
+            border-color: #64ffda;
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
         }
 
         .website-showcase-card {
-            flex: 0 0 600px;
             background: linear-gradient(145deg, rgba(30, 30, 50, 0.9), rgba(40, 40, 65, 0.8));
             border-radius: 24px;
             overflow: visible;
@@ -2319,18 +2477,23 @@
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .website-showcase-card {
-                flex: 0 0 350px;
+            .client-websites-swiper .swiper-slide {
+                width: 350px;
             }
 
-            .websites-carousel-wrapper {
-                padding: 20px 10px;
+            .client-websites-swiper {
+                padding: 20px 0 50px;
             }
 
-            .carousel-nav {
+            .client-websites-swiper .swiper-button-prev,
+            .client-websites-swiper .swiper-button-next {
                 width: 40px;
                 height: 40px;
-                opacity: 0.8;
+            }
+
+            .client-websites-swiper .swiper-button-prev::after,
+            .client-websites-swiper .swiper-button-next::after {
+                font-size: 14px;
             }
 
             .website-iframe-wrapper {
@@ -2357,12 +2520,13 @@
         }
 
         @media (max-width: 480px) {
-            .carousel-nav {
+            .client-websites-swiper .swiper-button-prev,
+            .client-websites-swiper .swiper-button-next {
                 display: none;
             }
 
-            .website-showcase-card {
-                flex: 0 0 300px;
+            .client-websites-swiper .swiper-slide {
+                width: 300px;
             }
 
             .website-iframe-wrapper {
@@ -2371,6 +2535,11 @@
 
             .website-iframe {
                 transform: scale(0.15625);
+            }
+
+            .client-websites-swiper .swiper-pagination-bullet {
+                width: 10px;
+                height: 10px;
             }
         }
 
@@ -2541,161 +2710,171 @@
                 Crafting Digital Experiences for Diverse Clientele
             </p>
 
-            <div class="websites-carousel-wrapper" data-aos="fade-up" data-aos-delay="200">
-                <div class="websites-carousel">
+            <!-- Swiper Container -->
+            <div class="swiper client-websites-swiper" data-aos="fade-up" data-aos-delay="200">
+                <div class="swiper-wrapper">
                     <!-- Harshita Mishra Website -->
-                    <div class="website-showcase-card">
-                        <div class="website-preview-container">
-                            <div class="browser-mockup">
-                                <div class="browser-bar">
-                                    <div class="browser-dots">
-                                        <span></span><span></span><span></span>
+                    <div class="swiper-slide">
+                        <div class="website-showcase-card">
+                            <div class="website-preview-container">
+                                <div class="browser-mockup">
+                                    <div class="browser-bar">
+                                        <div class="browser-dots">
+                                            <span></span><span></span><span></span>
+                                        </div>
+                                        <div class="browser-url">harshitatengoku.vercel.app</div>
                                     </div>
-                                    <div class="browser-url">harshitatengoku.vercel.app</div>
+                                    <div class="website-iframe-wrapper">
+                                        <iframe src="https://harshitatengoku.vercel.app/" class="website-iframe" title="Harshita Mishra Portfolio" scrolling="no"></iframe>
+                                        <div class="iframe-overlay"></div>
+                                        <a href="https://harshitatengoku.vercel.app/" target="_blank" class="view-site-btn">
+                                            View Live Site <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="website-iframe-wrapper">
-                                    <iframe src="https://harshitatengoku.vercel.app/" class="website-iframe" title="Harshita Mishra Portfolio" scrolling="no"></iframe>
-                                    <div class="iframe-overlay"></div>
-                                    <a href="https://harshitatengoku.vercel.app/" target="_blank" class="view-site-btn">
-                                        View Live Site <i class="fas fa-external-link-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="client-info">
-                                <img src="" alt="Harshita Mishra" class="client-avatar">
-                                <div class="client-details">
-                                    <h4>Harshita Mishra</h4>
-                                    <p>Emerging Writer</p>
-                                    <span class="project-type">Personal Portfolio</span>
+                                <div class="client-info">
+                                    <img src="" alt="Harshita Mishra" class="client-avatar">
+                                    <div class="client-details">
+                                        <h4>Harshita Mishra</h4>
+                                        <p>Emerging Writer</p>
+                                        <span class="project-type">Personal Portfolio</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Neha Mishra Website -->
-                    <div class="website-showcase-card">
-                        <div class="website-preview-container">
-                            <div class="browser-mockup">
-                                <div class="browser-bar">
-                                    <div class="browser-dots">
-                                        <span></span><span></span><span></span>
+                    <div class="swiper-slide">
+                        <div class="website-showcase-card">
+                            <div class="website-preview-container">
+                                <div class="browser-mockup">
+                                    <div class="browser-bar">
+                                        <div class="browser-dots">
+                                            <span></span><span></span><span></span>
+                                        </div>
+                                        <div class="browser-url">nehamishra.vercel.app/</div>
                                     </div>
-                                    <div class="browser-url">nehamishra.vercel.app/</div>
+                                    <div class="website-iframe-wrapper">
+                                        <iframe src="https://codemonk1307.github.io/neha-mishra-iet/" class="website-iframe" title="Neha Mishra Portfolio" scrolling="no"></iframe>
+                                        <div class="iframe-overlay"></div>
+                                        <a href="https://codemonk1307.github.io/neha-mishra-iet/" target="_blank" class="view-site-btn">
+                                            View Live Site <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="website-iframe-wrapper">
-                                    <iframe src="https://codemonk1307.github.io/neha-mishra-iet/" class="website-iframe" title="Neha Mishra Portfolio" scrolling="no"></iframe>
-                                    <div class="iframe-overlay"></div>
-                                    <a href="https://codemonk1307.github.io/neha-mishra-iet/" target="_blank" class="view-site-btn">
-                                        View Live Site <i class="fas fa-external-link-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="client-info">
-                                <img src="" alt="Neha Mishra" class="client-avatar">
-                                <div class="client-details">
-                                    <h4>Neha Mishra</h4>
-                                    <p>SDE-2 at Salesforce</p>
-                                    <span class="project-type">Professional Portfolio</span>
+                                <div class="client-info">
+                                    <img src="" alt="Neha Mishra" class="client-avatar">
+                                    <div class="client-details">
+                                        <h4>Neha Mishra</h4>
+                                        <p>SDE-2 at Salesforce</p>
+                                        <span class="project-type">Professional Portfolio</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- ICF Website -->
-                    <div class="website-showcase-card">
-                        <div class="website-preview-container">
-                            <div class="browser-mockup">
-                                <div class="browser-bar">
-                                    <div class="browser-dots">
-                                        <span></span><span></span><span></span>
+                    <div class="swiper-slide">
+                        <div class="website-showcase-card">
+                            <div class="website-preview-container">
+                                <div class="browser-mockup">
+                                    <div class="browser-bar">
+                                        <div class="browser-dots">
+                                            <span></span><span></span><span></span>
+                                        </div>
+                                        <div class="browser-url">icfprayag.vercel.app</div>
                                     </div>
-                                    <div class="browser-url">icfprayag.vercel.app</div>
+                                    <div class="website-iframe-wrapper">
+                                        <iframe src="https://codemonk1307.github.io/ICF-Integrated-Career-Foundation/" class="website-iframe" title="ICF Foundation" scrolling="no"></iframe>
+                                        <div class="iframe-overlay"></div>
+                                        <a href="https://codemonk1307.github.io/ICF-Integrated-Career-Foundation/" target="_blank" class="view-site-btn">
+                                            View Live Site <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="website-iframe-wrapper">
-                                    <iframe src="https://codemonk1307.github.io/ICF-Integrated-Career-Foundation/" class="website-iframe" title="ICF Foundation" scrolling="no"></iframe>
-                                    <div class="iframe-overlay"></div>
-                                    <a href="https://codemonk1307.github.io/ICF-Integrated-Career-Foundation/" target="_blank" class="view-site-btn">
-                                        View Live Site <i class="fas fa-external-link-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="client-info">
-                                <img src="" alt="Sarvesh Dwivedi" class="client-avatar">
-                                <div class="client-details">
-                                    <h4>ICF - Integrated Career Foundation</h4>
-                                    <p>Founder: Sarvesh Dwivedi</p>
-                                    <span class="project-type">E-Learning Platform</span>
+                                <div class="client-info">
+                                    <img src="" alt="Sarvesh Dwivedi" class="client-avatar">
+                                    <div class="client-details">
+                                        <h4>ICF - Integrated Career Foundation</h4>
+                                        <p>Founder: Sarvesh Dwivedi</p>
+                                        <span class="project-type">E-Learning Platform</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Akhilesh Dwivedi Website -->
-                    <div class="website-showcase-card">
-                        <div class="website-preview-container">
-                            <div class="browser-mockup">
-                                <div class="browser-bar">
-                                    <div class="browser-dots">
-                                        <span></span><span></span><span></span>
+                    <div class="swiper-slide">
+                        <div class="website-showcase-card">
+                            <div class="website-preview-container">
+                                <div class="browser-mockup">
+                                    <div class="browser-bar">
+                                        <div class="browser-dots">
+                                            <span></span><span></span><span></span>
+                                        </div>
+                                        <div class="browser-url">akhileshdwivedi.vercel.app</div>
                                     </div>
-                                    <div class="browser-url">akhileshdwivedi.vercel.app</div>
+                                    <div class="website-iframe-wrapper">
+                                        <iframe src="https://akhileshdwivedi.vercel.app/" class="website-iframe" title="Akhilesh Dwivedi Portfolio" scrolling="no"></iframe>
+                                        <div class="iframe-overlay"></div>
+                                        <a href="https://akhileshdwivedi.vercel.app/" target="_blank" class="view-site-btn">
+                                            View Live Site <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="website-iframe-wrapper">
-                                    <iframe src="https://akhileshdwivedi.vercel.app/" class="website-iframe" title="Akhilesh Dwivedi Portfolio" scrolling="no"></iframe>
-                                    <div class="iframe-overlay"></div>
-                                    <a href="https://akhileshdwivedi.vercel.app/" target="_blank" class="view-site-btn">
-                                        View Live Site <i class="fas fa-external-link-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="client-info">
-                                <img src="" alt="Akhilesh Dwivedi" class="client-avatar">
-                                <div class="client-details">
-                                    <h4>Akhilesh Dwivedi</h4>
-                                    <p>Professional</p>
-                                    <span class="project-type">Personal Portfolio</span>
+                                <div class="client-info">
+                                    <img src="" alt="Akhilesh Dwivedi" class="client-avatar">
+                                    <div class="client-details">
+                                        <h4>Akhilesh Dwivedi</h4>
+                                        <p>Professional</p>
+                                        <span class="project-type">Personal Portfolio</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Shivakant Pandey Website -->
-                    <div class="website-showcase-card">
-                        <div class="website-preview-container">
-                            <div class="browser-mockup">
-                                <div class="browser-bar">
-                                    <div class="browser-dots">
-                                        <span></span><span></span><span></span>
+                    <div class="swiper-slide">
+                        <div class="website-showcase-card">
+                            <div class="website-preview-container">
+                                <div class="browser-mockup">
+                                    <div class="browser-bar">
+                                        <div class="browser-dots">
+                                            <span></span><span></span><span></span>
+                                        </div>
+                                        <div class="browser-url">sksirkanpurchemistry.vercel.app</div>
                                     </div>
-                                    <div class="browser-url">sksirkanpurchemistry.vercel.app</div>
+                                    <div class="website-iframe-wrapper">
+                                        <iframe src="https://codemonk1307.github.io/sksir-kanpur/" class="website-iframe" title="Shivakant Pandey Portfolio" scrolling="no"></iframe>
+                                        <div class="iframe-overlay"></div>
+                                        <a href="https://codemonk1307.github.io/sksir-kanpur/" target="_blank" class="view-site-btn">
+                                            View Live Site <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="website-iframe-wrapper">
-                                    <iframe src="https://codemonk1307.github.io/sksir-kanpur/" class="website-iframe" title="Shivakant Pandey Portfolio" scrolling="no"></iframe>
-                                    <div class="iframe-overlay"></div>
-                                    <a href="https://codemonk1307.github.io/sksir-kanpur/" target="_blank" class="view-site-btn">
-                                        View Live Site <i class="fas fa-external-link-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="client-info">
-                                <img src="" alt="Shivakant Pandey" class="client-avatar">
-                                <div class="client-details">
-                                    <h4>Shivakant Pandey</h4>
-                                    <p>Educator</p>
-                                    <span class="project-type">Professional Portfolio</span>
+                                <div class="client-info">
+                                    <img src="" alt="Shivakant Pandey" class="client-avatar">
+                                    <div class="client-details">
+                                        <h4>Shivakant Pandey</h4>
+                                        <p>Educator</p>
+                                        <span class="project-type">Professional Portfolio</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Navigation Arrows -->
-                <button class="carousel-nav carousel-prev" onclick="scrollCarousel('prev')">
-                    <i class="fas fa-chevron-left" style="margin-bottom: unset;"></i>
-                </button>
-                <button class="carousel-nav carousel-next" onclick="scrollCarousel('next')">
-                    <i class="fas fa-chevron-right" style="margin-bottom: unset;"></i>
-                </button>
+                <!-- Swiper Pagination -->
+                <div class="swiper-pagination"></div>
+
+                <!-- Swiper Navigation Arrows -->
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
             </div>
         </div>
     </section>
@@ -2737,6 +2916,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- Swiper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
     <script>
         // Initialize AOS
@@ -2957,45 +3138,72 @@
             });
         }
 
-        // Carousel Navigation
-        function scrollCarousel(direction) {
-            const carousel = document.querySelector('.websites-carousel');
-            const cardWidth = 640; // Updated for new wider cards (600px + 40px gap)
+        // Initialize Swiper for Client Websites Showcase
+        const clientWebsitesSwiper = new Swiper('.client-websites-swiper', {
+            // Coverflow effect for that cool 3D look
+            effect: 'coverflow',
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
 
-            if (direction === 'prev') {
-                carousel.scrollLeft -= cardWidth;
-            } else {
-                carousel.scrollLeft += cardWidth;
-            }
-        }
+            // Coverflow effect settings
+            coverflowEffect: {
+                rotate: 0,
+                stretch: 0,
+                depth: 100,
+                modifier: 2,
+                slideShadows: false,
+            },
 
-        // Auto-scroll carousel
-        let autoScrollInterval;
-        const carousel = document.querySelector('.websites-carousel');
+            // Loop for infinite scrolling
+            loop: true,
 
-        function startAutoScroll() {
-            autoScrollInterval = setInterval(() => {
-                if (carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth) {
-                    carousel.scrollLeft = 0;
-                } else {
-                    carousel.scrollLeft += 1;
-                }
-            }, 30);
-        }
+            // Autoplay with pause on hover
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
 
-        function stopAutoScroll() {
-            clearInterval(autoScrollInterval);
-        }
+            // Keyboard navigation
+            keyboard: {
+                enabled: true,
+            },
 
-        // Start auto-scroll on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const carouselWrapper = document.querySelector('.websites-carousel-wrapper');
-            if (carouselWrapper && window.innerWidth > 768) {
-                // Auto-scroll only on desktop
-                carouselWrapper.addEventListener('mouseenter', stopAutoScroll);
-                carouselWrapper.addEventListener('mouseleave', startAutoScroll);
-                startAutoScroll();
-            }
+            // Pagination
+            pagination: {
+                el: '.client-websites-swiper .swiper-pagination',
+                clickable: true,
+                dynamicBullets: true,
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.client-websites-swiper .swiper-button-next',
+                prevEl: '.client-websites-swiper .swiper-button-prev',
+            },
+
+            // Responsive breakpoints
+            breakpoints: {
+                320: {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                },
+                640: {
+                    slidesPerView: 'auto',
+                    spaceBetween: 30,
+                },
+                1024: {
+                    slidesPerView: 'auto',
+                    spaceBetween: 40,
+                },
+            },
+
+            // Speed of transition
+            speed: 600,
+
+            // Enable smooth transitions
+            watchSlidesProgress: true,
         });
     </script>
 </body>
