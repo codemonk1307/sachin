@@ -3,617 +3,759 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DSA Mastery — 30-Day Sticky Notes</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+<title>DSA Mastery — 30-Day Program</title>
+<meta name="description" content="A 30-day data structures and algorithms program: patterns, templates, complexity and practice problems, one day at a time.">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     DESIGN TOKENS — shared language with the portfolio shell
+     ============================================================ */
+  :root {
+    --bg:            #08090A;
+    --bg-soft:       #0C0D0F;
+    --surface:       rgba(255, 255, 255, 0.024);
+    --surface-hover: rgba(255, 255, 255, 0.045);
+    --line:          rgba(255, 255, 255, 0.08);
+    --line-strong:   rgba(255, 255, 255, 0.16);
+
+    --text:          #EDEEF0;
+    --prose:         #D3D7DE;  /* 15.6:1 — main reading colour */
+    --text-2:        #9CA3AF;  /*  7.9:1 */
+    --text-3:        #7C8492;  /*  5.3:1 — smallest meta only */
+
+    --accent:        #E4713F;
+    --accent-soft:   rgba(228, 113, 63, 0.12);
+    --accent-line:   rgba(228, 113, 63, 0.32);
+
+    --easy:          #4ADE80;
+    --medium:        #FBBF24;
+    --hard:          #F87171;
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+    --gutter: 20px;
+    --measure: 780px;   /* reading column */
+    --wide: 1100px;     /* dashboard grid */
+
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    /* Reading scale — the "Aa" control swaps these */
+    --fs-prose: 1rem;      /* 16px */
+    --fs-code:  0.8125rem; /* 13px */
+  }
+
+  body.type-large {
+    --fs-prose: 1.0938rem; /* 17.5px */
+    --fs-code:  0.875rem;  /* 14px   */
+  }
+
+  /* ============================================================
+     RESET & BASE
+     ============================================================ */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #07080c;
-    --surface: #0e1017;
-    --card1: #1a1a2e;
-    --card2: #16213e;
-    --card3: #0f3460;
-    --card4: #1a0a2e;
-    --card5: #0a2e1a;
-    --accent1: #e94560;
-    --accent2: #00b4d8;
-    --accent3: #f4a261;
-    --accent4: #a855f7;
-    --accent5: #22c55e;
-    --text: #f0f0f0;
-    --dim: #666;
-    --dim2: #888;
-    --code-bg: rgba(255,255,255,0.05);
-    --border: rgba(255,255,255,0.06);
-  }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+  html, body { max-width: 100%; overflow-x: hidden; }
+  @supports (overflow: clip) { html, body { overflow-x: clip; } }
 
   body {
     background: var(--bg);
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text);
+    color: var(--prose);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.7;
+    letter-spacing: -0.011em;
     min-height: 100vh;
-    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* ─── NOISE OVERLAY ─── */
+  h1, h2, h3 {
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.028em;
+  }
+
+  ul { list-style: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input { font: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection { background: var(--accent-soft); color: #fff; }
+
+  .app { position: relative; z-index: 1; }
+
+  /* One calm wash instead of three coloured blobs + noise */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
+    background: radial-gradient(58rem 38rem at 50% -10%, rgba(228, 113, 63, 0.05), transparent 62%);
   }
 
-  /* ─── AMBIENT GLOW ─── */
-  .ambient {
-    position: fixed;
-    width: 600px; height: 600px;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.07;
-    pointer-events: none;
-    z-index: 0;
-    transition: all 1.5s ease;
-  }
-  .ambient-1 { top: -200px; left: -100px; background: var(--accent1); }
-  .ambient-2 { bottom: -200px; right: -100px; background: var(--accent4); }
-  .ambient-3 { top: 40%; left: 50%; transform: translateX(-50%); background: var(--accent2); opacity: 0.04; }
-
-  /* ─── LAYOUT SHELL ─── */
-  .app { position: relative; z-index: 1; }
-
-  /* ─── TOP BAR ─── */
+  /* ============================================================
+     TOP BAR
+     ============================================================ */
   .topbar {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(7,8,12,0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    padding: 0.8rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 16px;
+    padding: 12px var(--gutter);
+    background: rgba(8, 9, 10, 0.86);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
   }
 
   .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    background: linear-gradient(135deg, #e94560, #a855f7, #00b4d8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
     white-space: nowrap;
     cursor: pointer;
+  }
+
+  .logo::before {
+    content: '30';
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
   }
 
   .topbar-actions {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 8px;
+    min-width: 0;
   }
 
   .search-box {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
+    width: 190px;
+    min-width: 0;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 0.4rem 0.8rem;
+    background: var(--surface);
     color: var(--text);
-    font-family: inherit;
-    font-size: 0.7rem;
-    width: 180px;
+    font-size: 0.875rem;
     outline: none;
-    transition: border 0.3s, width 0.3s;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
   }
-  .search-box:focus {
-    border-color: var(--accent2);
-    width: 240px;
-  }
-  .search-box::placeholder { color: var(--dim); }
+
+  .search-box::placeholder { color: var(--text-3); }
+  .search-box:focus { border-color: var(--accent-line); background: var(--surface-hover); }
 
   .btn-icon {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
     border-radius: 8px;
-    color: var(--dim2);
-    font-size: 0.75rem;
-    padding: 0.4rem 0.7rem;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: 0.8125rem;
+    font-weight: 500;
     white-space: nowrap;
-  }
-  .btn-icon:hover {
-    background: rgba(255,255,255,0.1);
-    color: var(--text);
-  }
-  .btn-icon.active {
-    background: rgba(168,85,247,0.15);
-    border-color: var(--accent4);
-    color: var(--accent4);
+    transition: all 0.25s var(--ease);
   }
 
-  /* ─── PROGRESS BAR ─── */
-  .progress-strip {
-    height: 2px;
-    background: rgba(255,255,255,0.03);
-    position: relative;
+  .btn-icon:hover { background: var(--surface-hover); color: var(--text); border-color: var(--line-strong); }
+
+  .btn-icon.active {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+    color: var(--accent);
   }
+
+  /* ============================================================
+     PROGRESS STRIP
+     ============================================================ */
+  .progress-strip {
+    position: sticky;
+    top: 62px;
+    z-index: 99;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent1), var(--accent4), var(--accent2));
-    transition: width 0.6s ease;
-    border-radius: 0 1px 1px 0;
+    background: var(--accent);
+    transition: width 0.6s var(--ease);
   }
 
-  /* ─── DASHBOARD VIEW ─── */
-  .view { display: none; padding: 2rem; animation: fadeIn 0.35s ease; }
+  /* ============================================================
+     VIEWS
+     ============================================================ */
+  .view { display: none; padding: clamp(28px, 5vw, 56px) var(--gutter) 0; }
   .view.active { display: block; }
 
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes slideIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
-
+  /* ============================================================
+     DASHBOARD
+     ============================================================ */
   .dash-header {
-    text-align: center;
-    margin-bottom: 2rem;
+    max-width: var(--wide);
+    margin: 0 auto clamp(28px, 4vw, 44px);
   }
+
   .dash-header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.6rem, 4vw, 2.6rem);
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(90deg, #e94560, #00b4d8, #a855f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: clamp(1.75rem, 1.2rem + 2.2vw, 2.5rem);
+    letter-spacing: -0.04em;
   }
+
   .dash-header p {
-    color: var(--dim);
-    font-size: 0.7rem;
-    margin-top: 0.4rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    margin-top: 10px;
+    color: var(--text-2);
+    font-size: 1rem;
+    max-width: 60ch;
   }
 
   .stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
-  }
-  .stat-box {
-    text-align: center;
-    padding: 1rem 1.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    max-width: var(--wide);
+    margin: 0 auto clamp(28px, 4vw, 44px);
+    background: var(--line);
+    border: 1px solid var(--line);
     border-radius: 12px;
-    min-width: 120px;
+    overflow: hidden;
   }
+
+  @media (min-width: 720px) {
+    .stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+
+  .stat-box {
+    background: var(--bg);
+    padding: 18px 20px;
+    min-width: 0;
+  }
+
   .stat-box .num {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 800;
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    color: var(--text) !important; /* neutralises the inline accent colours */
   }
+
   .stat-box .label {
-    font-size: 0.6rem;
-    color: var(--dim);
+    margin-top: 4px;
+    color: var(--text-3);
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .section-heading {
+    max-width: var(--wide);
+    margin: 0 auto 16px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-top: 0.2rem;
+    color: var(--text-3);
   }
 
   .days-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.8rem;
-    max-width: 1200px;
+    grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+    gap: 10px;
+    max-width: var(--wide);
     margin: 0 auto;
   }
 
   .day-tile {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.25s ease;
     position: relative;
-    overflow: hidden;
-  }
-  .day-tile:hover {
-    border-color: rgba(255,255,255,0.15);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  }
-  .day-tile.available {
-    border-color: rgba(168,85,247,0.2);
-  }
-  .day-tile.available::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent1), var(--accent4));
-  }
-  .day-tile.completed {
-    border-color: rgba(34,197,94,0.25);
-  }
-  .day-tile.completed::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--accent5);
-  }
-  .day-tile .day-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: var(--dim);
-    transition: color 0.2s;
-  }
-  .day-tile.available .day-num { color: var(--text); }
-  .day-tile.completed .day-num { color: var(--accent5); }
-  .day-tile .day-label {
-    font-size: 0.55rem;
-    color: var(--dim);
-    margin-top: 0.3rem;
-    line-height: 1.4;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .day-tile .day-status {
-    position: absolute;
-    top: 0.7rem;
-    right: 0.7rem;
-    font-size: 0.7rem;
-  }
-  .day-tile.locked { opacity: 0.35; cursor: default; }
-  .day-tile.locked:hover { transform: none; box-shadow: none; }
-
-  /* ─── DAY DETAIL VIEW ─── */
-  .day-view-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .back-btn {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--dim2);
-    font-size: 0.72rem;
-    padding: 0.5rem 1rem;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
     cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    min-width: 0;
+    transition: background 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
   }
-  .back-btn:hover {
-    background: rgba(255,255,255,0.1);
+
+  @media (hover: hover) {
+    .day-tile:hover {
+      background: var(--surface-hover);
+      border-color: var(--line-strong);
+      transform: translateY(-2px);
+    }
+  }
+
+  .day-tile .day-num {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
     color: var(--text);
   }
 
+  .day-tile .day-label {
+    margin-top: 6px;
+    color: var(--text-2);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .day-tile .day-status {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  .day-tile.completed { border-color: rgba(74, 222, 128, 0.32); }
+  .day-tile.completed .day-num { color: var(--easy); }
+  .day-tile.completed .day-status { color: var(--easy); }
+
+  /* ============================================================
+     DAY VIEW — single reading column
+     ============================================================ */
+  .day-view-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: var(--measure);
+    margin: 0 auto 6px;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: all 0.25s var(--ease);
+  }
+
+  .back-btn:hover { background: var(--surface-hover); color: var(--text); border-color: var(--line-strong); }
+
   .day-view-header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
-    font-weight: 800;
-    background: linear-gradient(90deg, #e94560, #00b4d8, #a855f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: clamp(1.4rem, 1.1rem + 1.4vw, 2rem);
+    letter-spacing: -0.035em;
+  }
+
+  .complete-btn {
+    min-height: 38px;
+    padding: 8px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.25s var(--ease);
+  }
+
+  .complete-btn:hover { border-color: rgba(74, 222, 128, 0.5); color: var(--easy); }
+
+  .complete-btn.done {
+    border-color: rgba(74, 222, 128, 0.32);
+    background: rgba(74, 222, 128, 0.1);
+    color: var(--easy);
+    pointer-events: none;
   }
 
   .day-subtitle {
-    color: var(--dim);
-    font-size: 0.68rem;
-    margin-bottom: 1.5rem;
-    letter-spacing: 1px;
+    max-width: var(--measure);
+    margin: 0 auto clamp(28px, 4vw, 40px);
+    color: var(--text-2);
+    font-size: 1rem;
+    letter-spacing: 0;
   }
 
-  /* ─── STICKY NOTES GRID ─── */
+  /* A column, not a wall of columns — this is the readability fix */
   .notes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.5rem;
-    max-width: 1440px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: var(--measure);
     margin: 0 auto;
   }
 
   .card {
-    border-radius: 12px;
-    padding: 1.5rem;
     position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.07);
-    animation: fadeUp 0.45s ease both;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-  }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
+    padding: clamp(22px, 3.5vw, 34px);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent-line);
+    border-radius: 12px;
+    background: var(--bg-soft);
+    min-width: 0;
   }
 
-  .c1 { background: var(--card1); } .c1::before { background: var(--accent1); }
-  .c2 { background: var(--card2); } .c2::before { background: var(--accent2); }
-  .c3 { background: var(--card3); } .c3::before { background: var(--accent3); }
-  .c4 { background: var(--card4); } .c4::before { background: var(--accent4); }
-  .c5 { background: var(--card5); } .c5::before { background: var(--accent5); }
-
-  .card:nth-child(2) { animation-delay: 0.08s; }
-  .card:nth-child(3) { animation-delay: 0.16s; }
-  .card:nth-child(4) { animation-delay: 0.24s; }
-  .card:nth-child(5) { animation-delay: 0.32s; }
+  /* The five theme classes no longer repaint the card; they only tint
+     the topic label, so the page reads as one calm surface. */
+  .c1, .c2, .c3, .c4, .c5 { background: var(--bg-soft); }
 
   .tag {
     display: inline-block;
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 2px;
+    margin-bottom: 12px;
+    padding: 3px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-bottom: 0.6rem;
+    color: var(--text-3);
   }
-  .c1 .tag { background: rgba(233,69,96,0.2); color: var(--accent1); }
-  .c2 .tag { background: rgba(0,180,216,0.2); color: var(--accent2); }
-  .c3 .tag { background: rgba(244,162,97,0.2); color: var(--accent3); }
-  .c4 .tag { background: rgba(168,85,247,0.2); color: var(--accent4); }
-  .c5 .tag { background: rgba(34,197,94,0.2); color: var(--accent5); }
 
   .card h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 800;
-    margin-bottom: 0.9rem;
-    line-height: 1.2;
+    font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.5rem);
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
   }
 
   .section-label {
-    font-size: 0.55rem;
-    letter-spacing: 2px;
+    margin: 26px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
-    color: var(--dim2);
-    margin: 0.9rem 0 0.35rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding-bottom: 0.25rem;
+    color: var(--text-3);
   }
 
-  ul { list-style: none; display: flex; flex-direction: column; gap: 0.25rem; }
-  ul li {
-    font-size: 0.7rem;
-    line-height: 1.55;
-    color: #c8c8c8;
-    padding-left: 1rem;
-    position: relative;
+  .card ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  ul li::before {
-    content: '→';
+
+  /* max-width holds the line length near 65 characters — the comfortable
+     reading measure. Code blocks below are deliberately left full width. */
+  .card ul li {
+    position: relative;
+    max-width: 62ch;
+    padding-left: 22px;
+    font-size: var(--fs-prose);
+    line-height: 1.68;
+    color: var(--prose);
+  }
+
+  .card ul li::before {
+    content: '';
     position: absolute;
     left: 0;
-    font-size: 0.6rem;
+    top: 0.78em;
+    width: 10px;
+    height: 1px;
+    background: var(--accent-line);
   }
-  ul li b { color: var(--text); font-weight: 600; }
-  .c1 ul li::before { color: var(--accent1); }
-  .c2 ul li::before { color: var(--accent2); }
-  .c3 ul li::before { color: var(--accent3); }
-  .c4 ul li::before { color: var(--accent4); }
-  .c5 ul li::before { color: var(--accent5); }
 
-  code {
+  .card ul li b { color: var(--text); font-weight: 600; }
+
+  .patterns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+  }
+
+  /* ============================================================
+     CODE
+     ============================================================ */
+  code, .revision-code {
     display: block;
-    background: var(--code-bg);
-    border-radius: 6px;
-    padding: 0.7rem 0.8rem;
-    font-size: 0.65rem;
-    line-height: 1.7;
-    color: #ddd;
-    margin-top: 0.4rem;
+    margin-top: 4px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #0A0B0D;
+    font-family: var(--font-mono);
+    font-size: var(--fs-code);
+    line-height: 1.75;
+    color: #C8CDD6;
     white-space: pre;
     overflow-x: auto;
-    border-left: 2px solid rgba(255,255,255,0.08);
-  }
-  .c1 code { border-color: var(--accent1); }
-  .c2 code { border-color: var(--accent2); }
-  .c3 code { border-color: var(--accent3); }
-  .c4 code { border-color: var(--accent4); }
-  .c5 code { border-color: var(--accent5); }
-
-  .patterns { margin-top: 0.4rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
-  .pill {
-    font-size: 0.58rem;
-    padding: 2px 8px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #aaa;
+    -webkit-overflow-scrolling: touch;
+    tab-size: 4;
   }
 
-  .complexity { margin-top: 0.7rem; display: flex; gap: 1rem; flex-wrap: wrap; }
-  .cx { font-size: 0.62rem; color: var(--dim2); }
-  .cx span { color: #eee; font-weight: 700; }
+  code::-webkit-scrollbar, .revision-code::-webkit-scrollbar { height: 8px; }
+  code::-webkit-scrollbar-thumb, .revision-code::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+  }
 
-  /* ─── PROBLEM TAG ─── */
+  .complexity {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .cx {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  .cx span {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--text);
+    margin-left: 6px;
+  }
+
+  .problem-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .problem-name {
+    font-size: var(--fs-prose);
+    font-weight: 500;
+    color: var(--text);
+  }
+
   .problem-tag {
     display: inline-block;
-    font-size: 0.55rem;
-    padding: 2px 7px;
-    border-radius: 4px;
-    margin-top: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
   }
-  .problem-tag.easy { background: rgba(34,197,94,0.15); color: var(--accent5); }
-  .problem-tag.medium { background: rgba(244,162,97,0.15); color: var(--accent3); }
-  .problem-tag.hard { background: rgba(233,69,96,0.15); color: var(--accent1); }
 
-  /* ─── EXPAND / COLLAPSE ─── */
+  .problem-tag.easy   { background: rgba(74, 222, 128, 0.12); color: var(--easy); }
+  .problem-tag.medium { background: rgba(251, 191, 36, 0.12); color: var(--medium); }
+  .problem-tag.hard   { background: rgba(248, 113, 113, 0.12); color: var(--hard); }
+
+  /* ============================================================
+     EXPAND / COLLAPSE
+     ============================================================ */
   .expandable { display: none; }
-  .expandable.open { display: block; animation: slideIn 0.25s ease; }
+  .expandable.open { display: block; }
+
   .expand-btn {
-    background: none;
-    border: 1px dashed rgba(255,255,255,0.1);
-    border-radius: 6px;
-    color: var(--dim2);
-    font-size: 0.6rem;
-    padding: 0.35rem 0.7rem;
-    cursor: pointer;
-    font-family: inherit;
-    margin-top: 0.6rem;
-    transition: all 0.2s;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 8px;
+    min-height: 38px;
+    margin-top: 18px;
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: all 0.25s var(--ease);
   }
-  .expand-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
 
-  /* ─── DAY NAV (prev/next) ─── */
+  .expand-btn:hover { background: var(--surface-hover); color: var(--text); border-color: var(--line-strong); }
+
+  .expand-caret { color: var(--accent); }
+
+  /* ============================================================
+     EMPTY STATE
+     ============================================================ */
+  .empty-state {
+    padding: clamp(40px, 8vw, 72px) clamp(22px, 3.5vw, 34px);
+    border: 1px dashed var(--line-strong);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .empty-state h2 {
+    font-size: 1.25rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .empty-state p {
+    max-width: 46ch;
+    margin: 0 auto;
+    color: var(--text-2);
+    font-size: var(--fs-prose);
+  }
+
+  /* ============================================================
+     REVISION PANEL
+     ============================================================ */
+  .revision-panel {
+    display: none;
+    max-width: var(--measure);
+    margin: 28px auto 0;
+    padding: clamp(22px, 3.5vw, 30px);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg-soft);
+  }
+
+  .revision-panel.open { display: block; }
+
+  .revision-panel h3 {
+    margin-bottom: 14px;
+    font-size: 1.125rem;
+    letter-spacing: -0.025em;
+    color: var(--text);
+  }
+
+  /* ============================================================
+     DAY NAV + FOOTER
+     ============================================================ */
   .day-nav {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    max-width: 1440px;
-    margin: 2rem auto 0;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
+    gap: 12px;
+    max-width: var(--measure);
+    margin: 40px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
   }
+
   .nav-btn {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.5rem 1.2rem;
-    color: var(--dim2);
-    font-family: inherit;
-    font-size: 0.7rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .nav-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
-  .nav-btn:disabled { opacity: 0.25; cursor: default; }
-
-  /* ─── MARK COMPLETE BUTTON ─── */
-  .complete-btn {
-    background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05));
-    border: 1px solid rgba(34,197,94,0.3);
-    border-radius: 8px;
-    padding: 0.5rem 1.2rem;
-    color: var(--accent5);
-    font-family: inherit;
-    font-size: 0.68rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 600;
-  }
-  .complete-btn:hover {
-    background: linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.1));
-    box-shadow: 0 0 15px rgba(34,197,94,0.15);
-  }
-  .complete-btn.done {
-    background: rgba(34,197,94,0.2);
-    color: var(--accent5);
-    pointer-events: none;
-  }
-
-  /* ─── QUICK REVISION PANEL ─── */
-  .revision-panel {
-    max-width: 1440px;
-    margin: 2rem auto 0;
+    min-height: 40px;
+    padding: 9px 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.2rem 1.5rem;
-    display: none;
-  }
-  .revision-panel.open { display: block; animation: fadeUp 0.3s ease; }
-  .revision-panel h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 800;
-    margin-bottom: 0.7rem;
-    color: var(--accent3);
-  }
-  .revision-code {
-    background: var(--code-bg);
-    border-radius: 8px;
-    padding: 1rem;
-    font-size: 0.65rem;
-    line-height: 1.7;
-    color: #ddd;
-    white-space: pre;
-    overflow-x: auto;
-    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.25s var(--ease);
   }
 
-  /* ─── FOOTER ─── */
+  .nav-btn:hover:not(:disabled) { background: var(--surface-hover); color: var(--text); border-color: var(--line-strong); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
   .footer {
+    max-width: var(--wide);
+    margin: clamp(48px, 8vw, 80px) auto 0;
+    padding: 24px var(--gutter) 40px;
+    border-top: 1px solid var(--line);
+    color: var(--text-3);
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+    text-transform: none;
     text-align: center;
-    padding: 2.5rem 2rem;
-    color: var(--dim);
-    font-size: 0.6rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
   }
 
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 700px) {
-    .topbar { padding: 0.6rem 1rem; }
-    .view { padding: 1.2rem; }
-    .notes-grid { grid-template-columns: 1fr; }
-    .days-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-    .search-box { width: 120px; }
-    .search-box:focus { width: 160px; }
-    .stats-row { gap: 0.8rem; }
-    .stat-box { min-width: 90px; padding: 0.7rem 1rem; }
-    .stat-box .num { font-size: 1.3rem; }
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (min-width: 768px) {
+    :root { --gutter: 32px; }
+    .progress-strip { top: 63px; }
   }
 
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  /* Narrow phones: the bar was one non-wrapping row, so the search box
+     and buttons overflowed the viewport and became unreachable. */
+  @media (max-width: 680px) {
+    .topbar { flex-wrap: wrap; row-gap: 10px; }
+    .topbar-actions { width: 100%; flex-wrap: wrap; gap: 8px; }
+    .search-box, .search-box:focus { flex: 1 1 100%; width: auto; }
+    .btn-icon { flex: 1 1 auto; justify-content: center; }
+    .progress-strip { top: 0; position: relative; }
+    .day-view-header h1 { flex: 1 1 100%; order: 3; }
+  }
 
-  /* Compact Mode Styles */
-  .compact-mode .card { padding: 1rem; }
-  .compact-mode .card h2 { font-size: 0.9rem; margin-bottom: 0.6rem; }
-  .compact-mode .section-label { margin: 0.6rem 0 0.25rem; }
-  .compact-mode ul li { font-size: 0.65rem; }
-  .compact-mode code { font-size: 0.6rem; padding: 0.5rem 0.6rem; }
-  .compact-mode .day-tile { padding: 0.7rem; }
-  .compact-mode .day-tile .day-num { font-size: 1rem; }
-  .compact-mode .day-tile .day-label { font-size: 0.5rem; }
+  @media (max-width: 420px) {
+    .days-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* ============================================================
+     MOTION / PRINT
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  @media print {
+    .topbar, .progress-strip, .day-nav, .expand-btn { display: none !important; }
+    body { background: #fff; color: #000; }
+    body::before { display: none; }
+    .card { border-color: #ddd; background: #fff; break-inside: avoid; }
+    .expandable { display: block !important; }
+    code, .revision-code { background: #f6f6f6; color: #111; border-color: #ddd; white-space: pre-wrap; }
+  }
 </style>
 </head>
 <body>
-
-<div class="ambient ambient-1"></div>
-<div class="ambient ambient-2"></div>
-<div class="ambient ambient-3"></div>
 
 <div class="app">
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <div class="logo" onclick="showDashboard()">⚡ DSA 30</div>
+    <div class="logo" onclick="showDashboard()" role="button" tabindex="0">DSA Mastery</div>
     <div class="topbar-actions">
-      <input type="text" class="search-box" id="searchBox" placeholder="Search topics..." oninput="handleSearch(this.value)">
-      <button class="btn-icon" id="revisionToggle" onclick="toggleRevision()">📋 Cheatsheet</button>
-      <button class="btn-icon" id="darkToggle" onclick="toggleCompact()">⊞ Compact</button>
-      <button class="btn-icon" id="resetBtn" onclick="resetProgress()" style="color: var(--accent1);">↺ Reset</button>
+      <input type="text" class="search-box" id="searchBox" placeholder="Filter topics on this day" oninput="handleSearch(this.value)">
+      <button class="btn-icon" id="revisionToggle" onclick="toggleRevision()">Cheatsheet</button>
+      <button class="btn-icon" id="darkToggle" onclick="toggleCompact()" title="Larger text" aria-pressed="false">Aa</button>
+      <button class="btn-icon" id="resetBtn" onclick="resetProgress()">Reset</button>
     </div>
   </div>
 
@@ -625,28 +767,29 @@
   <div class="view active" id="dashboardView">
     <div class="dash-header">
       <h1>30-Day DSA Mastery</h1>
-      <p>5 Topics · 5 Problems · Daily Sticky Notes</p>
+      <p>Five topics and five problems a day — patterns, templates, complexity and the trigger that tells you which one to reach for.</p>
     </div>
 
     <div class="stats-row">
       <div class="stat-box">
-        <div class="num" style="color: var(--accent4)" id="statCompleted">0</div>
-        <div class="label">Days Done</div>
+        <div class="num" id="statCompleted">0</div>
+        <div class="label">Days done</div>
       </div>
       <div class="stat-box">
-        <div class="num" style="color: var(--accent2)" id="statTopics">0</div>
-        <div class="label">Topics</div>
+        <div class="num" id="statTopics">0</div>
+        <div class="label">Topics covered</div>
       </div>
       <div class="stat-box">
-        <div class="num" style="color: var(--accent1)" id="statProblems">0</div>
-        <div class="label">Problems</div>
+        <div class="num" id="statProblems">0</div>
+        <div class="label">Problems solved</div>
       </div>
       <div class="stat-box">
-        <div class="num" style="color: var(--accent5)" id="statStreak">0</div>
-        <div class="label">Streak 🔥</div>
+        <div class="num" id="statStreak">0</div>
+        <div class="label">Day streak</div>
       </div>
     </div>
 
+    <div class="section-heading">All days</div>
     <div class="days-grid" id="daysGrid"></div>
   </div>
 
@@ -663,7 +806,7 @@
 
     <!-- Quick Revision -->
     <div class="revision-panel" id="revisionPanel">
-      <h3>⚡ Quick Revision — All Templates</h3>
+      <h3>Quick revision — all templates</h3>
       <div class="revision-code" id="revisionCode"></div>
     </div>
 
@@ -674,7 +817,7 @@
     </div>
   </div>
 
-  <div class="footer">DSA 30-Day Mastery · Revise Daily · Keep Grinding 🔥</div>
+  <div class="footer">30-Day DSA Mastery · Revise daily · Progress is saved in this browser</div>
 </div>
 
 <script>
@@ -9623,10 +9766,9 @@ function showDay(day) {
 
   if (!data) {
     grid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align:center; padding: 4rem 2rem;">
-        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🚧</div>
-        <div style="font-family: Syne, sans-serif; font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">Day ${day} Notes Coming Soon</div>
-        <div style="color: var(--dim); font-size: 0.72rem;">Complete previous days and content will unlock here.</div>
+      <div class="empty-state">
+        <h2>Day ${day} notes coming soon</h2>
+        <p>Content for this day hasn't been written yet. Keep working through the earlier days in the meantime.</p>
       </div>
     `;
   } else {
@@ -9659,14 +9801,14 @@ function showDay(day) {
           <div class="cx">Space <span>${card.complexity.space}</span></div>
         </div>
 
-        <div class="section-label" style="margin-top:1rem">Problem</div>
-        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-          <span style="font-size:0.72rem;color:#ddd;font-weight:600;">${card.problem.name}</span>
+        <div class="section-label">Problem</div>
+        <div class="problem-row">
+          <span class="problem-name">${card.problem.name}</span>
           <span class="problem-tag ${card.problem.diff}">${card.problem.diff.toUpperCase()}</span>
         </div>
 
         <button class="expand-btn" onclick="toggleInsights('${insightsId}', this)">
-          ▸ Key Insights
+          <span class="expand-caret">▸</span> Key insights
         </button>
         <div class="expandable" id="${insightsId}">
           <ul style="margin-top:0.4rem;">
@@ -9698,7 +9840,7 @@ function toggleInsights(id, btn) {
   const el = document.getElementById(id);
   const isOpen = el.classList.contains('open');
   el.classList.toggle('open');
-  btn.innerHTML = isOpen ? '▸ Key Insights' : '▾ Key Insights';
+  btn.innerHTML = (isOpen ? '<span class="expand-caret">▸</span>' : '<span class="expand-caret">▾</span>') + ' Key insights';
 }
 
 function toggleComplete() {
@@ -9740,30 +9882,19 @@ function toggleRevision() {
   }
 }
 
+// Reading size control. This used to be a density toggle that shrank the
+// body text to ~10px; it now steps the reading scale up instead, which is
+// what the control is actually useful for on a page you study from.
 function toggleCompact() {
   isCompact = !isCompact;
 
-  // Apply to notes grid (day view)
-  const notesGrid = document.querySelector('.notes-grid');
-  if (notesGrid) {
-    notesGrid.style.gridTemplateColumns = isCompact
-      ? 'repeat(auto-fill, minmax(260px, 1fr))'
-      : 'repeat(auto-fill, minmax(340px, 1fr))';
-  }
+  document.body.classList.toggle('type-large', isCompact);
 
-  // Apply to days grid (dashboard)
-  const daysGrid = document.querySelector('.days-grid');
-  if (daysGrid) {
-    daysGrid.style.gridTemplateColumns = isCompact
-      ? 'repeat(auto-fill, minmax(100px, 1fr))'
-      : 'repeat(auto-fill, minmax(140px, 1fr))';
-  }
+  const btn = document.getElementById('darkToggle');
+  btn.classList.toggle('active', isCompact);
+  btn.setAttribute('aria-pressed', isCompact ? 'true' : 'false');
+  btn.title = isCompact ? 'Default text size' : 'Larger text';
 
-  // Apply compact class to body for card styling
-  document.body.classList.toggle('compact-mode', isCompact);
-  document.getElementById('darkToggle').classList.toggle('active', isCompact);
-
-  // Save preference
   try { localStorage.setItem('dsa30_compact', isCompact); } catch(e) {}
 }
 
@@ -9784,8 +9915,10 @@ function resetProgress() {
   } catch(e) {}
 
   // Reset UI
-  document.body.classList.remove('compact-mode');
-  document.getElementById('darkToggle').classList.remove('active');
+  document.body.classList.remove('type-large');
+  const sizeBtn = document.getElementById('darkToggle');
+  sizeBtn.classList.remove('active');
+  sizeBtn.setAttribute('aria-pressed', 'false');
 
   // Re-render dashboard
   showDashboard();
@@ -9838,8 +9971,11 @@ try {
   const savedCompact = localStorage.getItem('dsa30_compact');
   if (savedCompact === 'true') {
     isCompact = true;
-    document.body.classList.add('compact-mode');
-    document.getElementById('darkToggle').classList.add('active');
+    document.body.classList.add('type-large');
+    const sizeBtn = document.getElementById('darkToggle');
+    sizeBtn.classList.add('active');
+    sizeBtn.setAttribute('aria-pressed', 'true');
+    sizeBtn.title = 'Default text size';
   }
 } catch(e) {}
 
