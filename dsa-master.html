@@ -10229,16 +10229,19 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Touch swipe for topic pages
+// Touch swipe for topic pages (skip if swiping inside code blocks)
 (function() {
   const page = document.getElementById('topicPage');
   let startX = 0;
   let startY = 0;
+  let startedOnCode = false;
   page.addEventListener('touchstart', function(e) {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+    startedOnCode = !!e.target.closest('pre, code');
   }, { passive: true });
   page.addEventListener('touchend', function(e) {
+    if (startedOnCode) return;
     if (!currentDay || !currentTopicCards.length) return;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = e.changedTouches[0].clientY - startY;
