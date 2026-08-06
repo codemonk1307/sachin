@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#08090A">
+    <meta name="theme-color" content="#FAF6F0" id="metaThemeColor">
     <title>Sachin Mishra — Full Stack Developer & AI Engineer</title>
     <meta name="description" content="Sachin Mishra — Senior Software Engineer and AI Engineer. Four years building healthcare AI and scalable backend systems at Zoho Corporation, used by thousands of practitioners.">
 
@@ -16,7 +16,10 @@
     <!-- Favicon -->
     <link rel="icon" href="among_us_youtube_icon_156933.png">
 
-    <script>document.documentElement.classList.add('js');</script>
+    <script>
+        document.documentElement.classList.add('js');
+        (function(){var t=localStorage.getItem('theme');if(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('metaThemeColor').content=t==='dark'?'#08090A':'#FAF6F0';}})();
+    </script>
 
     <style>
         /* ============================================================
@@ -50,6 +53,24 @@
             --r-lg: 16px;
 
             --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        /* ---- LIGHT THEME (default) ---- */
+        [data-theme="light"] {
+            --bg:            #FAF6F0;
+            --bg-soft:       #F3EDE4;
+            --surface:       rgba(160, 130, 90, 0.06);
+            --surface-hover: rgba(160, 130, 90, 0.11);
+            --line:          rgba(160, 130, 90, 0.14);
+            --line-strong:   rgba(160, 130, 90, 0.24);
+
+            --text:          #2A2118;
+            --text-2:        #6D5E4F;
+            --text-3:        #9B8D7E;
+
+            --accent:        #C45A28;
+            --accent-soft:   rgba(196, 90, 40, 0.10);
+            --accent-line:   rgba(196, 90, 40, 0.28);
         }
 
         @media (min-width: 768px) {
@@ -650,215 +671,163 @@
         .chip:hover { border-color: var(--line-strong); color: var(--text); }
 
         /* ============================================================
-           TIMELINE / EXPERIENCE
+           TREE TIMELINE / EXPERIENCE
            ============================================================ */
-        .timeline {
+        .tree {
             position: relative;
-            padding-left: 26px;
+            max-width: 900px;
+            margin-inline: auto;
         }
 
-        .timeline::before {
+        /* Central trunk line */
+        .tree::before {
             content: '';
             position: absolute;
-            left: 5px;
-            top: 8px;
-            bottom: 8px;
-            width: 1px;
-            background: linear-gradient(180deg, var(--line-strong), var(--line) 30%, transparent);
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-line) 40%, var(--line-strong));
+            transform: translateX(-50%);
         }
 
-        @media (min-width: 640px) { .timeline { padding-left: 34px; } }
+        .tree-item {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            padding-bottom: clamp(28px, 4vw, 48px);
+        }
 
-        .tl-item { position: relative; }
-        .tl-item + .tl-item { margin-top: 8px; }
-
-        .tl-item::before {
+        /* Dot on the trunk */
+        .tree-item::after {
             content: '';
             position: absolute;
-            left: -26px;
-            top: 26px;
-            width: 11px;
-            height: 11px;
+            left: 50%;
+            top: 28px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
+            border: 2px solid var(--line-strong);
             background: var(--bg);
-            border: 1px solid var(--line-strong);
-            transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+            transform: translateX(-50%);
+            z-index: 2;
+            transition: all 0.3s var(--ease);
         }
-
-        @media (min-width: 640px) { .tl-item::before { left: -34px; } }
-
-        /* Driven by data-current, not :first-child — there is more than one
-           ongoing role now, and both deserve the live marker. */
-        .tl-item[data-open="true"]::before,
-        .tl-item[data-current="true"]::before {
+        .tree-item[data-current="true"]::after {
             border-color: var(--accent);
             background: var(--accent);
-            box-shadow: 0 0 0 4px var(--accent-soft);
+            box-shadow: 0 0 0 5px var(--accent-soft);
         }
 
-        .tl-head {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 16px;
-            width: 100%;
-            text-align: left;
-            padding: 18px 16px;
-            border: 1px solid transparent;
-            border-radius: var(--r-md);
-            transition: background 0.25s var(--ease), border-color 0.25s var(--ease);
+        /* Alternating: odd items card on left, even on right */
+        .tree-item:nth-child(odd) .tree-card {
+            grid-column: 1;
+            margin-right: clamp(28px, 4vw, 48px);
+            text-align: right;
+        }
+        .tree-item:nth-child(odd) .tree-card::after {
+            content: '';
+            position: absolute;
+            top: 32px;
+            right: -clamp(28px, 4vw, 48px);
+            width: calc(clamp(28px, 4vw, 48px) - 7px);
+            height: 2px;
+            background: var(--line-strong);
         }
 
-        .tl-head:hover { background: var(--surface); border-color: var(--line); }
-
-        /* Founding your own thing earns visual weight the other rows don't get. */
-        .tl-item--featured .tl-head {
-            border-color: var(--accent-line);
-            background: linear-gradient(180deg, var(--accent-soft), rgba(255, 255, 255, 0.015));
+        .tree-item:nth-child(even) .tree-card {
+            grid-column: 2;
+            margin-left: clamp(28px, 4vw, 48px);
+        }
+        .tree-item:nth-child(even) .tree-card::after {
+            content: '';
+            position: absolute;
+            top: 32px;
+            left: -clamp(28px, 4vw, 48px);
+            width: calc(clamp(28px, 4vw, 48px) - 7px);
+            height: 2px;
+            background: var(--line-strong);
         }
 
-        .tl-item--featured .tl-head:hover {
-            border-color: rgba(228, 113, 63, 0.5);
-            background: linear-gradient(180deg, rgba(228, 113, 63, 0.16), rgba(255, 255, 255, 0.03));
-        }
-
-        .tl-flags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .tl-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 3px 10px;
+        .tree-card {
+            position: relative;
+            padding: clamp(16px, 2.5vw, 24px);
             border: 1px solid var(--line);
-            border-radius: 999px;
+            border-radius: var(--r-md);
             background: var(--surface);
-            font-family: var(--font-mono);
-            font-size: 10.5px;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text-3);
-            white-space: nowrap;
+            cursor: pointer;
+            transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
         }
-
-        .tl-badge--accent {
+        .tree-card:hover {
+            border-color: var(--line-strong);
+            background: var(--surface-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+        .tree-item.is-active .tree-card {
             border-color: var(--accent-line);
             background: var(--accent-soft);
-            color: var(--accent);
+        }
+        .tree-item.is-active::after {
+            border-color: var(--accent);
+            background: var(--accent);
+            box-shadow: 0 0 0 5px var(--accent-soft);
         }
 
-        .tl-badge--live::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #34D399;
-            flex: none;
-        }
-
-        /* Links out to the venture, inside the expanded panel */
-        .tl-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 18px;
-        }
-
-        .tl-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            max-width: 100%;
-            padding: 9px 16px;
-            border: 1px solid var(--line-strong);
-            border-radius: 999px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text);
-            white-space: nowrap;
-            transition: all 0.25s var(--ease);
-        }
-
-        .tl-link:hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent); }
-        .tl-link svg { width: 13px; height: 13px; flex: none; }
-
-        .tl-date {
+        .tree-date {
             display: block;
             font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
             color: var(--text-3);
             margin-bottom: 8px;
         }
-
-        .tl-role {
+        .tree-role {
             display: block;
-            font-size: clamp(1.02rem, 0.98rem + 0.3vw, 1.2rem);
+            font-size: clamp(1rem, 0.96rem + 0.25vw, 1.15rem);
             font-weight: 600;
             letter-spacing: -0.02em;
             color: var(--text);
         }
-
-        .tl-org {
+        .tree-org {
             display: block;
-            margin-top: 3px;
+            margin-top: 4px;
             font-size: 0.9rem;
             color: var(--text-2);
         }
-
-        .tl-chevron {
-            display: grid;
-            place-items: center;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 1px solid var(--line);
-            color: var(--text-2);
-            transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
+        .tree-loc {
+            display: inline;
+            font-size: 0.8rem;
+            color: var(--text-3);
         }
 
-        .tl-chevron svg { width: 14px; height: 14px; }
-
-        .tl-head[aria-expanded="true"] .tl-chevron {
-            transform: rotate(180deg);
-            border-color: var(--accent-line);
-            color: var(--accent);
-        }
-
-        /* Height is driven in JS from the measured content box — deliberately
-           not the grid 0fr/1fr trick, whose track sizing is not dependable.
-           Scoped to .js so the panels stay open when scripting is off. */
-        .js .tl-body {
-            height: 0;
+        /* Expandable detail body inside the card */
+        .tree-body {
             overflow: hidden;
-            transition: height 0.35s var(--ease);
+            max-height: 0;
+            transition: max-height 0.4s var(--ease), margin-top 0.4s var(--ease);
+            margin-top: 0;
         }
-
-        .tl-body-inner { padding: 4px 16px 22px; }
-
-        .tl-body-inner > p {
+        .tree-item.is-active .tree-body {
+            max-height: 800px;
+            margin-top: 16px;
+        }
+        .tree-body p {
             color: var(--text-2);
-            font-size: 0.95rem;
-            max-width: 68ch;
+            font-size: 0.925rem;
+            max-width: 60ch;
         }
+        .tree-item:nth-child(odd) .tree-body p { margin-left: auto; }
 
-        .tl-list { margin-top: 18px; display: grid; gap: 12px; }
-
-        .tl-list li {
+        .tree-body ul { margin-top: 14px; display: grid; gap: 10px; list-style: none; padding: 0; }
+        .tree-body li {
             position: relative;
             padding-left: 20px;
             font-size: 0.925rem;
             color: var(--text-2);
-            max-width: 72ch;
         }
-
-        .tl-list li::before {
+        .tree-body li::before {
             content: '';
             position: absolute;
             left: 0;
@@ -867,8 +836,30 @@
             height: 1px;
             background: var(--accent-line);
         }
+        .tree-body strong { color: var(--text); font-weight: 500; }
 
-        .tl-list strong { color: var(--text); font-weight: 500; }
+        .tree-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .tree-item:nth-child(odd) .tree-links { justify-content: flex-end; }
+        .tree-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            white-space: nowrap;
+            transition: all 0.25s var(--ease);
+        }
+        .tree-link:hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent); }
+        .tree-link svg { width: 13px; height: 13px; flex: none; }
 
         .metric {
             font-family: var(--font-mono);
@@ -876,6 +867,29 @@
             color: var(--accent);
             font-weight: 500;
             white-space: nowrap;
+        }
+
+        /* MOBILE: single-column, line on left */
+        @media (max-width: 700px) {
+            .tree::before { left: 16px; }
+            .tree-item { grid-template-columns: 1fr; padding-left: 44px; }
+            .tree-item::after { left: 16px; top: 24px; transform: translateX(-50%); }
+            .tree-item:nth-child(odd) .tree-card,
+            .tree-item:nth-child(even) .tree-card {
+                grid-column: 1;
+                margin-left: 0;
+                margin-right: 0;
+                text-align: left;
+            }
+            .tree-item:nth-child(odd) .tree-card::after,
+            .tree-item:nth-child(even) .tree-card::after {
+                left: -28px;
+                right: auto;
+                top: 28px;
+                width: 20px;
+            }
+            .tree-item:nth-child(odd) .tree-body p { margin-left: 0; }
+            .tree-item:nth-child(odd) .tree-links { justify-content: flex-start; }
         }
 
         /* ============================================================
@@ -1128,7 +1142,7 @@
             padding: 10px 18px;
             border-radius: 999px;
             background: var(--text);
-            color: #0A0B0C;
+            color: var(--bg);
             font-size: 0.825rem;
             font-weight: 600;
             transform: translateY(6px);
@@ -1334,31 +1348,7 @@
         .links a svg { flex: none; width: 13px; height: 13px; color: var(--text-3); transition: transform 0.25s var(--ease), color 0.25s var(--ease); }
         .links a:hover svg { transform: translate(2px, -2px); color: var(--accent); }
 
-        .footer {
-            position: relative;
-            z-index: 1;
-            border-top: 1px solid var(--line);
-            padding-block: 28px;
-        }
-
-        .footer__inner {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            font-size: 0.8125rem;
-            color: var(--text-3);
-        }
-
-        .footer__inner a {
-            display: inline-flex;
-            align-items: center;
-            min-height: 32px;
-            padding: 4px 2px;
-        }
-
-        .footer__inner a:hover { color: var(--text-2); }
+        /* footer styles moved to FOOTER WITH BACKGROUND section below */
 
         /* ============================================================
            DSA LAB OVERLAY
@@ -1396,6 +1386,234 @@
 
         .lab__close:hover { border-color: var(--accent-line); color: var(--accent); }
         .lab__close svg { width: 14px; height: 14px; }
+
+        /* ============================================================
+           THEME TOGGLE
+           ============================================================ */
+        .theme-toggle {
+            display: inline-grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            color: var(--text-2);
+            transition: color 0.25s var(--ease), background 0.25s var(--ease);
+            margin-right: 2px;
+        }
+        .theme-toggle:hover { background: var(--surface-hover); color: var(--accent); }
+        .theme-toggle svg { width: 18px; height: 18px; }
+        .theme-toggle .icon-sun { display: none; }
+        .theme-toggle .icon-moon { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+        /* Light theme header overrides */
+        [data-theme="light"] .header {
+            background: rgba(250, 246, 240, 0.78);
+        }
+        [data-theme="light"] .header[data-scrolled="true"] {
+            background: rgba(250, 246, 240, 0.92);
+        }
+        [data-theme="light"] .menu {
+            background: rgba(250, 246, 240, 0.97);
+        }
+        [data-theme="light"] body::before {
+            background:
+                radial-gradient(60rem 40rem at 12% -8%, rgba(196, 90, 40, 0.06), transparent 60%),
+                radial-gradient(52rem 36rem at 92% 6%, rgba(160, 130, 90, 0.05), transparent 62%);
+        }
+        [data-theme="light"] .stat { background: var(--bg); }
+        [data-theme="light"] .preview { background: #f5f0e8; }
+        [data-theme="light"] .lab__close { background: rgba(250, 246, 240, 0.9); }
+        [data-theme="light"] ::selection { background: var(--accent-soft); color: var(--text); }
+        [data-theme="light"] ::-webkit-scrollbar-track { background: var(--bg); }
+        [data-theme="light"] ::-webkit-scrollbar-thumb { background: #d5cec4; border-color: var(--bg); }
+        [data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #bdb5a9; }
+        [data-theme="light"] .portrait::after {
+            background: linear-gradient(180deg, transparent 55%, rgba(250, 246, 240, 0.55));
+        }
+        /* (horizontal timeline handles its own light-mode styling via CSS vars) */
+
+        /* Body subtle background texture */
+        .bg-texture {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: url('images/background-icons.png') repeat center / 480px;
+            opacity: 0.06;
+        }
+        [data-theme="dark"] .bg-texture { opacity: 0.025; filter: invert(1); }
+
+        /* ============================================================
+           INTERESTS SECTION
+           ============================================================ */
+        .interests-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        @media (min-width: 640px) { .interests-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1000px) { .interests-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .interest-card {
+            position: relative;
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+            aspect-ratio: 1 / 1;
+        }
+        .interest-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-line);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        }
+        .interest-card--wide { grid-column: span 2; aspect-ratio: 2 / 1; }
+        @media (max-width: 639px) { .interest-card--wide { aspect-ratio: 16 / 9; } }
+
+        .interest-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s var(--ease), filter 0.5s var(--ease);
+        }
+        .interest-card:hover img { transform: scale(1.05); }
+        [data-theme="light"] .interest-card img { filter: brightness(1.02) saturate(0.95); }
+        [data-theme="light"] .interest-card:hover img { filter: brightness(1.05) saturate(1); }
+
+        .interest-card__overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: clamp(12px, 2vw, 20px);
+            background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.65));
+            pointer-events: none;
+        }
+        [data-theme="light"] .interest-card__overlay {
+            background: linear-gradient(180deg, transparent 30%, rgba(42,33,24,0.60));
+        }
+
+        .interest-card__title {
+            font-size: clamp(0.8rem, 0.75rem + 0.3vw, 0.95rem);
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+        .interest-card__sub {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.72);
+            margin-top: 2px;
+        }
+
+        /* Oval / abstract shapes for specific cards */
+        .interest-card--oval { border-radius: 50%; }
+        .interest-card--pill { border-radius: 999px; aspect-ratio: 2 / 1.2; }
+
+        /* Languages chip strip */
+        .lang-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .lang-chip {
+            padding: 8px 18px;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-2);
+            background: var(--surface);
+            transition: all 0.25s var(--ease);
+        }
+        .lang-chip:hover {
+            border-color: var(--accent-line);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        /* Code icons row */
+        .code-icons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .code-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            padding: 8px;
+            transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+        }
+        .code-icon:hover { transform: translateY(-3px) scale(1.08); border-color: var(--accent-line); }
+        .code-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+
+        /* ============================================================
+           FOOTER WITH BACKGROUND
+           ============================================================ */
+        .footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--line);
+            padding-block: 0;
+            overflow: hidden;
+            min-height: 220px;
+        }
+        .footer__bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .footer__bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 65%;
+            opacity: 0.3;
+        }
+        /* Footer stays dark in both themes so the blue glow image pops */
+        [data-theme="light"] .footer {
+            background: #0a0b0d;
+            border-top-color: rgba(255,255,255,0.08);
+        }
+        [data-theme="light"] .footer__inner {
+            color: #7C8492;
+        }
+        [data-theme="light"] .footer__inner a:hover { color: #9CA3AF; }
+        .footer__inner {
+            position: relative;
+            z-index: 1;
+            padding-top: 100px;
+            padding-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.8125rem;
+            color: var(--text-3);
+            min-height: 200px;
+        }
+        .footer__inner a {
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+            padding: 4px 2px;
+        }
+        .footer__inner a:hover { color: var(--text-2); }
 
         /* ============================================================
            SCROLL REVEAL
@@ -1471,9 +1689,16 @@
             <g id="i-layout" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></g>
             <g id="i-database" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.66 3.58 3 8 3s8-1.34 8-3V6M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></g>
             <g id="i-cloud" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 .5-8.97A6 6 0 0 0 6.1 11.1 3.5 3.5 0 0 0 6.5 19h11z"/></g>
+            <g id="i-sun" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></g>
+            <g id="i-moon" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></g>
+            <g id="i-send" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></g>
+            <g id="i-check-circle" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></g>
             <g id="i-cpu" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4" rx="1"/><path d="M10 2v4M14 2v4M10 18v4M14 18v4M2 10h4M2 14h4M18 10h4M18 14h4"/></g>
         </defs>
     </svg>
+
+    <!-- Background texture -->
+    <div class="bg-texture" aria-hidden="true"></div>
 
     <!-- ============================ HEADER ============================ -->
     <header class="header" id="header">
@@ -1489,11 +1714,17 @@
                 <a class="nav__link" href="#skills">Skills</a>
                 <a class="nav__link" href="#projects">Projects</a>
                 <a class="nav__link" href="#achievements">Achievements</a>
-                <a class="nav__link" href="#clients">Clients</a>
+                <a class="nav__link" href="#clients">Collaborations</a>
+                <a class="nav__link" href="#interests">Interests</a>
                 <a class="nav__link nav__link--lab" href="#dsa-lab" data-lab-open>DSA Lab</a>
             </nav>
 
             <a class="btn btn--ghost header__cta" href="#contact">Get in touch</a>
+
+            <button class="theme-toggle" type="button" aria-label="Toggle light/dark theme" id="themeToggle">
+                <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg>
+            </button>
 
             <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="menu" id="navToggle">
                 <svg class="icon-menu" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-menu"/></svg>
@@ -1509,7 +1740,8 @@
         <a class="menu__link" href="#skills"><span>Skills</span><span class="idx">03</span></a>
         <a class="menu__link" href="#projects"><span>Projects</span><span class="idx">04</span></a>
         <a class="menu__link" href="#achievements"><span>Achievements</span><span class="idx">05</span></a>
-        <a class="menu__link" href="#clients"><span>Client Work</span><span class="idx">06</span></a>
+        <a class="menu__link" href="#clients"><span>Collaborations</span><span class="idx">06</span></a>
+        <a class="menu__link" href="#interests"><span>Interests</span><span class="idx">07</span></a>
         <a class="menu__link menu__link--lab" href="#dsa-lab" data-lab-open><span>DSA Lab</span><span class="idx">↗</span></a>
         <a class="btn btn--primary" href="mailto:sachinmishra030@gmail.com">
             <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mail"/></svg>
@@ -1534,9 +1766,8 @@
                 </p>
 
                 <p class="hero__lede reveal">
-                    I design and ship production systems at the intersection of healthcare and AI —
-                    from clinical documentation copilots used by 10,000+ practitioners to subscription
-                    and identity infrastructure built to scale.
+                    Engineer, writer, and builder — I ship AI-powered products, scalable backend systems,
+                    and the kind of software that quietly runs behind the scenes for hundreds of thousands of users.
                 </p>
 
                 <div class="hero__actions reveal">
@@ -1552,7 +1783,7 @@
 
                 <div class="stats reveal">
                     <div class="stat">
-                        <div class="stat__num">10,000+</div>
+                        <div class="stat__num">1,00,000+</div>
                         <div class="stat__label">Medical practitioners served</div>
                     </div>
                     <div class="stat">
@@ -1564,7 +1795,7 @@
                         <div class="stat__label">Projected annual revenue</div>
                     </div>
                     <div class="stat">
-                        <div class="stat__num">5,000+</div>
+                        <div class="stat__num">20,000+</div>
                         <div class="stat__label">Practices using AI solutions</div>
                     </div>
                 </div>
@@ -1586,24 +1817,28 @@
 
                     <div class="about__body reveal">
                         <p>
-                            I'm a Senior Software Engineer and AI Engineer with <strong>4+ years</strong> of experience
-                            building scalable systems that reach real users. Across four years at
-                            <strong>Zoho Corporation</strong> I built healthcare products, where the work I led cut
-                            clinical documentation time by <strong>75%</strong> for over <strong>10,000</strong>
-                            medical practitioners.
+                            I'm Sachin — a <strong>software engineer</strong>, <strong>writer</strong>, and someone who is
+                            endlessly curious about how things work, whether that's a distributed system or a line of Urdu
+                            poetry. I build things for a living and I build things because I can't help it.
                         </p>
                         <p>
-                            My approach is shaped by competitive programming — ranking in the top 2% of Google Code Jam
-                            and reaching the national finals of the Smart India Hackathon taught me to reason about
-                            constraints before writing code. I care about latency budgets, clean interfaces, and systems
-                            that stay simple as they grow.
+                            I have <strong>5+ years</strong> of professional experience shipping production systems — from
+                            AI-powered healthcare tools used by lakhs of practitioners to identity infrastructure and
+                            subscription platforms built to scale. Competitive programming sharpened how I think:
+                            <strong>top 2%</strong> in Google Code Jam, national finalist at Smart India Hackathon.
+                        </p>
+                        <p>
+                            Outside of code, I run a literary collective called
+                            <strong>Ain Sheen Qaf: The Muted Void</strong>, write about love and solitude, host mushairas,
+                            and dream about building something like Jarvis someday. I care about craft — in engineering,
+                            in language, and in everything I put my name on.
                         </p>
 
                         <div class="chips">
                             <span class="chip">AI-powered products</span>
                             <span class="chip">Full stack engineering</span>
                             <span class="chip">Competitive programming</span>
-                            <span class="chip">Open source</span>
+                            <span class="chip">Writing &amp; Poetry</span>
                             <span class="chip">Applied ML</span>
                             <span class="chip">Cloud infrastructure</span>
                         </div>
@@ -1618,202 +1853,134 @@
                 <div class="section-head reveal">
                     <span class="eyebrow">Experience</span>
                     <h2 class="section-title">Where I've worked</h2>
-                    <p class="section-sub">Select any role to read the detail.</p>
+                    <p class="section-sub">Tap any role on the timeline to read the detail.</p>
                 </div>
 
-                <ol class="timeline">
-                    <li class="tl-item tl-item--featured reveal" data-open="false" data-current="true">
-                        <button class="tl-head" type="button" aria-expanded="false" aria-controls="exp-founder">
-                            <span>
-                                <span class="tl-flags">
-                                    <span class="tl-badge tl-badge--accent">Founder</span>
-                                    <span class="tl-badge tl-badge--live">Present</span>
-                                </span>
-                                <span class="tl-date">Jun 2026 — Present</span>
-                                <span class="tl-role">Founder</span>
-                                <span class="tl-org">Ain Sheen Qaf · Literary Collective</span>
-                            </span>
-                            <span class="tl-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chevron"/></svg></span>
-                        </button>
-                        <div class="tl-body" id="exp-founder">
-                            <div>
-                                <div class="tl-body-inner">
-                                    <p>
-                                        Ain Sheen Qaf — the three letters <bdi lang="ur">ع ش ق</bdi> that spell
-                                        <em>ishq</em> — is a literary collective I started to give Hindi and Urdu
-                                        writing a home online. It is in its early community-building phase.
-                                    </p>
-                                    <ul class="tl-list">
-                                        <li>Founded and run the collective end to end — <strong>identity, platform, editorial direction and community</strong>.</li>
-                                        <li>Designed and shipped the website myself, then published it at <strong>ishqtmvofficial.vercel.app</strong>.</li>
-                                        <li>Building the audience across Instagram, YouTube, X and LinkedIn under a single voice.</li>
-                                    </ul>
-                                    <div class="tl-links">
-                                        <a class="tl-link" href="https://ishqtmvofficial.vercel.app/" target="_blank" rel="noopener noreferrer">
-                                            Visit Ain Sheen Qaf
-                                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
-                                        </a>
-                                        <a class="tl-link" href="mailto:ishqtmvofficial@gmail.com">
-                                            Write to us
-                                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mail"/></svg>
-                                        </a>
-                                    </div>
+                <div class="tree reveal">
+                    <!-- 1 — most recent first, alternating left/right -->
+                    <div class="tree-item" data-current="true">
+                        <div class="tree-card">
+                            <span class="tree-date">Jun 2026 — Present</span>
+                            <span class="tree-role">Founder</span>
+                            <span class="tree-org">Ain Sheen Qaf: The Muted Void · Literary Collective</span>
+                            <div class="tree-body">
+                                <p>Ain Sheen Qaf: The Muted Void — the three letters <bdi lang="ur">ع ش ق</bdi> that spell <em>ishq</em> — is a literary collective I started to give Hindi and Urdu writing a home online.</p>
+                                <ul>
+                                    <li>Founded and run the collective end to end — <strong>identity, platform, editorial direction and community</strong>.</li>
+                                    <li>Designed and shipped the website myself, then published it at <strong>ishqtmvofficial.vercel.app</strong>.</li>
+                                    <li>Building the audience across Instagram, YouTube, X and LinkedIn under a single voice.</li>
+                                </ul>
+                                <div class="tree-links">
+                                    <a class="tree-link" href="https://ishqtmvofficial.vercel.app/" target="_blank" rel="noopener noreferrer">Visit Ain Sheen Qaf: The Muted Void <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg></a>
+                                    <a class="tree-link" href="mailto:ishqtmvofficial@gmail.com">Write to us <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mail"/></svg></a>
                                 </div>
                             </div>
                         </div>
-                    </li>
+                    </div>
 
-                    <li class="tl-item reveal" data-open="false" data-current="true">
-                        <button class="tl-head" type="button" aria-expanded="false" aria-controls="exp-rootz">
-                            <span>
-                                <span class="tl-flags">
-                                    <span class="tl-badge tl-badge--live">Present</span>
-                                </span>
-                                <span class="tl-date">Jun 2026 — Present</span>
-                                <span class="tl-role">YouTube Content Developer</span>
-                                <span class="tl-org">Recursive Rootz</span>
-                            </span>
-                            <span class="tl-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chevron"/></svg></span>
-                        </button>
-                        <div class="tl-body" id="exp-rootz">
-                            <div>
-                                <div class="tl-body-inner">
-                                    <p>Writing, recording and editing technical content for Recursive Rootz — an ongoing channel on engineering and problem solving.</p>
-                                    <ul class="tl-list">
-                                        <li>Own the full pipeline: <strong>topic research, scripting, recording, editing and publishing</strong>.</li>
-                                        <li>Turning the engineering work I do into explanations other developers can follow.</li>
-                                    </ul>
-                                    <div class="tl-links">
-                                        <a class="tl-link" href="https://www.youtube.com/@recursiverootz" target="_blank" rel="noopener noreferrer">
-                                            Watch on YouTube
-                                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
-                                        </a>
-                                    </div>
+                    <div class="tree-item" data-current="true">
+                        <div class="tree-card">
+                            <span class="tree-date">Jun 2026 — Present</span>
+                            <span class="tree-role">YouTube Content Developer</span>
+                            <span class="tree-org">Recursive Rootz</span>
+                            <div class="tree-body">
+                                <p>Writing, recording and editing technical content for Recursive Rootz — an ongoing channel on engineering and problem solving.</p>
+                                <ul>
+                                    <li>Own the full pipeline: <strong>topic research, scripting, recording, editing and publishing</strong>.</li>
+                                    <li>Turning the engineering work I do into explanations other developers can follow.</li>
+                                </ul>
+                                <div class="tree-links">
+                                    <a class="tree-link" href="https://www.youtube.com/@recursiverootz" target="_blank" rel="noopener noreferrer">Watch on YouTube <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg></a>
                                 </div>
                             </div>
                         </div>
-                    </li>
+                    </div>
 
-                    <li class="tl-item reveal" data-open="false">
-                        <button class="tl-head" type="button" aria-expanded="false" aria-controls="exp-1">
-                            <span>
-                                <span class="tl-date">Jul 2022 — Jun 2026</span>
-                                <span class="tl-role">Senior Software Engineer — AI</span>
-                                <span class="tl-org">Zoho Corporation · Member Technical Staff</span>
-                            </span>
-                            <span class="tl-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chevron"/></svg></span>
-                        </button>
-                        <div class="tl-body" id="exp-1">
-                            <div>
-                                <div class="tl-body-inner">
-                                    <p>Led development of AI systems for healthcare documentation and practice management — work that reaches thousands of medical practitioners every day.</p>
-                                    <ul class="tl-list">
-                                        <li>Spearheaded <strong>Charm Copilot</strong>, an AI clinical documentation assistant that reduced documentation time by <span class="metric">75%</span> for 10,000+ practitioners.</li>
-                                        <li>Created <strong>FAQPilot</strong>, an intelligent support system that cut support tickets by <span class="metric">60%</span> and saved 100+ agent hours daily.</li>
-                                        <li>Architected enterprise subscription infrastructure with advanced RBAC, projecting <span class="metric">$10M</span> in annual revenue.</li>
-                                        <li>Built a secure e-KYC microservices architecture covering 7 verification workflows, generating <span class="metric">$50K</span> in revenue.</li>
-                                        <li>Launched <strong>Charm Assist</strong> for 5,000+ healthcare practices at <span class="metric">sub-200ms</span> response times.</li>
-                                        <li>Developed a high-performance PDF417 barcode decoder processing 100K+ licenses at <span class="metric">85%</span> accuracy.</li>
-                                    </ul>
-                                </div>
+                    <div class="tree-item">
+                        <div class="tree-card">
+                            <span class="tree-date">Jul 2022 — Jun 2026 · <span class="tree-loc">Chennai</span></span>
+                            <span class="tree-role">Senior Software Engineer — AI</span>
+                            <span class="tree-org">Zoho Corporation · Member Technical Staff</span>
+                            <div class="tree-body">
+                                <p>Led development of AI systems for healthcare documentation and practice management — work that reaches lakhs of medical practitioners every day.</p>
+                                <ul>
+                                    <li>Spearheaded <strong>Charm Copilot</strong>, an AI clinical documentation assistant that reduced documentation time by <span class="metric">75%</span> for 1,00,000+ practitioners.</li>
+                                    <li>Created <strong>FAQPilot</strong>, an intelligent support system that cut support tickets by <span class="metric">60%</span> and saved 100+ agent hours daily.</li>
+                                    <li>Architected enterprise subscription infrastructure with advanced RBAC, projecting <span class="metric">$10M</span> in annual revenue.</li>
+                                    <li>Built a secure e-KYC microservices architecture covering 7 verification workflows, generating <span class="metric">$50K</span> in revenue.</li>
+                                    <li>Launched <strong>Charm Assist</strong> for 20,000+ healthcare practices at <span class="metric">sub-200ms</span> response times.</li>
+                                    <li>Developed a high-performance PDF417 barcode decoder processing 100K+ licenses at <span class="metric">85%</span> accuracy.</li>
+                                </ul>
                             </div>
                         </div>
-                    </li>
+                    </div>
 
-                    <li class="tl-item reveal" data-open="false">
-                        <button class="tl-head" type="button" aria-expanded="false" aria-controls="exp-2">
-                            <span>
-                                <span class="tl-date">Apr 2022 — May 2022</span>
-                                <span class="tl-role">AI/ML Engineering Intern</span>
-                                <span class="tl-org">Edvak Technologies Inc</span>
-                            </span>
-                            <span class="tl-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chevron"/></svg></span>
-                        </button>
-                        <div class="tl-body" id="exp-2">
-                            <div>
-                                <div class="tl-body-inner">
-                                    <p>Contributed to healthcare AI solutions focused on intelligent matching and cost-effective computation services.</p>
-                                    <ul class="tl-list">
-                                        <li>Pioneered a hybrid recommendation algorithm that improved patient–provider matching accuracy by <span class="metric">45%</span>.</li>
-                                        <li>Built a mathematical computation microservice that removed an expensive Wolfram API dependency.</li>
-                                    </ul>
-                                </div>
+                    <div class="tree-item">
+                        <div class="tree-card">
+                            <span class="tree-date">Apr 2022 — May 2022 · <span class="tree-loc">Hyderabad</span></span>
+                            <span class="tree-role">AI/ML Engineering Intern</span>
+                            <span class="tree-org">Edvak Technologies Inc</span>
+                            <div class="tree-body">
+                                <p>Contributed to healthcare AI solutions focused on intelligent matching and cost-effective computation services.</p>
+                                <ul>
+                                    <li>Pioneered a hybrid recommendation algorithm that improved patient–provider matching accuracy by <span class="metric">45%</span>.</li>
+                                    <li>Built a mathematical computation microservice that removed an expensive Wolfram API dependency.</li>
+                                </ul>
                             </div>
                         </div>
-                    </li>
+                    </div>
 
-                    <li class="tl-item reveal" data-open="false">
-                        <button class="tl-head" type="button" aria-expanded="false" aria-controls="exp-3">
-                            <span>
-                                <span class="tl-date">Jan 2022 — Apr 2022</span>
-                                <span class="tl-role">Solutions Developer Intern</span>
-                                <span class="tl-org">Incentius</span>
-                            </span>
-                            <span class="tl-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chevron"/></svg></span>
-                        </button>
-                        <div class="tl-body" id="exp-3">
-                            <div>
-                                <div class="tl-body-inner">
-                                    <p>Delivered high-performance B2B web solutions for the acoustic industry using modern frontend frameworks.</p>
-                                    <ul class="tl-list">
-                                        <li>Delivered a component-based Vue.js SPA with Vuex state management at <span class="metric">98%</span> test coverage.</li>
-                                        <li>Achieved a <span class="metric">50%</span> reduction in initial load time via webpack optimization and code splitting.</li>
-                                        <li>Integrated RESTful Flask APIs with a MySQL cluster supporting <span class="metric">50K</span> daily transactions.</li>
-                                        <li>Implemented connection pooling and prepared statements for SQL injection prevention.</li>
-                                    </ul>
-                                </div>
+                    <div class="tree-item">
+                        <div class="tree-card">
+                            <span class="tree-date">Jan 2022 — Apr 2022 · <span class="tree-loc">Pune</span></span>
+                            <span class="tree-role">Solutions Developer Intern</span>
+                            <span class="tree-org">Incentius</span>
+                            <div class="tree-body">
+                                <p>Delivered high-performance B2B web solutions for the acoustic industry using modern frontend frameworks.</p>
+                                <ul>
+                                    <li>Delivered a component-based Vue.js SPA with Vuex state management at <span class="metric">98%</span> test coverage.</li>
+                                    <li>Achieved a <span class="metric">50%</span> reduction in initial load time via webpack optimization and code splitting.</li>
+                                    <li>Integrated RESTful Flask APIs with a MySQL cluster supporting <span class="metric">50K</span> daily transactions.</li>
+                                    <li>Implemented connection pooling and prepared statements for SQL injection prevention.</li>
+                                </ul>
                             </div>
                         </div>
-                    </li>
+                    </div>
 
-                    <li class="tl-item reveal" data-open="false">
-                        <button class="tl-head" type="button" aria-expanded="false" aria-controls="exp-4">
-                            <span>
-                                <span class="tl-date">Jun 2021 — Jul 2021 · Gurugram</span>
-                                <span class="tl-role">Cyber Security Analyst Intern</span>
-                                <span class="tl-org">SafeHouse Technologies · GPCSSI 2021</span>
-                            </span>
-                            <span class="tl-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chevron"/></svg></span>
-                        </button>
-                        <div class="tl-body" id="exp-4">
-                            <div>
-                                <div class="tl-body-inner">
-                                    <p>Conducted cybersecurity research and analysis on emerging threats and defensive strategies.</p>
-                                    <ul class="tl-list">
-                                        <li>Researched real-world cybercrime cases, data breaches, and F2P/ESIM/AEPS scams.</li>
-                                        <li>Analyzed QRL Jacking vulnerabilities and IDOR (Insecure Direct Object Reference) attack vectors.</li>
-                                        <li>Theorized honeypot servers with custom payloads for tracing exploiters behind VPN/proxy servers.</li>
-                                        <li>Worked hands-on with Wireshark, Kali Linux, and OSINT platforms.</li>
-                                    </ul>
-                                </div>
+                    <div class="tree-item">
+                        <div class="tree-card">
+                            <span class="tree-date">Jun 2021 — Jul 2021 · <span class="tree-loc">Gurugram</span></span>
+                            <span class="tree-role">Cyber Security Analyst Intern</span>
+                            <span class="tree-org">SafeHouse Technologies · GPCSSI 2021</span>
+                            <div class="tree-body">
+                                <p>Conducted cybersecurity research and analysis on emerging threats and defensive strategies.</p>
+                                <ul>
+                                    <li>Researched real-world cybercrime cases, data breaches, and F2P/ESIM/AEPS scams.</li>
+                                    <li>Analyzed QRL Jacking vulnerabilities and IDOR (Insecure Direct Object Reference) attack vectors.</li>
+                                    <li>Theorized honeypot servers with custom payloads for tracing exploiters behind VPN/proxy servers.</li>
+                                    <li>Worked hands-on with Wireshark, Kali Linux, and OSINT platforms.</li>
+                                </ul>
                             </div>
                         </div>
-                    </li>
+                    </div>
 
-                    <li class="tl-item reveal" data-open="false">
-                        <button class="tl-head" type="button" aria-expanded="false" aria-controls="exp-5">
-                            <span>
-                                <span class="tl-date">Oct 2020 — Dec 2020 · Bengaluru</span>
-                                <span class="tl-role">Python Developer Intern</span>
-                                <span class="tl-org">KoiReader Technologies</span>
-                            </span>
-                            <span class="tl-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chevron"/></svg></span>
-                        </button>
-                        <div class="tl-body" id="exp-5">
-                            <div>
-                                <div class="tl-body-inner">
-                                    <p>Enhanced document processing through computer vision and low-level performance optimization.</p>
-                                    <ul class="tl-list">
-                                        <li>Developed an optical code detection system for invoice documents using OpenCV with bbox visualizations.</li>
-                                        <li>Optimized Python hot paths with Numba and Cython for significant throughput gains.</li>
-                                        <li>Tested and analyzed REST APIs and their JSON responses for system integration.</li>
-                                        <li>Drove cost reduction and efficiency improvements through automated document processing.</li>
-                                    </ul>
-                                </div>
+                    <div class="tree-item">
+                        <div class="tree-card">
+                            <span class="tree-date">Oct 2020 — Dec 2020 · <span class="tree-loc">Bengaluru</span></span>
+                            <span class="tree-role">Python Developer Intern</span>
+                            <span class="tree-org">KoiReader Technologies</span>
+                            <div class="tree-body">
+                                <p>Enhanced document processing through computer vision and low-level performance optimization.</p>
+                                <ul>
+                                    <li>Developed an optical code detection system for invoice documents using OpenCV with bbox visualizations.</li>
+                                    <li>Optimized Python hot paths with Numba and Cython for significant throughput gains.</li>
+                                    <li>Tested and analyzed REST APIs and their JSON responses for system integration.</li>
+                                    <li>Drove cost reduction and efficiency improvements through automated document processing.</li>
+                                </ul>
                             </div>
                         </div>
-                    </li>
-                </ol>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -2000,7 +2167,7 @@
                 <div class="section-head work-head reveal" style="max-width:none">
                     <div style="display:flex;flex-direction:column;gap:12px;max-width:62ch">
                         <span class="eyebrow">Freelance</span>
-                        <h2 class="section-title">Client work</h2>
+                        <h2 class="section-title">Crafted with Care</h2>
                         <p class="section-sub">Websites designed and shipped for clients across education, writing, and professional services.</p>
                     </div>
 
@@ -2145,6 +2312,93 @@
             </div>
         </section>
 
+        <!-- ============================ INTERESTS ============================ -->
+        <section class="section" id="interests">
+            <div class="container">
+                <div class="section-head reveal">
+                    <span class="eyebrow">Beyond Code</span>
+                    <h2 class="section-title">What I Care About</h2>
+                    <p class="section-sub">The things that shape how I think, build, and create — on and off the screen.</p>
+                </div>
+
+                <!-- Code / Tech icons -->
+                <div class="code-icons reveal">
+                    <div class="code-icon"><img src="images/python.png" alt="Python" loading="lazy"></div>
+                    <div class="code-icon"><img src="images/java.png" alt="Java" loading="lazy"></div>
+                    <div class="code-icon"><img src="images/JavaScript.png" alt="JavaScript" loading="lazy"></div>
+                    <div class="code-icon"><img src="images/C++.png" alt="C++" loading="lazy"></div>
+                    <div class="code-icon"><img src="images/Node.png" alt="Node.js" loading="lazy"></div>
+                    <div class="code-icon"><img src="images/github.png" alt="GitHub" loading="lazy"></div>
+                </div>
+
+                <div class="interests-grid">
+                    <!-- Writing -->
+                    <div class="interest-card interest-card--wide reveal">
+                        <img src="images/writing_interest.jpg" alt="Writing — love, politics, solitude, abstract concepts" loading="lazy">
+                        <div class="interest-card__overlay">
+                            <span class="interest-card__title">Writing</span>
+                            <span class="interest-card__sub">Love, politics, solitude, abstract concepts</span>
+                        </div>
+                    </div>
+
+                    <!-- Philosophy -->
+                    <div class="interest-card reveal">
+                        <img src="images/abstract_philosophy.jpg" alt="Philosophy — theology and epistemology" loading="lazy">
+                        <div class="interest-card__overlay">
+                            <span class="interest-card__title">Philosophy</span>
+                            <span class="interest-card__sub">Theology &middot; Epistemology &middot; Refutation of innate ideas</span>
+                        </div>
+                    </div>
+
+                    <!-- Filmmaking -->
+                    <div class="interest-card reveal">
+                        <img src="images/filmmaking_interest.jpg" alt="Filmmaking and cinematography" loading="lazy">
+                        <div class="interest-card__overlay">
+                            <span class="interest-card__title">Filmmaking</span>
+                            <span class="interest-card__sub">Nolan-inspired &middot; Mind-bending narratives</span>
+                        </div>
+                    </div>
+
+                    <!-- Movies -->
+                    <div class="interest-card interest-card--wide reveal">
+                        <img src="images/movieholic.jpg" alt="Movies — deep mysteries and psychological thrillers" loading="lazy">
+                        <div class="interest-card__overlay">
+                            <span class="interest-card__title">Cinephile</span>
+                            <span class="interest-card__sub">Deep mysteries &middot; Psychological thrillers &middot; Mind-bending cinema</span>
+                        </div>
+                    </div>
+
+                    <!-- Art / Expression -->
+                    <div class="interest-card reveal">
+                        <img src="images/artistic_crave.jpg" alt="Art — heart and mind in tension" loading="lazy">
+                        <div class="interest-card__overlay">
+                            <span class="interest-card__title">Art &amp; Expression</span>
+                            <span class="interest-card__sub">Where the heart fights the mind</span>
+                        </div>
+                    </div>
+
+                    <!-- Storytelling -->
+                    <div class="interest-card reveal">
+                        <img src="images/storytelling_interest.jpg" alt="Storytelling, narrating, hosting mushairas" loading="lazy">
+                        <div class="interest-card__overlay">
+                            <span class="interest-card__title">Storytelling</span>
+                            <span class="interest-card__sub">Narrating &middot; Hosting mushairas &amp; kavi sammelan</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Languages -->
+                <div class="lang-strip reveal">
+                    <span class="lang-chip">Urdu</span>
+                    <span class="lang-chip">Hindi</span>
+                    <span class="lang-chip">Punjabi</span>
+                    <span class="lang-chip">Haryanvi</span>
+                    <span class="lang-chip">English</span>
+                </div>
+            </div>
+        </section>
+
         <!-- ============================ CONTACT ============================ -->
         <section class="section" id="contact">
             <div class="container">
@@ -2198,11 +2452,11 @@
                     </div>
 
                     <div class="link-group reveal">
-                        <h3 class="link-group__title">Literature · Sahitya</h3>
-                        <nav class="links" aria-label="Ain Sheen Qaf links">
+                        <h3 class="link-group__title">Creative</h3>
+                        <nav class="links" aria-label="Ain Sheen Qaf: The Muted Void links">
                             <a href="https://ishqtmvofficial.vercel.app/" target="_blank" rel="noopener noreferrer">
                                 <span class="link-name">Website</span>
-                                <span class="handle">Ain Sheen Qaf</span>
+                                <span class="handle">@ishqtmvofficial</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
                             <a href="mailto:ishqtmvofficial@gmail.com">
@@ -2237,7 +2491,12 @@
         </section>
     </main>
 
+    <div style="height:clamp(80px,12vw,160px)" aria-hidden="true"></div>
+
     <footer class="footer">
+        <div class="footer__bg" aria-hidden="true">
+            <img src="images/footer_background_img.jpg" alt="" loading="lazy">
+        </div>
         <div class="container footer__inner">
             <span>© <span id="year"></span> Sachin Mishra</span>
             <a href="#top">Back to top ↑</a>
@@ -2258,6 +2517,23 @@
         'use strict';
 
         var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* ---------- Theme toggle ---------- */
+        var root = document.documentElement;
+        var themeBtn = document.getElementById('themeToggle');
+        var stored = localStorage.getItem('theme');
+        if (stored) {
+            root.setAttribute('data-theme', stored);
+        }
+        /* else default is "light" from the HTML attribute */
+
+        themeBtn.addEventListener('click', function () {
+            var current = root.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('metaThemeColor').content = next === 'dark' ? '#08090A' : '#FAF6F0';
+        });
 
         /* ---------- Year ---------- */
         document.getElementById('year').textContent = new Date().getFullYear();
@@ -2314,38 +2590,26 @@
             }, 2800);
         }
 
-        /* ---------- Experience accordion ---------- */
-        function setPanel(item, open) {
-            var head = item.querySelector('.tl-head');
-            var body = item.querySelector('.tl-body');
-            var inner = body.firstElementChild;
+        /* ---------- Tree timeline (click to expand) ---------- */
+        var treeItems = Array.prototype.slice.call(document.querySelectorAll('.tree-item'));
 
-            item.dataset.open = open ? 'true' : 'false';
-            head.setAttribute('aria-expanded', open ? 'true' : 'false');
+        treeItems.forEach(function (item) {
+            var card = item.querySelector('.tree-card');
+            if (!card) return;
 
-            /* Always start from a concrete pixel height so the transition has
-               two definite endpoints in both directions. */
-            body.style.height = inner.offsetHeight + 'px';
+            card.addEventListener('click', function () {
+                var wasActive = item.classList.contains('is-active');
 
-            if (open) {
-                /* Settle to auto once expanded, so the panel keeps fitting its
-                   content when the viewport resizes and the text re-wraps. */
-                var settle = function () {
-                    if (item.dataset.open === 'true') body.style.height = 'auto';
-                    body.removeEventListener('transitionend', settle);
-                };
-                body.addEventListener('transitionend', settle);
-                setTimeout(settle, 450);
-            } else {
-                void body.offsetHeight; // force reflow before collapsing
-                body.style.height = '0px';
-            }
-        }
+                /* Close all other items */
+                treeItems.forEach(function (t) { t.classList.remove('is-active'); });
 
-        document.querySelectorAll('.tl-head').forEach(function (head) {
-            head.addEventListener('click', function () {
-                var item = head.closest('.tl-item');
-                setPanel(item, item.dataset.open !== 'true');
+                /* Toggle current */
+                if (!wasActive) {
+                    item.classList.add('is-active');
+                    setTimeout(function () {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 120);
+                }
             });
         });
 
@@ -2522,6 +2786,7 @@
         window.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && lab.dataset.open === 'true') closeLab();
         });
+
     })();
     </script>
 </body>

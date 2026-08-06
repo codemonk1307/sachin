@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,6 +48,27 @@
     --fs-prose: 1rem;      /* 16px */
     --fs-code:  0.8125rem; /* 13px */
   }
+
+  /* ---- LIGHT THEME ---- */
+  [data-theme="light"] {
+    --bg:            #FAF6F0;
+    --bg-soft:       #F3EDE4;
+    --surface:       rgba(160, 130, 90, 0.06);
+    --surface-hover: rgba(160, 130, 90, 0.11);
+    --line:          rgba(160, 130, 90, 0.14);
+    --line-strong:   rgba(160, 130, 90, 0.24);
+
+    --text:          #2A2118;
+    --prose:         #3D3428;
+    --text-2:        #6D5E4F;
+    --text-3:        #9B8D7E;
+
+    --accent:        #C45A28;
+    --accent-soft:   rgba(196, 90, 40, 0.10);
+    --accent-line:   rgba(196, 90, 40, 0.28);
+  }
+  [data-theme="light"] .topbar { background: rgba(250, 246, 240, 0.88); }
+  [data-theme="light"] ::selection { background: rgba(196, 90, 40, 0.15); color: var(--text); }
 
   body.type-large {
     --fs-prose: 1.0938rem; /* 17.5px */
@@ -291,6 +312,9 @@
     color: var(--text-3);
   }
 
+  /* ============================================================
+     DASHBOARD — day tile grid (original)
+     ============================================================ */
   .days-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
@@ -346,6 +370,177 @@
   .day-tile.completed { border-color: rgba(74, 222, 128, 0.32); }
   .day-tile.completed .day-num { color: var(--easy); }
   .day-tile.completed .day-status { color: var(--easy); }
+
+  /* ============================================================
+     TOPIC PAGE — single-page book view for day content
+     ============================================================ */
+  .topic-page-wrap {
+    max-width: var(--measure);
+    margin: 0 auto;
+  }
+
+  .topic-page {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 4px 14px 14px 4px;
+    background: var(--bg-soft);
+    overflow: hidden;
+    box-shadow:
+      0 2px 20px rgba(0, 0, 0, 0.12),
+      0 0 0 1px var(--line),
+      inset 0 0 40px rgba(0, 0, 0, 0.03);
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Spine edge — left side simulated page stack */
+  .topic-page::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 3px;
+    background: repeating-linear-gradient(180deg,
+      var(--line) 0px,
+      var(--line) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Page curl — bottom right */
+  .topic-page::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(
+      225deg,
+      var(--bg) 0%,
+      var(--bg) 44%,
+      var(--line) 44%,
+      var(--line) 46%,
+      var(--bg-soft) 46%
+    );
+    border-radius: 0 0 14px 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .topic-page__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px clamp(22px, 4vw, 36px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topic-page__num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .topic-page__of {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-3);
+    letter-spacing: 0.06em;
+  }
+
+  .topic-page__body {
+    flex: 1;
+    padding: clamp(20px, 4vw, 36px);
+    overflow-y: auto;
+  }
+
+  /* Smooth page transition */
+  @keyframes topicPageIn {
+    from { opacity: 0; transform: translateX(16px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes topicPageInReverse {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .topic-page.flip-forward {
+    animation: topicPageIn 0.32s var(--ease) both;
+  }
+  .topic-page.flip-backward {
+    animation: topicPageInReverse 0.32s var(--ease) both;
+  }
+
+  /* Navigation bar below the page */
+  .topic-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 18px;
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
+  .topic-nav-btn {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    color: var(--text-2);
+    background: var(--surface);
+    transition: all 0.25s var(--ease);
+    font-size: 1rem;
+  }
+
+  .topic-nav-btn:hover:not(:disabled) {
+    border-color: var(--accent-line);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .topic-nav-btn:disabled { opacity: 0.25; cursor: default; }
+
+  .topic-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .topic-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line-strong);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.25s var(--ease);
+  }
+  .topic-dot:hover { background: var(--text-3); }
+  .topic-dot.active {
+    background: var(--accent);
+    width: 20px;
+    border-radius: 999px;
+  }
+
+  /* Light theme page refinements */
+  [data-theme="light"] .topic-page {
+    background: #F7F2EA;
+    box-shadow:
+      0 2px 24px rgba(100, 80, 50, 0.10),
+      0 0 0 1px var(--line),
+      inset 0 0 60px rgba(160, 130, 90, 0.04);
+  }
 
   /* ============================================================
      DAY VIEW — single reading column
@@ -410,15 +605,6 @@
     color: var(--text-2);
     font-size: 1rem;
     letter-spacing: 0;
-  }
-
-  /* A column, not a wall of columns — this is the readability fix */
-  .notes-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: var(--measure);
-    margin: 0 auto;
   }
 
   .card {
@@ -802,7 +988,21 @@
     </div>
     <div class="day-subtitle" id="daySubtitle">5 Topics · Key Patterns · Templates · Triggers</div>
 
-    <div class="notes-grid" id="notesGrid"></div>
+    <!-- Topic page (1 topic at a time, flip through) -->
+    <div class="topic-page-wrap">
+      <div class="topic-page" id="topicPage">
+        <div class="topic-page__head">
+          <span class="topic-page__num" id="topicPageNum">Topic 1 of 5</span>
+          <span class="topic-page__of" id="topicPageTitle"></span>
+        </div>
+        <div class="topic-page__body" id="topicPageBody"></div>
+      </div>
+      <div class="topic-nav">
+        <button class="topic-nav-btn" id="topicPrev" onclick="flipTopic(-1)" aria-label="Previous topic">&larr;</button>
+        <div class="topic-dots" id="topicDots"></div>
+        <button class="topic-nav-btn" id="topicNext" onclick="flipTopic(1)" aria-label="Next topic">&rarr;</button>
+      </div>
+    </div>
 
     <!-- Quick Revision -->
     <div class="revision-panel" id="revisionPanel">
@@ -821,6 +1021,20 @@
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════
+// THEME SYNC — reads from localStorage set by the portfolio page
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  var t = localStorage.getItem('theme');
+  if (t) document.documentElement.setAttribute('data-theme', t);
+  // Listen for storage changes from parent page
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'theme' && e.newValue) {
+      document.documentElement.setAttribute('data-theme', e.newValue);
+    }
+  });
+})();
+
 // ═══════════════════════════════════════════════════════════════
 // DATA: All 30 days (Day 1 fully populated, others placeholder)
 // ═══════════════════════════════════════════════════════════════
@@ -9704,7 +9918,7 @@ function renderDashboard() {
       cls += ' available';
       status = '→';
     } else {
-      cls += ' available'; // all days clickable
+      cls += ' available';
       status = '◇';
     }
 
@@ -9715,16 +9929,16 @@ function renderDashboard() {
       <div class="day-label">${DAY_LABELS[d] || 'Coming Soon'}</div>
       <div class="day-status">${status}</div>
     `;
-    if (hasData) {
-      tile.onclick = () => showDay(d);
-    } else {
-      tile.onclick = () => showDay(d);
-    }
+    tile.onclick = () => showDay(d);
     grid.appendChild(tile);
   }
 
   updateProgress();
 }
+
+// ─── Topic page flip (inside day view) ───
+let currentTopicIdx = 0;
+let currentTopicCards = [];  // populated by showDay
 
 function showDashboard() {
   currentDay = null;
@@ -9760,65 +9974,26 @@ function showDay(day) {
   document.getElementById('prevDay').disabled = day <= 1;
   document.getElementById('nextDay').disabled = day >= 30;
 
-  // Render cards
-  const grid = document.getElementById('notesGrid');
-  grid.innerHTML = '';
-
+  // Build topic cards data for page flip
   if (!data) {
-    grid.innerHTML = `
+    currentTopicCards = [];
+    currentTopicIdx = 0;
+    const body = document.getElementById('topicPageBody');
+    body.innerHTML = `
       <div class="empty-state">
         <h2>Day ${day} notes coming soon</h2>
         <p>Content for this day hasn't been written yet. Keep working through the earlier days in the meantime.</p>
       </div>
     `;
+    document.getElementById('topicPageNum').textContent = '';
+    document.getElementById('topicPageTitle').textContent = '';
+    document.getElementById('topicDots').innerHTML = '';
+    document.getElementById('topicPrev').disabled = true;
+    document.getElementById('topicNext').disabled = true;
   } else {
-    data.cards.forEach((card, idx) => {
-      const el = document.createElement('div');
-      el.className = `card ${card.theme}`;
-      el.style.animationDelay = `${idx * 0.08}s`;
-
-      const insightsId = `insights-${day}-${idx}`;
-
-      el.innerHTML = `
-        <div class="tag">${card.topic}</div>
-        <h2>${card.title}</h2>
-
-        <div class="section-label">Patterns</div>
-        <div class="patterns">
-          ${card.patterns.map(p => `<div class="pill">${p}</div>`).join('')}
-        </div>
-
-        <div class="section-label">Use When</div>
-        <ul>
-          ${card.useWhen.map(u => `<li>${u}</li>`).join('')}
-        </ul>
-
-        <div class="section-label">Core Template</div>
-        <code>${escapeHtml(card.template)}</code>
-
-        <div class="complexity">
-          <div class="cx">Time <span>${card.complexity.time}</span></div>
-          <div class="cx">Space <span>${card.complexity.space}</span></div>
-        </div>
-
-        <div class="section-label">Problem</div>
-        <div class="problem-row">
-          <span class="problem-name">${card.problem.name}</span>
-          <span class="problem-tag ${card.problem.diff}">${card.problem.diff.toUpperCase()}</span>
-        </div>
-
-        <button class="expand-btn" onclick="toggleInsights('${insightsId}', this)">
-          <span class="expand-caret">▸</span> Key insights
-        </button>
-        <div class="expandable" id="${insightsId}">
-          <ul style="margin-top:0.4rem;">
-            ${card.keyInsights.map(i => `<li>${i}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-
-      grid.appendChild(el);
-    });
+    currentTopicCards = data.cards;
+    currentTopicIdx = 0;
+    renderTopicPage();
   }
 
   // Revision panel
@@ -9834,6 +10009,95 @@ function showDay(day) {
 
 function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderTopicPage(direction) {
+  const card = currentTopicCards[currentTopicIdx];
+  const total = currentTopicCards.length;
+  const page = document.getElementById('topicPage');
+  const body = document.getElementById('topicPageBody');
+
+  document.getElementById('topicPageNum').textContent = `Topic ${currentTopicIdx + 1} of ${total}`;
+  document.getElementById('topicPageTitle').textContent = card.title;
+
+  const insightsId = `insights-${currentDay}-${currentTopicIdx}`;
+
+  body.innerHTML = `
+    <div class="card ${card.theme}" style="border:none;padding:0;background:transparent;border-radius:0;border-left:none;">
+      <div class="tag">${card.topic}</div>
+      <h2>${card.title}</h2>
+
+      <div class="section-label">Patterns</div>
+      <div class="patterns">
+        ${card.patterns.map(p => `<div class="pill">${p}</div>`).join('')}
+      </div>
+
+      <div class="section-label">Use When</div>
+      <ul>
+        ${card.useWhen.map(u => `<li>${u}</li>`).join('')}
+      </ul>
+
+      <div class="section-label">Core Template</div>
+      <code>${escapeHtml(card.template)}</code>
+
+      <div class="complexity">
+        <div class="cx">Time <span>${card.complexity.time}</span></div>
+        <div class="cx">Space <span>${card.complexity.space}</span></div>
+      </div>
+
+      <div class="section-label">Problem</div>
+      <div class="problem-row">
+        <span class="problem-name">${card.problem.name}</span>
+        <span class="problem-tag ${card.problem.diff}">${card.problem.diff.toUpperCase()}</span>
+      </div>
+
+      <button class="expand-btn" onclick="toggleInsights('${insightsId}', this)">
+        <span class="expand-caret">▸</span> Key insights
+      </button>
+      <div class="expandable" id="${insightsId}">
+        <ul style="margin-top:0.4rem;">
+          ${card.keyInsights.map(i => `<li>${i}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  `;
+
+  // Nav buttons
+  document.getElementById('topicPrev').disabled = currentTopicIdx <= 0;
+  document.getElementById('topicNext').disabled = currentTopicIdx >= total - 1;
+
+  // Dots
+  const dotsWrap = document.getElementById('topicDots');
+  dotsWrap.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'topic-dot' + (i === currentTopicIdx ? ' active' : '');
+    dot.setAttribute('aria-label', 'Go to topic ' + (i + 1));
+    dot.onclick = () => {
+      const dir = i > currentTopicIdx ? 1 : -1;
+      currentTopicIdx = i;
+      renderTopicPage(dir);
+    };
+    dotsWrap.appendChild(dot);
+  }
+
+  // Flip animation
+  if (direction) {
+    page.classList.remove('flip-forward', 'flip-backward');
+    void page.offsetWidth;
+    page.classList.add(direction > 0 ? 'flip-forward' : 'flip-backward');
+  }
+
+  // Scroll page into view
+  document.querySelector('.topic-page-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function flipTopic(dir) {
+  const next = currentTopicIdx + dir;
+  if (next >= 0 && next < currentTopicCards.length) {
+    currentTopicIdx = next;
+    renderTopicPage(dir);
+  }
 }
 
 function toggleInsights(id, btn) {
@@ -9928,24 +10192,21 @@ function resetProgress() {
 }
 
 function handleSearch(query) {
-  if (!currentDay || !DAYS_DATA[currentDay]) return;
+  if (!currentDay || !currentTopicCards.length) return;
   query = query.toLowerCase().trim();
-  const cards = document.querySelectorAll('.notes-grid .card');
+  if (!query) return;
 
-  cards.forEach(card => {
-    if (!query) {
-      card.style.display = '';
-      card.style.opacity = '1';
+  // Jump to the first topic whose title or content matches
+  for (let i = 0; i < currentTopicCards.length; i++) {
+    const card = currentTopicCards[i];
+    const text = (card.title + ' ' + card.topic + ' ' + card.patterns.join(' ') + ' ' + card.useWhen.join(' ')).toLowerCase();
+    if (text.includes(query)) {
+      const dir = i > currentTopicIdx ? 1 : -1;
+      currentTopicIdx = i;
+      renderTopicPage(dir);
       return;
     }
-    const text = card.textContent.toLowerCase();
-    if (text.includes(query)) {
-      card.style.display = '';
-      card.style.opacity = '1';
-    } else {
-      card.style.opacity = '0.15';
-    }
-  });
+  }
 }
 
 // Keyboard shortcuts
@@ -9955,12 +10216,38 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (currentDay) showDashboard();
   }
-  if (e.key === 'ArrowLeft' && currentDay) navigateDay(-1);
-  if (e.key === 'ArrowRight' && currentDay) navigateDay(1);
+  if (e.key === 'ArrowLeft' && currentDay) {
+    if (currentTopicIdx > 0) flipTopic(-1);
+    else navigateDay(-1);
+  }
+  if (e.key === 'ArrowRight' && currentDay) {
+    if (currentTopicIdx < currentTopicCards.length - 1) flipTopic(1);
+    else navigateDay(1);
+  }
   if (e.key === 'r' || e.key === 'R') {
     if (currentDay) toggleRevision();
   }
 });
+
+// Touch swipe for topic pages
+(function() {
+  const page = document.getElementById('topicPage');
+  let startX = 0;
+  let startY = 0;
+  page.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  page.addEventListener('touchend', function(e) {
+    if (!currentDay || !currentTopicCards.length) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) flipTopic(1);
+      else flipTopic(-1);
+    }
+  }, { passive: true });
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
@@ -9980,6 +10267,7 @@ try {
 } catch(e) {}
 
 renderDashboard();
+
 </script>
 </body>
 </html>
