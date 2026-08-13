@@ -986,6 +986,240 @@
         }
 
         /* ============================================================
+           CERTIFICATIONS
+           ============================================================ */
+
+        /* Category hues. Deliberately desaturated so they read as accents
+           on the warm paper background rather than competing with it. */
+        :root {
+            --cat-comp: #E4713F;
+            --cat-hack: #D9A83C;
+            --cat-course: #62B393;
+            --cat-intern: #9092D6;
+        }
+
+        [data-theme="light"] {
+            --cat-comp: #C45A28;
+            --cat-hack: #A6791F;
+            --cat-course: #3E7A62;
+            --cat-intern: #5D5FA0;
+        }
+
+        [data-cat="competitive"] { --cat: var(--cat-comp); }
+        [data-cat="hackathon"]   { --cat: var(--cat-hack); }
+        [data-cat="course"]      { --cat: var(--cat-course); }
+        [data-cat="internship"]  { --cat: var(--cat-intern); }
+
+        /* ---- Filter bar ---- */
+        .cert-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+            padding-bottom: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cert-filters::-webkit-scrollbar { display: none; }
+
+        @media (min-width: 720px) {
+            .cert-filters { flex-wrap: wrap; overflow: visible; }
+        }
+
+        .cert-filter {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 8px 15px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--text-2);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: -0.005em;
+            cursor: pointer;
+            transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+        }
+
+        .cert-filter:hover { color: var(--text); border-color: var(--line-strong); }
+
+        .cert-filter__n {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-3);
+        }
+
+        .cert-filter[aria-pressed="true"] {
+            background: var(--accent-soft);
+            border-color: var(--accent-line);
+            color: var(--accent);
+        }
+
+        .cert-filter[aria-pressed="true"] .cert-filter__n { color: var(--accent); }
+
+        .cert[hidden] { display: none; }
+
+        /* ---- Card ---- */
+        .cert__inner {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            overflow: hidden;
+            transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
+        }
+
+        @media (hover: hover) {
+            .cert:hover .cert__inner {
+                background: var(--surface-hover);
+                border-color: var(--line-strong);
+            }
+        }
+
+        /* ---- Engraved plate carrying the issuer's mark ---- */
+        .cert__plate {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 2.1 / 1;
+            overflow: hidden;
+            background:
+                radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--cat) 9%, transparent), transparent 70%),
+                linear-gradient(160deg, var(--bg-soft), var(--bg));
+            border-bottom: 1px solid var(--line);
+        }
+
+        /* Guilloche-ish engraving: two fine hatch fields crossing each other. */
+        .cert__plate::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.5;
+            background:
+                repeating-linear-gradient(48deg, transparent 0 6px, color-mix(in srgb, var(--cat) 22%, transparent) 6px 6.5px),
+                repeating-linear-gradient(-48deg, transparent 0 6px, color-mix(in srgb, var(--cat) 14%, transparent) 6px 6.5px);
+            -webkit-mask-image: radial-gradient(75% 60% at 50% 50%, transparent 40%, #000 100%);
+                    mask-image: radial-gradient(75% 60% at 50% 50%, transparent 40%, #000 100%);
+        }
+
+        /* Double rule frame. */
+        .cert__plate::after {
+            content: '';
+            position: absolute;
+            inset: 9px;
+            border: 1px solid color-mix(in srgb, var(--cat) 34%, transparent);
+            box-shadow: inset 0 0 0 3px var(--bg-soft), inset 0 0 0 4px color-mix(in srgb, var(--cat) 18%, transparent);
+            pointer-events: none;
+        }
+
+        .cert__plate > * { position: relative; z-index: 1; }
+
+        .cert__brand {
+            display: block;
+            padding: 0 24px;
+            text-align: center;
+            text-wrap: balance;
+            font-size: clamp(1rem, 0.86rem + 0.6vw, 1.2rem);
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        .cert__rule {
+            width: 42px;
+            height: 1px;
+            margin-top: 11px;
+            background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--cat) 70%, transparent), transparent);
+        }
+
+        .cert__seal {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            margin-top: 11px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--cat) 30%, transparent), color-mix(in srgb, var(--cat) 14%, transparent));
+            border: 1px solid color-mix(in srgb, var(--cat) 45%, transparent);
+            box-shadow: inset 0 0 0 3px var(--bg-soft), inset 0 0 0 4px color-mix(in srgb, var(--cat) 30%, transparent);
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: var(--cat);
+        }
+
+        /* ---- Card body ---- */
+        .cert__body {
+            display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+            padding: 16px 18px 18px;
+        }
+
+        .cert__cat {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: var(--font-mono);
+            font-size: 0.63rem;
+            font-weight: 500;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--cat);
+        }
+
+        .cert__cat::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            flex: 0 0 auto;
+        }
+
+        .cert__title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.35;
+            letter-spacing: -0.015em;
+            overflow-wrap: anywhere;
+        }
+
+        .cert__issuer {
+            font-size: 0.8rem;
+            color: var(--text-2);
+            overflow-wrap: anywhere;
+        }
+
+        .cert__detail {
+            margin-top: auto;
+            padding-top: 8px;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: var(--text-3);
+        }
+
+        .cert-empty {
+            padding: 40px 0;
+            color: var(--text-3);
+            font-size: 0.9rem;
+        }
+
+        /* ============================================================
            CLIENT WORK — RESPONSIVE SCROLL-SNAP CAROUSEL
            ============================================================ */
         .work-head {
@@ -1050,6 +1284,12 @@
 
         @media (min-width: 640px) { .slide { flex-basis: min(520px, 70%); } }
         @media (min-width: 1024px) { .slide { flex-basis: min(520px, 48%); } }
+
+        /* Certificate slides are compact reference cards, so they run
+           narrower than the client-work previews and more fit on screen.
+           Declared after the .slide breakpoints so they win. */
+        .slide--cert { flex-basis: min(300px, 78%); }
+        @media (min-width: 640px) { .slide--cert { flex-basis: 300px; } }
 
         .work-card {
             display: flex;
@@ -1740,8 +1980,9 @@
         <a class="menu__link" href="#skills"><span>Skills</span><span class="idx">03</span></a>
         <a class="menu__link" href="#projects"><span>Projects</span><span class="idx">04</span></a>
         <a class="menu__link" href="#achievements"><span>Achievements</span><span class="idx">05</span></a>
-        <a class="menu__link" href="#clients"><span>Collaborations</span><span class="idx">06</span></a>
-        <a class="menu__link" href="#interests"><span>Interests</span><span class="idx">07</span></a>
+        <a class="menu__link" href="#certifications"><span>Certifications</span><span class="idx">06</span></a>
+        <a class="menu__link" href="#clients"><span>Collaborations</span><span class="idx">07</span></a>
+        <a class="menu__link" href="#interests"><span>Interests</span><span class="idx">08</span></a>
         <a class="menu__link menu__link--lab" href="#dsa-lab" data-lab-open><span>DSA Lab</span><span class="idx">↗</span></a>
         <a class="btn btn--primary" href="mailto:sachinmishra030@gmail.com">
             <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mail"/></svg>
@@ -2161,6 +2402,343 @@
             </div>
         </section>
 
+        <!-- ========================== CERTIFICATIONS ========================== -->
+        <section class="section" id="certifications">
+            <div class="container">
+                <div class="section-head work-head reveal" style="max-width:none">
+                    <div style="display:flex;flex-direction:column;gap:12px;max-width:62ch">
+                        <span class="eyebrow">Credentials</span>
+                        <h2 class="section-title">Certifications</h2>
+                        <p class="section-sub">Twenty credentials earned across global programming contests, hackathons, online courses, and internships.</p>
+                    </div>
+
+                    <div class="carousel-ctl">
+                        <button class="carousel-btn" type="button" data-carousel-prev aria-label="Previous certificates">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                        </button>
+                        <button class="carousel-btn" type="button" data-carousel-next aria-label="Next certificates">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-right"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cert-filters reveal" role="group" aria-label="Filter certifications by category">
+                    <button class="cert-filter" type="button" data-filter="all" aria-pressed="true">All <span class="cert-filter__n">20</span></button>
+                    <button class="cert-filter" type="button" data-filter="competitive" aria-pressed="false">Competitive <span class="cert-filter__n">8</span></button>
+                    <button class="cert-filter" type="button" data-filter="hackathon" aria-pressed="false">Hackathons <span class="cert-filter__n">4</span></button>
+                    <button class="cert-filter" type="button" data-filter="course" aria-pressed="false">Courses <span class="cert-filter__n">6</span></button>
+                    <button class="cert-filter" type="button" data-filter="internship" aria-pressed="false">Internships <span class="cert-filter__n">2</span></button>
+                </div>
+
+                <div class="scroller" id="certScroller" tabindex="0" role="region" aria-label="Certificates, scrollable">
+
+                    <!-- ---------- Competitive programming ---------- -->
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Google</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">Google Code Jam 2021</h3>
+                                <p class="cert__detail">Global rank #964 &mdash; top 2% of 40,000+ entrants</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Google</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">Google Kick Start 2021</h3>
+                                <p class="cert__detail">Round B &mdash; global rank #5,212</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Google</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2022</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">Google Hash Code 2022</h3>
+                                <p class="cert__detail">Team-based optimisation contest run by Google</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Meta</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">Meta Hacker Cup 2021</h3>
+                                <p class="cert__issuer">Meta (formerly Facebook)</p>
+                                <p class="cert__detail">Global algorithmic programming contest &mdash; 2021 season</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">ICPC</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">ACM-ICPC 2021 &mdash; Team Certificate</h3>
+                                <p class="cert__issuer">ICPC Foundation</p>
+                                <p class="cert__detail">Rank #2,270 among 50,000+ in the preliminary round</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">ICPC</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2020</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">ACM-ICPC 2020</h3>
+                                <p class="cert__issuer">ICPC Foundation</p>
+                                <p class="cert__detail">Preliminary round of the collegiate programming contest</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">TCS</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2022</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">TCS CodeVita Season 10</h3>
+                                <p class="cert__issuer">Tata Consultancy Services</p>
+                                <p class="cert__detail">Global rank #1,810 among 100,000+ participants</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="competitive">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">CodeChef</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Competitive</span>
+                                <h3 class="cert__title">CodeChef SnackDown 2021</h3>
+                                <p class="cert__detail">Pre-Elimination Round &mdash; rank #1,197</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ---------- Hackathons ---------- -->
+                    <article class="slide slide--cert cert reveal" data-cat="hackathon">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Flipkart</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Hackathon</span>
+                                <h3 class="cert__title">Flipkart GRiD 2.0 &mdash; Merit</h3>
+                                <p class="cert__detail">Top 20 teams within the institute, Round 1 &middot; Team Ingenious</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="hackathon">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Flipkart</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Hackathon</span>
+                                <h3 class="cert__title">Flipkart GRiD 2.0 &mdash; Participation</h3>
+                                <p class="cert__detail">Round 1, Engineering Campus Challenge &middot; Team Ingenious</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="hackathon">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Flipkart</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Hackathon</span>
+                                <h3 class="cert__title">Flipkart GRiD 3.0 &mdash; InfoSec Challenge</h3>
+                                <p class="cert__detail">Level 1: E-Commerce &amp; Tech Quiz &middot; Team comding_billa</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="hackathon">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">TCS</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Hackathon</span>
+                                <h3 class="cert__title">TCS NeuralHack 2021</h3>
+                                <p class="cert__issuer">Tata Consultancy Services</p>
+                                <p class="cert__detail">AI and machine learning hackathon</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ---------- Courses ---------- -->
+                    <article class="slide slide--cert cert reveal" data-cat="course">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Coursera</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2019</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Course</span>
+                                <h3 class="cert__title">Programming for Everybody (Python)</h3>
+                                <p class="cert__issuer">Coursera &middot; University of Michigan</p>
+                                <p class="cert__detail">Part of the Python for Everybody specialization</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="course">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Coursera</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2019</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Course</span>
+                                <h3 class="cert__title">Python Data Structures</h3>
+                                <p class="cert__issuer">Coursera &middot; University of Michigan</p>
+                                <p class="cert__detail">Part of the Python for Everybody specialization</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="course">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Coursera</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2020</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Course</span>
+                                <h3 class="cert__title">Using Python to Access Web Data</h3>
+                                <p class="cert__issuer">Coursera &middot; University of Michigan</p>
+                                <p class="cert__detail">Part of the Python for Everybody specialization</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="course">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Coursera</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2020</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Course</span>
+                                <h3 class="cert__title">Capstone: Retrieving, Processing &amp; Visualizing Data</h3>
+                                <p class="cert__issuer">Coursera &middot; University of Michigan</p>
+                                <p class="cert__detail">Capstone of the Python for Everybody specialization</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="course">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">GeeksforGeeks</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2024</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Course</span>
+                                <h3 class="cert__title">Full Stack Developer Bootcamp</h3>
+                                <p class="cert__detail">8-week bootcamp &mdash; frontend to backend</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="course">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Great Learning</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Course</span>
+                                <h3 class="cert__title">Getting Started: Hadoop</h3>
+                                <p class="cert__issuer">Great Learning Academy</p>
+                                <p class="cert__detail">Introduction to the Hadoop big-data ecosystem</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ---------- Internships ---------- -->
+                    <article class="slide slide--cert cert reveal" data-cat="internship">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">Gurugram Police</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Internship</span>
+                                <h3 class="cert__title">Cyber Security Summer Internship</h3>
+                                <p class="cert__issuer">Gurugram Police &middot; SafeHouse Technologies</p>
+                                <p class="cert__detail">Jun&ndash;Jul 2021, Cyber Crime Cell &mdash; rated Excellent</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="slide slide--cert cert reveal" data-cat="internship">
+                        <div class="cert__inner">
+                            <div class="cert__plate" aria-hidden="true">
+                                <span class="cert__brand">IET Lucknow</span>
+                                <span class="cert__rule"></span>
+                                <span class="cert__seal">2021</span>
+                            </div>
+                            <div class="cert__body">
+                                <span class="cert__cat">Internship</span>
+                                <h3 class="cert__title">Online Summer Internship &mdash; IoT</h3>
+                                <p class="cert__issuer">IET Lucknow &middot; TEQIP-III</p>
+                                <p class="cert__detail">Department of Electronics &amp; Communication</p>
+                            </div>
+                        </div>
+                    </article>
+
+
+                </div>
+
+                <p class="cert-empty" id="certEmpty" hidden>No certificates in this category.</p>
+            </div>
+        </section>
+
         <!-- ========================== CLIENT WORK ========================== -->
         <section class="section" id="clients">
             <div class="container">
@@ -2438,14 +3016,14 @@
                                 <span class="handle">@recursiverootz</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
-                            <a href="https://www.instagram.com/recursiverootz/" target="_blank" rel="noopener noreferrer">
-                                <span class="link-name">Instagram</span>
-                                <span class="handle">@recursiverootz</span>
+                            <a href="https://www.geeksforgeeks.org/profile/tatvam_asi" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">GFG</span>
+                                <span class="handle">@tatvam_asi</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
-                            <a href="https://discord.gg/5VUDxY2X" target="_blank" rel="noopener noreferrer">
-                                <span class="link-name">Discord</span>
-                                <span class="handle">Join server</span>
+                            <a href="https://www.interviewbit.com/profile/codemonk1307/" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">Interviewbit</span>
+                                <span class="handle">@codemonk1307</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
                         </nav>
@@ -2638,14 +3216,21 @@
         window.addEventListener('resize', rescaleAll);
         window.addEventListener('orientationchange', rescaleAll);
 
-        /* ---------- Client work carousel ---------- */
-        var scroller = document.getElementById('workScroller');
-        var dotsWrap = document.getElementById('workDots');
+        /* ---------- Horizontal card carousels ----------
+           Shared by the client-work and certifications tracks. Controls are
+           looked up inside `section` so two carousels can coexist, and the
+           slide list is read live so a filtered track stays in sync. */
+        function initCarousel(section, scroller, dotsWrap, dotNoun) {
+            if (!section || !scroller) return null;
 
-        if (scroller && dotsWrap) {
-            var slides = Array.prototype.slice.call(scroller.querySelectorAll('.slide'));
-            var prevBtn = document.querySelector('[data-carousel-prev]');
-            var nextBtn = document.querySelector('[data-carousel-next]');
+            var prevBtn = section.querySelector('[data-carousel-prev]');
+            var nextBtn = section.querySelector('[data-carousel-next]');
+            var dots = [];
+
+            function slides() {
+                return Array.prototype.slice.call(scroller.querySelectorAll('.slide'))
+                    .filter(function (s) { return !s.hidden; });
+            }
 
             /* Distance of a slide from the scroller's content start, measured
                geometrically so it stays correct regardless of offsetParent,
@@ -2655,40 +3240,45 @@
                 return slide.getBoundingClientRect().left - scroller.getBoundingClientRect().left - padLeft;
             }
 
-            slides.forEach(function (slide, i) {
-                var dot = document.createElement('button');
-                dot.type = 'button';
-                dot.setAttribute('aria-label', 'Go to project ' + (i + 1));
-                dot.addEventListener('click', function () {
-                    scroller.scrollTo({
-                        left: scroller.scrollLeft + slideDelta(slide),
-                        behavior: reduceMotion ? 'auto' : 'smooth'
+            function buildDots() {
+                if (!dotsWrap) return;
+                dotsWrap.textContent = '';
+                slides().forEach(function (slide, i) {
+                    var dot = document.createElement('button');
+                    dot.type = 'button';
+                    dot.setAttribute('aria-label', 'Go to ' + dotNoun + ' ' + (i + 1));
+                    dot.addEventListener('click', function () {
+                        scroller.scrollTo({
+                            left: scroller.scrollLeft + slideDelta(slide),
+                            behavior: reduceMotion ? 'auto' : 'smooth'
+                        });
                     });
+                    dotsWrap.appendChild(dot);
                 });
-                dotsWrap.appendChild(dot);
-            });
-
-            var dots = Array.prototype.slice.call(dotsWrap.children);
+                dots = Array.prototype.slice.call(dotsWrap.children);
+            }
 
             function step(dir) {
+                var first = slides()[0];
                 var gap = parseFloat(getComputedStyle(scroller).columnGap) || 0;
-                var w = slides[0] ? slides[0].getBoundingClientRect().width + gap : scroller.clientWidth;
+                var w = first ? first.getBoundingClientRect().width + gap : scroller.clientWidth;
                 scroller.scrollBy({ left: dir * w, behavior: reduceMotion ? 'auto' : 'smooth' });
             }
 
             if (prevBtn) prevBtn.addEventListener('click', function () { step(-1); });
             if (nextBtn) nextBtn.addEventListener('click', function () { step(1); });
 
-            function syncCarousel() {
+            function sync() {
                 var maxScroll = scroller.scrollWidth - scroller.clientWidth;
                 var x = scroller.scrollLeft;
 
                 if (prevBtn) prevBtn.disabled = x <= 2;
                 if (nextBtn) nextBtn.disabled = x >= maxScroll - 2;
 
+                if (!dots.length) return;
                 var active = 0;
                 var best = Infinity;
-                slides.forEach(function (slide, i) {
+                slides().forEach(function (slide, i) {
                     var d = Math.abs(slideDelta(slide));
                     if (d < best) { best = d; active = i; }
                 });
@@ -2697,12 +3287,32 @@
                 });
             }
 
-            syncCarousel();
+            buildDots();
+            sync();
+
             scroller.addEventListener('scroll', function () {
-                window.requestAnimationFrame(syncCarousel);
+                window.requestAnimationFrame(sync);
             }, { passive: true });
-            window.addEventListener('resize', syncCarousel);
+            window.addEventListener('resize', sync);
+
+            return {
+                refresh: function () {
+                    /* 'instant', not 'auto' — 'auto' defers to the track's
+                       CSS scroll-behavior: smooth, and sync() would then read
+                       a stale scrollLeft and mis-set the arrow states. */
+                    scroller.scrollTo({ left: 0, behavior: 'instant' });
+                    buildDots();
+                    sync();
+                }
+            };
         }
+
+        initCarousel(
+            document.getElementById('clients'),
+            document.getElementById('workScroller'),
+            document.getElementById('workDots'),
+            'project'
+        );
 
         /* ---------- Scroll reveal ---------- */
         var revealEls = document.querySelectorAll('.reveal');
@@ -2786,6 +3396,37 @@
         window.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && lab.dataset.open === 'true') closeLab();
         });
+
+        /* ---------- Certifications: carousel + category filter ---------- */
+        (function () {
+            var track = document.getElementById('certScroller');
+            if (!track) return;
+
+            var carousel = initCarousel(document.getElementById('certifications'), track, null, 'certificate');
+
+            var cards   = Array.prototype.slice.call(track.querySelectorAll('.cert'));
+            var filters = Array.prototype.slice.call(document.querySelectorAll('.cert-filter'));
+            var empty   = document.getElementById('certEmpty');
+
+            filters.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var cat = btn.dataset.filter;
+                    var shown = 0;
+
+                    cards.forEach(function (card) {
+                        var match = cat === 'all' || card.dataset.cat === cat;
+                        card.hidden = !match;
+                        if (match) shown++;
+                    });
+
+                    if (empty) empty.hidden = shown > 0;
+                    filters.forEach(function (b) {
+                        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+                    });
+                    if (carousel) carousel.refresh();
+                });
+            });
+        })();
 
     })();
     </script>
