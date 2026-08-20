@@ -1575,69 +1575,108 @@
            FOOTER CODING PROFILES
            ============================================================ */
 
-        /* Bare brand marks, no labels. The platform name lives in aria-label
-           and title, so the link is reachable without being visible.
-           --brand and --brand-ink are set inline per link and deliberately
-           never reference theme tokens: on hover the tile fills solid with the
-           platform's own colour and the mark flips to its contrast ink, so a
-           near-black brand like AtCoder reads the same in both themes without
-           a per-theme override. */
+        /* Tiles carry their platform's colour permanently, not just on hover.
+           --brand and --brand-ink are set inline per link and never reference
+           theme tokens, so every tile looks the same in both themes.
+
+           Because the fill is now the resting state, a few brands had to move:
+           AtCoder is near-black and HackerEarth deep navy, which vanish against
+           this footer. AtCoder inverts to a light tile with a black mark, the
+           way near-black logos are normally shown on dark; the rest lift to a
+           legible tint of their own hue. */
         .social {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             list-style: none;
             margin: 0;
             padding: 0;
         }
 
         .social__link {
+            position: relative;
             flex: 0 0 auto;
             display: grid;
             place-items: center;
             width: 42px;
             height: 42px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(233, 231, 227, 0.72);
-            transition: background 0.22s var(--ease), border-color 0.22s var(--ease),
-                        color 0.22s var(--ease), transform 0.22s var(--ease),
-                        box-shadow 0.22s var(--ease);
+            background: var(--brand);
+            color: var(--brand-ink);
+            box-shadow: 0 2px 10px -5px rgba(0, 0, 0, 0.7);
+            transition: transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1),
+                        box-shadow 0.32s var(--ease);
         }
 
-        .social__link svg { width: 19px; height: 19px; display: block; }
+        .social__link svg {
+            width: 19px;
+            height: 19px;
+            display: block;
+            transition: transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+        }
 
+        /* The selected-state ring: a dark gap the width of the footer's own
+           backdrop, then a halo in the tile's own colour, so the ring reads as
+           a selection outline rather than a second border. */
         @media (hover: hover) {
             .social__link:hover {
-                background: var(--brand);
-                border-color: var(--brand);
-                color: var(--brand-ink);
-                transform: translateY(-3px);
-                box-shadow: 0 10px 24px -12px var(--brand);
+                transform: translateY(-6px) scale(1.06);
+                box-shadow: 0 0 0 3px rgba(10, 11, 13, 0.92),
+                            0 0 0 5px var(--brand),
+                            0 18px 32px -12px var(--brand);
             }
+            .social__link:hover svg { transform: scale(1.12); }
         }
 
         .social__link:focus-visible {
-            background: var(--brand);
-            border-color: var(--brand);
-            color: var(--brand-ink);
+            outline: none;
+            transform: translateY(-6px) scale(1.06);
+            box-shadow: 0 0 0 3px rgba(10, 11, 13, 0.92),
+                        0 0 0 5px var(--brand),
+                        0 18px 32px -12px var(--brand);
         }
 
-        /* Touch devices never hover, so the marks carry full contrast at rest
-           and the brand fill lands on press instead. */
+        /* One ripple of the same ring, expanding outward and fading, fired per
+           hover. Sits on a pseudo-element so it can scale past the tile without
+           disturbing layout. */
+        .social__link::after {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            border: 2px solid var(--brand);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (hover: hover) {
+            .social__link:hover::after { animation: social-pulse 0.75s var(--ease); }
+        }
+
+        @keyframes social-pulse {
+            0%   { transform: scale(1);    opacity: 0.85; }
+            100% { transform: scale(1.55); opacity: 0; }
+        }
+
+        /* Touch devices have no hover, so the press itself gives the feedback. */
         @media (hover: none) {
-            .social__link { color: rgba(255, 255, 255, 0.88); }
             .social__link:active {
-                background: var(--brand);
-                border-color: var(--brand);
-                color: var(--brand-ink);
+                transform: scale(0.94);
+                box-shadow: 0 0 0 3px rgba(10, 11, 13, 0.92), 0 0 0 5px var(--brand);
             }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .social__link,
+            .social__link svg { transition: none; }
+            .social__link:hover,
+            .social__link:focus-visible { transform: none; }
+            .social__link:hover::after { animation: none; }
         }
 
         @media (max-width: 520px) {
             .social__link { width: 38px; height: 38px; }
-            .social { gap: 8px; }
+            .social { gap: 10px; }
         }
 
         .link-name { flex: 0 0 auto; }
@@ -3175,13 +3214,13 @@
         <div class="container footer__inner">
             <ul class="social" aria-label="Coding profiles">
                 <li><a class="social__link" style="--brand:#FFA116; --brand-ink:#1A1A1A;" href="https://leetcode.com/u/tatvam_asi/" target="_blank" rel="noopener noreferrer" aria-label="LeetCode" title="LeetCode"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-leetcode"/></svg></a></li>
-                <li><a class="social__link" style="--brand:#1F8ACB; --brand-ink:#FFFFFF;" href="https://codeforces.com/profile/ZyxterDavid" target="_blank" rel="noopener noreferrer" aria-label="Codeforces" title="Codeforces"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codeforces"/></svg></a></li>
-                <li><a class="social__link" style="--brand:#5B4638; --brand-ink:#FFFFFF;" href="https://www.codechef.com/users/sachin1307" target="_blank" rel="noopener noreferrer" aria-label="CodeChef" title="CodeChef"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codechef"/></svg></a></li>
-                <li><a class="social__link" style="--brand:#222222; --brand-ink:#FFFFFF;" href="https://atcoder.jp/users/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="AtCoder" title="AtCoder"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-atcoder"/></svg></a></li>
-                <li><a class="social__link" style="--brand:#29A7DF; --brand-ink:#FFFFFF;" href="https://profiles.topcoder.com/codemonk13" target="_blank" rel="noopener noreferrer" aria-label="Topcoder" title="Topcoder"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-topcoder"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#1F8ACB; --brand-ink:#04202F;" href="https://codeforces.com/profile/ZyxterDavid" target="_blank" rel="noopener noreferrer" aria-label="Codeforces" title="Codeforces"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codeforces"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#8A6A52; --brand-ink:#FFFFFF;" href="https://www.codechef.com/users/sachin1307" target="_blank" rel="noopener noreferrer" aria-label="CodeChef" title="CodeChef"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codechef"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#F2F2F2; --brand-ink:#16181C;" href="https://atcoder.jp/users/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="AtCoder" title="AtCoder"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-atcoder"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#29A7DF; --brand-ink:#06283A;" href="https://profiles.topcoder.com/codemonk13" target="_blank" rel="noopener noreferrer" aria-label="Topcoder" title="Topcoder"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-topcoder"/></svg></a></li>
                 <li><a class="social__link" style="--brand:#00EA64; --brand-ink:#0B2A18;" href="https://www.hackerrank.com/profile/zyxsterdavid" target="_blank" rel="noopener noreferrer" aria-label="HackerRank" title="HackerRank"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-hackerrank"/></svg></a></li>
-                <li><a class="social__link" style="--brand:#2C3454; --brand-ink:#FFFFFF;" href="https://www.hackerearth.com/@tatvam_asi/" target="_blank" rel="noopener noreferrer" aria-label="HackerEarth" title="HackerEarth"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-hackerearth"/></svg></a></li>
-                <li><a class="social__link" style="--brand:#2F8D46; --brand-ink:#FFFFFF;" href="https://www.geeksforgeeks.org/profile/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="GeeksforGeeks" title="GeeksforGeeks"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-gfg"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#4653A6; --brand-ink:#FFFFFF;" href="https://www.hackerearth.com/@tatvam_asi/" target="_blank" rel="noopener noreferrer" aria-label="HackerEarth" title="HackerEarth"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-hackerearth"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#38A55A; --brand-ink:#06250F;" href="https://www.geeksforgeeks.org/profile/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="GeeksforGeeks" title="GeeksforGeeks"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-gfg"/></svg></a></li>
                 <li><a class="social__link" style="--brand:#337AB7; --brand-ink:#FFFFFF;" href="https://www.spoj.com/users/codemonk13/" target="_blank" rel="noopener noreferrer" aria-label="SPOJ" title="SPOJ"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-spoj"/></svg></a></li>
                 <li><a class="social__link" style="--brand:#1266F1; --brand-ink:#FFFFFF;" href="https://www.interviewbit.com/profile/codemonk1307/" target="_blank" rel="noopener noreferrer" aria-label="InterviewBit" title="InterviewBit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-interviewbit"/></svg></a></li>
                 <li><a class="social__link" style="--brand:#F58025; --brand-ink:#1A1A1A;" href="https://stackoverflow.com/users/13898585/codemonk1307" target="_blank" rel="noopener noreferrer" aria-label="Stack Overflow" title="Stack Overflow"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-stackoverflow"/></svg></a></li>
