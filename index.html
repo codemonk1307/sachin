@@ -1517,17 +1517,6 @@
             .contact__intro { grid-column: auto; }
         }
 
-        /* A third link group was added (Coding Profiles). Four tracks only fit
-           the 1120px container with a tighter column gap: the email needs 322px
-           and the widest link row 217px, so 344 + 3x226 + 3x32 = 1118 leaves the intro
-           346px and each link 9px of slack. Widen the link tracks and the email
-           overflows its own column again, which is what the 1120px rule guards. */
-        @media (min-width: 1280px) {
-            .contact {
-                grid-template-columns: minmax(344px, 1fr) repeat(3, minmax(0, 226px));
-                column-gap: 32px;
-            }
-        }
 
         .link-group__title {
             margin-bottom: 12px;
@@ -1581,63 +1570,75 @@
 
         .links a:hover { background: var(--surface-hover); color: var(--text); }
 
-        /* Coding profiles render as bare brand marks, no labels. Each anchor
-           carries its platform's own colour in --brand, applied only on hover
-           and focus so the resting grid stays monochrome and quiet. The name
-           lives in aria-label and title, so the link stays reachable without
-           being visible. */
-        .profile-icons {
+
+        /* ============================================================
+           FOOTER CODING PROFILES
+           ============================================================ */
+
+        /* Bare brand marks, no labels. The platform name lives in aria-label
+           and title, so the link is reachable without being visible.
+           --brand and --brand-ink are set inline per link and deliberately
+           never reference theme tokens: on hover the tile fills solid with the
+           platform's own colour and the mark flips to its contrast ink, so a
+           near-black brand like AtCoder reads the same in both themes without
+           a per-theme override. */
+        .social {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
         }
 
-        .profile-icons .pi {
+        .social__link {
             flex: 0 0 auto;
             display: grid;
             place-items: center;
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: var(--bg);
-            color: var(--text-3);
-            transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(233, 231, 227, 0.72);
+            transition: background 0.22s var(--ease), border-color 0.22s var(--ease),
+                        color 0.22s var(--ease), transform 0.22s var(--ease),
+                        box-shadow 0.22s var(--ease);
         }
 
-        .profile-icons .pi svg { width: 19px; height: 19px; display: block; }
+        .social__link svg { width: 19px; height: 19px; display: block; }
 
-        .profile-icons .pi:hover,
-        .profile-icons .pi:focus-visible {
-            color: var(--brand);
-            background: color-mix(in srgb, var(--brand) 12%, var(--bg));
-            transform: translateY(-2px);
+        @media (hover: hover) {
+            .social__link:hover {
+                background: var(--brand);
+                border-color: var(--brand);
+                color: var(--brand-ink);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 24px -12px var(--brand);
+            }
         }
 
-        /* Official brand hexes, except where one is too dark or too light to
-           read against this page. HackerRank's #00EA64 and CodeChef's #5B4638
-           are adjusted per theme below. AtCoder and InterviewBit publish no
-           icon in Simple Icons, so their colour is approximate too. */
-        .pi--leetcode      { --brand: #FFA116; }
-        .pi--codeforces    { --brand: #1F8ACB; }
-        .pi--codechef      { --brand: #7A5C43; }
-        .pi--atcoder       { --brand: #1A1A1A; }
-        .pi--topcoder      { --brand: #29A7DF; }
-        .pi--hackerrank    { --brand: #00B54E; }
-        .pi--hackerearth   { --brand: #2C3454; }
-        .pi--gfg           { --brand: #2F8D46; }
-        .pi--spoj          { --brand: #337AB7; }
-        .pi--interviewbit  { --brand: #1976D2; }
-        .pi--stackoverflow { --brand: #F58025; }
+        .social__link:focus-visible {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: var(--brand-ink);
+        }
 
-        /* Four brands are near-black or deep navy and disappear on the dark
-           canvas, so they lift to a legible tint of the same hue. */
-        [data-theme="dark"] .pi--atcoder     { --brand: #EDEDED; }
-        [data-theme="dark"] .pi--hackerearth { --brand: #8A95CF; }
-        [data-theme="dark"] .pi--codechef    { --brand: #C09070; }
-        [data-theme="dark"] .pi--spoj        { --brand: #5DA9E9; }
-        [data-theme="dark"] .pi--hackerrank  { --brand: #00EA64; }
-        [data-theme="dark"] .pi--gfg         { --brand: #43C463; }
-        [data-theme="dark"] .pi--interviewbit{ --brand: #5AA9F0; }
+        /* Touch devices never hover, so the marks carry full contrast at rest
+           and the brand fill lands on press instead. */
+        @media (hover: none) {
+            .social__link { color: rgba(255, 255, 255, 0.88); }
+            .social__link:active {
+                background: var(--brand);
+                border-color: var(--brand);
+                color: var(--brand-ink);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .social__link { width: 38px; height: 38px; }
+            .social { gap: 8px; }
+        }
 
         .link-name { flex: 0 0 auto; }
 
@@ -1902,28 +1903,39 @@
         [data-theme="light"] .footer__inner {
             color: #7C8492;
         }
-        [data-theme="light"] .footer__inner a:hover { color: #9CA3AF; }
+        [data-theme="light"] .footer__bottom a:hover { color: #9CA3AF; }
+        /* Column now: the coding-profile marks sit above the copyright row. */
         .footer__inner {
             position: relative;
             z-index: 1;
-            padding-top: 100px;
+            padding-top: 84px;
             padding-bottom: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-end;
+            gap: 28px;
+            font-size: 0.8125rem;
+            color: var(--text-3);
+            min-height: 200px;
+        }
+        .footer__bottom {
             display: flex;
             flex-wrap: wrap;
             align-items: flex-end;
             justify-content: space-between;
             gap: 12px;
-            font-size: 0.8125rem;
-            color: var(--text-3);
-            min-height: 200px;
         }
-        .footer__inner a {
+        /* Scoped to the bottom row on purpose. Applied to .footer__inner a it
+           outranks .social__link on specificity and would flatten the icon
+           tiles from grid to inline-flex. */
+        .footer__bottom a {
             display: inline-flex;
             align-items: center;
             min-height: 32px;
             padding: 4px 2px;
         }
-        .footer__inner a:hover { color: var(--text-2); }
+        .footer__bottom a:hover { color: var(--text-2); }
 
         /* ============================================================
            SCROLL REVEAL
@@ -3115,45 +3127,6 @@
                     </div>
 
                     <div class="link-group reveal">
-                        <h3 class="link-group__title">Coding Profiles</h3>
-                        <nav class="profile-icons" aria-label="Competitive programming and coding profiles">
-                            <a class="pi pi--leetcode" href="https://leetcode.com/u/tatvam_asi/" target="_blank" rel="noopener noreferrer" aria-label="LeetCode" title="LeetCode">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-leetcode"/></svg>
-                            </a>
-                            <a class="pi pi--codeforces" href="https://codeforces.com/profile/ZyxterDavid" target="_blank" rel="noopener noreferrer" aria-label="Codeforces" title="Codeforces">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codeforces"/></svg>
-                            </a>
-                            <a class="pi pi--codechef" href="https://www.codechef.com/users/sachin1307" target="_blank" rel="noopener noreferrer" aria-label="CodeChef" title="CodeChef">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codechef"/></svg>
-                            </a>
-                            <a class="pi pi--atcoder" href="https://atcoder.jp/users/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="AtCoder" title="AtCoder">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-atcoder"/></svg>
-                            </a>
-                            <a class="pi pi--topcoder" href="https://profiles.topcoder.com/codemonk13" target="_blank" rel="noopener noreferrer" aria-label="Topcoder" title="Topcoder">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-topcoder"/></svg>
-                            </a>
-                            <a class="pi pi--hackerrank" href="https://www.hackerrank.com/profile/zyxsterdavid" target="_blank" rel="noopener noreferrer" aria-label="HackerRank" title="HackerRank">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-hackerrank"/></svg>
-                            </a>
-                            <a class="pi pi--hackerearth" href="https://www.hackerearth.com/@tatvam_asi/" target="_blank" rel="noopener noreferrer" aria-label="HackerEarth" title="HackerEarth">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-hackerearth"/></svg>
-                            </a>
-                            <a class="pi pi--gfg" href="https://www.geeksforgeeks.org/profile/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="GeeksforGeeks" title="GeeksforGeeks">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-gfg"/></svg>
-                            </a>
-                            <a class="pi pi--spoj" href="https://www.spoj.com/users/codemonk13/" target="_blank" rel="noopener noreferrer" aria-label="SPOJ" title="SPOJ">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-spoj"/></svg>
-                            </a>
-                            <a class="pi pi--interviewbit" href="https://www.interviewbit.com/profile/codemonk1307/" target="_blank" rel="noopener noreferrer" aria-label="InterviewBit" title="InterviewBit">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-interviewbit"/></svg>
-                            </a>
-                            <a class="pi pi--stackoverflow" href="https://stackoverflow.com/users/13898585/codemonk1307" target="_blank" rel="noopener noreferrer" aria-label="Stack Overflow" title="Stack Overflow">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-stackoverflow"/></svg>
-                            </a>
-                        </nav>
-                    </div>
-
-                    <div class="link-group reveal">
                         <h3 class="link-group__title">Creative</h3>
                         <nav class="links" aria-label="Ain Sheen Qaf: The Muted Void links">
                             <a href="https://ishqtmvofficial.vercel.app/" target="_blank" rel="noopener noreferrer">
@@ -3200,8 +3173,23 @@
             <img src="images/footer_background_img.jpg" alt="" loading="lazy">
         </div>
         <div class="container footer__inner">
-            <span>© <span id="year"></span> Sachin Mishra</span>
-            <a href="#top">Back to top ↑</a>
+            <ul class="social" aria-label="Coding profiles">
+                <li><a class="social__link" style="--brand:#FFA116; --brand-ink:#1A1A1A;" href="https://leetcode.com/u/tatvam_asi/" target="_blank" rel="noopener noreferrer" aria-label="LeetCode" title="LeetCode"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-leetcode"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#1F8ACB; --brand-ink:#FFFFFF;" href="https://codeforces.com/profile/ZyxterDavid" target="_blank" rel="noopener noreferrer" aria-label="Codeforces" title="Codeforces"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codeforces"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#5B4638; --brand-ink:#FFFFFF;" href="https://www.codechef.com/users/sachin1307" target="_blank" rel="noopener noreferrer" aria-label="CodeChef" title="CodeChef"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-codechef"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#222222; --brand-ink:#FFFFFF;" href="https://atcoder.jp/users/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="AtCoder" title="AtCoder"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-atcoder"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#29A7DF; --brand-ink:#FFFFFF;" href="https://profiles.topcoder.com/codemonk13" target="_blank" rel="noopener noreferrer" aria-label="Topcoder" title="Topcoder"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-topcoder"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#00EA64; --brand-ink:#0B2A18;" href="https://www.hackerrank.com/profile/zyxsterdavid" target="_blank" rel="noopener noreferrer" aria-label="HackerRank" title="HackerRank"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-hackerrank"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#2C3454; --brand-ink:#FFFFFF;" href="https://www.hackerearth.com/@tatvam_asi/" target="_blank" rel="noopener noreferrer" aria-label="HackerEarth" title="HackerEarth"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-hackerearth"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#2F8D46; --brand-ink:#FFFFFF;" href="https://www.geeksforgeeks.org/profile/tatvam_asi" target="_blank" rel="noopener noreferrer" aria-label="GeeksforGeeks" title="GeeksforGeeks"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-gfg"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#337AB7; --brand-ink:#FFFFFF;" href="https://www.spoj.com/users/codemonk13/" target="_blank" rel="noopener noreferrer" aria-label="SPOJ" title="SPOJ"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-spoj"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#1266F1; --brand-ink:#FFFFFF;" href="https://www.interviewbit.com/profile/codemonk1307/" target="_blank" rel="noopener noreferrer" aria-label="InterviewBit" title="InterviewBit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-interviewbit"/></svg></a></li>
+                <li><a class="social__link" style="--brand:#F58025; --brand-ink:#1A1A1A;" href="https://stackoverflow.com/users/13898585/codemonk1307" target="_blank" rel="noopener noreferrer" aria-label="Stack Overflow" title="Stack Overflow"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#b-stackoverflow"/></svg></a></li>
+            </ul>
+            <div class="footer__bottom">
+                <span>&copy; <span id="year"></span> Sachin Mishra</span>
+                <a href="#top">Back to top &uarr;</a>
+            </div>
         </div>
     </footer>
 
