@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DSA Mastery — 30-Day Program</title>
+<title>DSA Mastery: 30-Day Program</title>
 <meta name="description" content="A 30-day data structures and algorithms program: patterns, templates, complexity and practice problems, one day at a time.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
 
 <style>
   /* ============================================================
-     DESIGN TOKENS — shared language with the portfolio shell
+     DESIGN TOKENS: shared language with the portfolio shell
      ============================================================ */
   :root {
     --bg:            #08090A;
@@ -23,9 +23,9 @@
     --line-strong:   rgba(255, 255, 255, 0.16);
 
     --text:          #EDEEF0;
-    --prose:         #D3D7DE;  /* 15.6:1 — main reading colour */
+    --prose:         #D3D7DE;  /* 15.6:1, main reading colour */
     --text-2:        #9CA3AF;  /*  7.9:1 */
-    --text-3:        #7C8492;  /*  5.3:1 — smallest meta only */
+    --text-3:        #7C8492;  /*  5.3:1, smallest meta only */
 
     --accent:        #E4713F;
     --accent-soft:   rgba(228, 113, 63, 0.12);
@@ -44,7 +44,7 @@
 
     --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-    /* Reading scale — the "Aa" control swaps these */
+    /* Reading scale, the "Aa" control swaps these */
     --fs-prose: 1rem;      /* 16px */
     --fs-code:  0.8125rem; /* 13px */
   }
@@ -313,7 +313,7 @@
   }
 
   /* ============================================================
-     DASHBOARD — day tile grid (original)
+     DASHBOARD: day tile grid (original)
      ============================================================ */
   .days-grid {
     display: grid;
@@ -372,7 +372,7 @@
   .day-tile.completed .day-status { color: var(--easy); }
 
   /* ============================================================
-     TOPIC PAGE — single-page book view for day content
+     TOPIC PAGE: single-page book view for day content
      ============================================================ */
   .topic-page-wrap {
     max-width: var(--measure);
@@ -394,7 +394,7 @@
     flex-direction: column;
   }
 
-  /* Spine edge — left side simulated page stack */
+  /* Spine edge, left side simulated page stack */
   .topic-page::before {
     content: '';
     position: absolute;
@@ -412,7 +412,7 @@
     z-index: 2;
   }
 
-  /* Page curl — bottom right */
+  /* Page curl, bottom right */
   .topic-page::after {
     content: '';
     position: absolute;
@@ -543,7 +543,7 @@
   }
 
   /* ============================================================
-     DAY VIEW — single reading column
+     DAY VIEW: single reading column
      ============================================================ */
   .day-view-header {
     display: flex;
@@ -660,7 +660,7 @@
     gap: 10px;
   }
 
-  /* max-width holds the line length near 65 characters — the comfortable
+  /* max-width holds the line length near 65 characters, the comfortable
      reading measure. Code blocks below are deliberately left full width. */
   .card ul li {
     position: relative;
@@ -953,7 +953,7 @@
   <div class="view active" id="dashboardView">
     <div class="dash-header">
       <h1>30-Day DSA Mastery</h1>
-      <p>Five topics and five problems a day — patterns, templates, complexity and the trigger that tells you which one to reach for.</p>
+      <p>Five topics and five problems a day: patterns, templates, complexity and the trigger that tells you which one to reach for.</p>
     </div>
 
     <div class="stats-row">
@@ -1006,7 +1006,7 @@
 
     <!-- Quick Revision -->
     <div class="revision-panel" id="revisionPanel">
-      <h3>Quick revision — all templates</h3>
+      <h3>Quick revision, all templates</h3>
       <div class="revision-code" id="revisionCode"></div>
     </div>
 
@@ -1022,7 +1022,7 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// THEME SYNC — reads from localStorage set by the portfolio page
+// THEME SYNC: reads from localStorage set by the portfolio page
 // ═══════════════════════════════════════════════════════════════
 (function(){
   var t = localStorage.getItem('theme');
@@ -1041,7 +1041,7 @@
 
 const DAYS_DATA = {
   1: {
-    title: "Day 1 — Foundations",
+    title: "Day 1: Foundations",
     subtitle: "Two Pointers · Stack · Tree DFS · DP Basics · Graph DFS/BFS",
     cards: [
       {
@@ -1236,7 +1236,7 @@ for nb in graph[node]:
   },
 
   2: {
-    title: "Day 2 — Core Data Structures",
+    title: "Day 2: Core Data Structures",
     subtitle: "HashMap · Queue · BST · Grid DP · Backtracking",
     cards: [
       {
@@ -1514,7 +1514,7 @@ path.pop()`
   },
 
   3: {
-    title: "Day 3 — Search & Trees",
+    title: "Day 3: Search & Trees",
     subtitle: "Binary Search · Heap · Trie · 1D DP · Union Find",
     cards: [
       {
@@ -1832,7 +1832,7 @@ def union(x, y): parent[find(x)] = find(y)`
   },
 
   4: {
-    title: "Day 4 — Advanced Arrays & Graphs",
+    title: "Day 4: Advanced Arrays & Graphs",
     subtitle: "Prefix Sum · Deque · Segment Tree · 2D DP · Dijkstra",
     cards: [
       {
@@ -2145,7 +2145,7 @@ while heap:
   },
 
   5: {
-    title: "Day 5 — Classic Algorithms",
+    title: "Day 5: Classic Algorithms",
     subtitle: "Kadane's · Monotonic Queue · LCA · Knapsack · Bellman-Ford",
     cards: [
       {
@@ -2460,7 +2460,7 @@ for _ in range(n-1):
   },
 
   6: {
-    title: "Day 6 — Intervals & Advanced Structures",
+    title: "Day 6: Intervals & Advanced Structures",
     subtitle: "Merge Intervals · Priority Queue · AVL Intro · LIS · Floyd-Warshall",
     cards: [
       {
@@ -2872,7 +2872,7 @@ for k, i, j:
   },
 
   7: {
-    title: "Day 7 — Week 1 Review",
+    title: "Day 7: Week 1 Review",
     subtitle: "Consolidation · Practice · Pattern Recognition",
     cards: [
       {
@@ -3070,7 +3070,7 @@ while heap:
   },
 
   8: {
-    title: "Day 8 — Advanced Techniques I",
+    title: "Day 8: Advanced Techniques I",
     subtitle: "Sliding Window · Linked List · Tree BFS · Coin Change · Topological Sort",
     cards: [
       {
@@ -3444,7 +3444,7 @@ start with indegree=0, process, reduce neighbors' indegree`
   },
 
   9: {
-    title: "Day 9 — Sorting & Matrix",
+    title: "Day 9: Sorting & Matrix",
     subtitle: "Cyclic Sort · Doubly LL · Zigzag Traverse · Matrix Chain · Bipartite",
     cards: [
       {
@@ -3802,7 +3802,7 @@ same color neighbor → not bipartite`
   },
 
   10: {
-    title: "Day 10 — Advanced Sorting & Graphs",
+    title: "Day 10: Advanced Sorting & Graphs",
     subtitle: "Dutch National · Skip List · Boundary Traverse · Edit Distance · MST",
     cards: [
       {
@@ -4165,7 +4165,7 @@ sort edges, union if no cycle`
   },
 
   11: {
-    title: "Day 11 — Bit Manipulation & Caching",
+    title: "Day 11: Bit Manipulation & Caching",
     subtitle: "Bit Manipulation · LRU Cache · Tree Serialize · Regex DP · Network Flow Intro",
     cards: [
       {
@@ -4544,7 +4544,7 @@ BFS find path, push flow, update residual`
   },
 
   12: {
-    title: "Day 12 — String Algorithms & Advanced Cache",
+    title: "Day 12: String Algorithms & Advanced Cache",
     subtitle: "String Hashing · LFU Cache · Morris Traversal · Palindrome DP · Euler Path",
     cards: [
       {
@@ -4919,7 +4919,7 @@ result.append(node)  # add when backtracking`
   },
 
   13: {
-    title: "Day 13 — Pattern Matching & Advanced Graphs",
+    title: "Day 13: Pattern Matching & Advanced Graphs",
     subtitle: "KMP · Circular Buffer · Threaded Tree · Subset Sum · Bridges/Articulation",
     cards: [
       {
@@ -5354,7 +5354,7 @@ if low[v] >= disc[u]: articulation point`
   },
 
   14: {
-    title: "Day 14 — Week 2 Review",
+    title: "Day 14: Week 2 Review",
     subtitle: "Consolidation · Practice · Advanced Patterns",
     cards: [
       {
@@ -5533,7 +5533,7 @@ x ^ x = 0  # XOR same = 0
   },
 
   15: {
-    title: "Day 15 — Divide & Conquer + Advanced Trees",
+    title: "Day 15: Divide & Conquer + Advanced Trees",
     subtitle: "Divide & Conquer · Ordered Map · Red-Black Intro · Stock Buy/Sell · SCC",
     cards: [
       {
@@ -5945,7 +5945,7 @@ DFS → get finish order → DFS on reverse`
   },
 
   16: {
-    title: "Day 16 — Sorting Algorithms & Tree Concepts",
+    title: "Day 16: Sorting Algorithms & Tree Concepts",
     subtitle: "Counting Sort · Bloom Filter · B-Tree Concepts · Egg Drop · Articulation Points",
     cards: [
       {
@@ -6338,7 +6338,7 @@ non-root: low[v] >= disc[u]`
   },
 
   17: {
-    title: "Day 17 — Advanced Sorting & Data Structures",
+    title: "Day 17: Advanced Sorting & Data Structures",
     subtitle: "Radix Sort · Interval Tree · Fenwick Tree · Word Break · Minimum Cut",
     cards: [
       {
@@ -6745,7 +6745,7 @@ random edge contraction until 2 vertices`
   },
 
   18: {
-    title: "Day 18 — Advanced Structures & DP",
+    title: "Day 18: Advanced Structures & DP",
     subtitle: "Bucket Sort · Disjoint Set · Cartesian Tree · Decode Ways · 2-SAT",
     cards: [
       {
@@ -7165,7 +7165,7 @@ same SCC as negation → unsatisfiable`
   },
 
   19: {
-    title: "Day 19 — Selection & Advanced DP",
+    title: "Day 19: Selection & Advanced DP",
     subtitle: "Quick Select · Persistent DS · Splay Tree · Burst Balloons · Centroid Decomposition",
     cards: [
       {
@@ -7584,7 +7584,7 @@ O(log n) centroid tree depth`
   },
 
   20: {
-    title: "Day 20 — Streaming & Advanced Trees",
+    title: "Day 20: Streaming & Advanced Trees",
     subtitle: "Median of Stream · Rope DS · Scapegoat Tree · Cherry Pickup · HLD",
     cards: [
       {
@@ -8042,7 +8042,7 @@ O(log n) light edges per path`
   },
 
   21: {
-    title: "Day 21 — Week 3 Review",
+    title: "Day 21: Week 3 Review",
     subtitle: "Advanced Algorithms Consolidation",
     cards: [
       {
@@ -8209,7 +8209,7 @@ subtree = contiguous range in tour`,
   },
 
   22: {
-    title: "Day 22 — Geometry & Strings",
+    title: "Day 22: Geometry & Strings",
     subtitle: "Geometry Basics · Suffix Array · Wavelet Tree · TSP · Network Flows",
     cards: [
       { theme: "c1", topic: "Topic 01", title: "Computational Geometry Basics",
@@ -8397,7 +8397,7 @@ def dinic(n, edges, source, sink):
   },
 
   23: {
-    title: "Day 23 — Advanced Algorithms",
+    title: "Day 23: Advanced Algorithms",
     subtitle: "Convex Hull · Suffix Tree · Van Emde Boas · Hamiltonian · Matching",
     cards: [
       { theme: "c1", topic: "Topic 01", title: "Convex Hull",
@@ -8559,7 +8559,7 @@ def maxMatching(n, m, adj):
   },
 
   24: {
-    title: "Day 24 — Line Sweep & String Matching",
+    title: "Day 24: Line Sweep & String Matching",
     subtitle: "Line Sweep · Aho-Corasick · Link-Cut Tree · Bitmask DP · Graph Planarity",
     cards: [
       { theme: "c1", topic: "Topic 01", title: "Line Sweep Algorithm",
@@ -8741,7 +8741,7 @@ def is_possibly_planar(n, m):
   },
 
   25: {
-    title: "Day 25 — Advanced Topics I",
+    title: "Day 25: Advanced Topics I",
     subtitle: "Closest Pair · Z-Algorithm · Treap · Profile DP · Chromatic Number",
     cards: [
       { theme: "c1", topic: "Topic 01", title: "Closest Pair of Points",
@@ -8947,7 +8947,7 @@ def chromaticNumber(n, adj):
   },
 
   26: {
-    title: "Day 26 — Advanced Topics II",
+    title: "Day 26: Advanced Topics II",
     subtitle: "Voronoi · Manacher's · Advanced LCT · SOS DP · Random Graphs",
     cards: [
       { theme: "c1", topic: "Topic 01", title: "Voronoi Diagram Concepts",
@@ -9133,7 +9133,7 @@ def is_connected(n, edges):
   },
 
   27: {
-    title: "Day 27 — Expert Topics",
+    title: "Day 27: Expert Topics",
     subtitle: "Polygon Area · Suffix Automaton · Top Tree · Broken Profile · Expander Graphs",
     cards: [
       { theme: "c1", topic: "Topic 01", title: "Polygon Area & Operations",
@@ -9350,7 +9350,7 @@ def check_expansion(graph, subset, c):
   },
 
   28: {
-    title: "Day 28 — Week 4 Review",
+    title: "Day 28: Week 4 Review",
     subtitle: "Expert Topics Consolidation",
     cards: [
       { theme: "c1", topic: "Review 01", title: "Geometry Summary",
@@ -9460,7 +9460,7 @@ Euler: V - E + F = 2`,
   },
 
   29: {
-    title: "Day 29 — Mock Contest I",
+    title: "Day 29: Mock Contest I",
     subtitle: "Practice Problems · Time Management · Strategy",
     cards: [
       { theme: "c1", topic: "Contest 01", title: "Problem Solving Strategy",
@@ -9634,7 +9634,7 @@ N ≤ 10^5 → N log N
   },
 
   30: {
-    title: "Day 30 — Grand Finale",
+    title: "Day 30: Grand Finale",
     subtitle: "Mock Contest II · Complete Review · Next Steps",
     cards: [
       { theme: "c1", topic: "Final 01", title: "30-Day Journey Summary",
@@ -9832,28 +9832,28 @@ const DAY_LABELS = {
   4: "Prefix Sum · Deque · Segment Tree · 2D DP · Dijkstra",
   5: "Kadane's · Monotonic Queue · LCA · Knapsack · Bellman-Ford",
   6: "Merge Intervals · Priority Queue · AVL · LIS · Floyd-Warshall",
-  7: "Review Day — Week 1 Consolidation",
+  7: "Review Day: Week 1 Consolidation",
   8: "Sliding Window · Linked List · Tree BFS · Coin Change · Topo Sort",
   9: "Cyclic Sort · Doubly LL · Zigzag Traverse · Matrix Chain · Bipartite",
   10: "Dutch National · Skip List · Boundary Traverse · Edit Distance · MST",
   11: "Bit Manipulation · LRU Cache · Tree Serialize · Regex DP · Network Flow",
   12: "String Hashing · LFU Cache · Morris Traversal · Palindrome DP · Euler Path",
   13: "KMP / Rabin-Karp · Circular Buffer · Threaded Tree · Subset Sum · Bridges",
-  14: "Review Day — Week 2 Consolidation",
+  14: "Review Day: Week 2 Consolidation",
   15: "Divide & Conquer · Ordered Map · Red-Black · Stock Buy/Sell · SCC",
   16: "Counting Sort · Bloom Filter · B-Tree Concepts · Egg Drop · Articulation Points",
   17: "Radix Sort · Interval Tree · Fenwick Tree · Word Break · Minimum Cut",
   18: "Bucket Sort · Disjoint Set · Cartesian Tree · Decode Ways · 2-SAT",
   19: "Quick Select · Persistent DS · Splay Tree · Burst Balloons · Centroid Decomp",
   20: "Median of Stream · Rope DS · Scapegoat Tree · Cherry Pickup · HLD",
-  21: "Review Day — Week 3 Consolidation",
+  21: "Review Day: Week 3 Consolidation",
   22: "Geometry Basics · Suffix Array · Wavelet Tree · Travelling Salesman · Flows",
   23: "Convex Hull · Suffix Tree · Van Emde Boas · Hamiltonian · Matching",
   24: "Line Sweep · Aho-Corasick · Link-Cut Tree · Bitmask DP · Planarity",
   25: "Closest Pair · Z-Algorithm · Treap · Profile DP · Chromatic Number",
   26: "Voronoi · Manacher's · Splay + LCT · SOS DP · Random Graphs",
   27: "Polygon Area · Suffix Automaton · Top Tree · Broken Profile · Expander",
-  28: "Review Day — Week 4 Consolidation",
+  28: "Review Day: Week 4 Consolidation",
   29: "Mock Contest Simulation Day 1",
   30: "Mock Contest Simulation Day 2 + Grand Review"
 };
@@ -9957,7 +9957,7 @@ function showDay(day) {
   document.getElementById('dashboardView').classList.remove('active');
   document.getElementById('dayView').classList.add('active');
 
-  document.getElementById('dayTitle').textContent = data ? data.title : `Day ${day} — Coming Soon`;
+  document.getElementById('dayTitle').textContent = data ? data.title : `Day ${day}: Coming Soon`;
   document.getElementById('daySubtitle').textContent = data ? data.subtitle : 'Content will be added as you progress';
 
   // Complete button
