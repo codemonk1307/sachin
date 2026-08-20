@@ -1517,6 +1517,18 @@
             .contact__intro { grid-column: auto; }
         }
 
+        /* A third link group was added (Coding Profiles). Four tracks only fit
+           the 1120px container with a tighter column gap: the email needs 322px
+           and the widest link row 217px, so 344 + 3x226 + 3x32 = 1118 leaves the intro
+           346px and each link 9px of slack. Widen the link tracks and the email
+           overflows its own column again, which is what the 1120px rule guards. */
+        @media (min-width: 1280px) {
+            .contact {
+                grid-template-columns: minmax(344px, 1fr) repeat(3, minmax(0, 226px));
+                column-gap: 32px;
+            }
+        }
+
         .link-group__title {
             margin-bottom: 12px;
             font-family: var(--font-mono);
@@ -3010,7 +3022,7 @@
 
                     <div class="link-group reveal">
                         <h3 class="link-group__title">Tech</h3>
-                        <nav class="links" aria-label="Technical profiles">
+                        <nav class="links" aria-label="Professional profiles">
                             <a href="https://www.linkedin.com/in/sachin-mishra-7508401b1/" target="_blank" rel="noopener noreferrer">
                                 <span class="link-name">LinkedIn</span>
                                 <span class="handle">sachin-mishra</span>
@@ -3021,14 +3033,50 @@
                                 <span class="handle">@codemonk1307</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
+                            <a href="https://www.youtube.com/@recursiverootz" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">YouTube</span>
+                                <span class="handle">@recursiverootz</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <div class="link-group reveal">
+                        <h3 class="link-group__title">Coding Profiles</h3>
+                        <nav class="links" aria-label="Competitive programming and coding profiles">
                             <a href="https://leetcode.com/u/tatvam_asi/" target="_blank" rel="noopener noreferrer">
                                 <span class="link-name">LeetCode</span>
                                 <span class="handle">@tatvam_asi</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
-                            <a href="https://www.youtube.com/@recursiverootz" target="_blank" rel="noopener noreferrer">
-                                <span class="link-name">YouTube</span>
-                                <span class="handle">@recursiverootz</span>
+                            <a href="https://codeforces.com/profile/ZyxterDavid" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">Codeforces</span>
+                                <span class="handle">@ZyxterDavid</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
+                            </a>
+                            <a href="https://www.codechef.com/users/sachin1307" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">CodeChef</span>
+                                <span class="handle">@sachin1307</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
+                            </a>
+                            <a href="https://atcoder.jp/users/tatvam_asi" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">AtCoder</span>
+                                <span class="handle">@tatvam_asi</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
+                            </a>
+                            <a href="https://profiles.topcoder.com/codemonk13" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">TopCoder</span>
+                                <span class="handle">@codemonk13</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
+                            </a>
+                            <a href="https://www.hackerrank.com/profile/zyxsterdavid" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">HackerRank</span>
+                                <span class="handle">@zyxsterdavid</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
+                            </a>
+                            <a href="https://www.hackerearth.com/@tatvam_asi/" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">HackerEarth</span>
+                                <span class="handle">@tatvam_asi</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
                             <a href="https://www.geeksforgeeks.org/profile/tatvam_asi" target="_blank" rel="noopener noreferrer">
@@ -3037,7 +3085,12 @@
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
                             <a href="https://www.interviewbit.com/profile/codemonk1307/" target="_blank" rel="noopener noreferrer">
-                                <span class="link-name">Interviewbit</span>
+                                <span class="link-name">InterviewBit</span>
+                                <span class="handle">@codemonk1307</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
+                            </a>
+                            <a href="https://stackoverflow.com/users/13898585/codemonk1307" target="_blank" rel="noopener noreferrer">
+                                <span class="link-name">Stack Overflow</span>
                                 <span class="handle">@codemonk1307</span>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-external"/></svg>
                             </a>
