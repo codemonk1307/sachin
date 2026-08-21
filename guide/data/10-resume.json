@@ -1,0 +1,1228 @@
+{
+  "id": "resume",
+  "name": "Résumé, Line by Line",
+  "desc": "Every claim you print, with the mechanism behind it and the follow-up question that finds out whether you actually did the work.",
+  "color": "#E4713F",
+  "modules": [
+    {
+      "id": "story",
+      "name": "The Story & The Domain",
+      "desc": "The first four minutes of every interview: who you are, what the product does, and why you moved. Get the domain words right and the rest of the loop treats you as a senior engineer.",
+      "bullet": "Software Engineer, MedicalMine India Private Limited — CharmHealth product entity; same codebase as prior Zoho role, now on billing applying AI to revenue-cycle workflows. Member Technical Staff, ZOHO Corporation — CharmHealth: HIPAA-compliant EHR SaaS serving 10,000+ US medical practices.",
+      "concepts": [
+        {
+          "t": "The 90-second intro",
+          "tier": "core",
+          "resume": true,
+          "one": "Not your life story. Four beats: what you own now, the scale it runs at, the hardest thing you shipped, and why you are in this room.",
+          "analogy": "A film trailer. It does not tell the plot; it makes you want the ticket. Every second that is not intriguing is wasted.",
+          "points": [
+            "**Beat 1 — now:** \"I'm a backend engineer on CharmHealth, a US electronic health record platform. I own the AI layer in revenue-cycle billing.\"",
+            "**Beat 2 — scale:** the product serves 10,000+ US medical practices; state it as product scale, not your personal scale.",
+            "**Beat 3 — hardest:** one concrete rebuild. The Copilot latency work is the strongest because it has a before, an after, and a reason.",
+            "**Beat 4 — why here:** forward-looking, never a complaint about the current job.",
+            "Rehearse it to 90 seconds out loud. Written and spoken lengths are wildly different."
+          ],
+          "trap": "The 4-minute intro. Interviewers decide in the first minute whether you are senior, then spend the rest confirming it. Rambling reads as junior no matter how good the content is.",
+          "say": "I'm a backend engineer on CharmHealth — a HIPAA-regulated EHR used by 10,000+ US practices. For the last year I've owned the AI layer in revenue-cycle billing: most recently I rebuilt our clinical copilot off OpenAI's Assistants API onto an in-house agentic runtime and took p95 response from 8–15 seconds to 2–5."
+        },
+        {
+          "t": "EHR — Electronic Health Record",
+          "tier": "core",
+          "resume": true,
+          "one": "The system of record for a patient's clinical life: demographics, encounters, diagnoses, prescriptions, labs, notes. CharmHealth is a cloud, multi-tenant EHR sold to US ambulatory practices.",
+          "analogy": "A bank core-banking system, but the balance is a human body. Same demands: never lose a write, never show one customer another's data, never be down.",
+          "points": [
+            "**EHR vs EMR:** an EMR is one clinic's chart; an EHR is designed to travel between providers. Vendors use them interchangeably; know the distinction exists.",
+            "The **encounter** is the central entity — one patient visit, hanging off it are notes, orders, diagnoses, and charges.",
+            "Ambulatory (outpatient clinics) vs inpatient (hospitals). CharmHealth is ambulatory — smaller practices, higher tenant count.",
+            "Writes are effectively **append-only**: you never hard-delete a clinical note, you amend it and keep the original for the audit trail."
+          ],
+          "qa": [
+            {
+              "q": "What makes an EHR harder to build than a normal CRUD SaaS?",
+              "a": [
+                "Three things. First, the audit trail: every read and write of patient data is logged, immutably, because it is legally discoverable — that changes your data model and your storage costs.",
+                "Second, you cannot delete. Corrections are amendments with the prior version retained, so every clinical entity is versioned rather than mutated.",
+                "Third, downtime is a patient-safety issue, not a revenue issue. A clinic mid-visit with no chart access cannot safely prescribe. That pushes you toward read-replica fallbacks and very conservative deploys."
+              ]
+            }
+          ],
+          "say": "CharmHealth is a multi-tenant ambulatory EHR — cloud-hosted, sold to independent US practices rather than hospital systems."
+        },
+        {
+          "t": "HIPAA",
+          "tier": "core",
+          "resume": true,
+          "one": "The US law governing protected health information. For an engineer it reduces to four hard constraints: encrypt it, log every access, minimise what you expose, and have a signed BAA with anyone you send it to.",
+          "analogy": "A vault with a visitor book. It is not enough to lock the data — you must be able to prove afterwards exactly who opened it and why.",
+          "points": [
+            "**PHI** (protected health information) = health data plus any of 18 identifiers — name, MRN, dates, even a full-face photo.",
+            "**Encryption:** in transit (TLS 1.2+) and at rest. Non-negotiable and easy to state.",
+            "**Audit logging:** every access to PHI is recorded with actor, subject, timestamp, reason. This is what makes support tooling hard.",
+            "**Minimum necessary:** a support agent gets the least data that lets them do the job — the principle behind your read-only props endpoints.",
+            "**BAA** (Business Associate Agreement): the contract you must have before PHI touches a third party. This is *why* you are on Azure OpenAI rather than the OpenAI public API."
+          ],
+          "qa": [
+            {
+              "q": "How does HIPAA change how you build an LLM feature?",
+              "a": [
+                "It decides your vendor before it decides your architecture. The model provider has to sign a BAA and contractually not train on your data or retain prompts — that is why our clinical features run on Azure OpenAI rather than the public API.",
+                "Then it changes the plumbing: no PHI in logs or traces, no PHI in prompt-caching keys you do not control, and an audit record for every generation that touched a chart. In practice we log a request ID and the prompt version, never the prompt body."
+              ]
+            },
+            {
+              "q": "What is the minimum necessary principle and where did you apply it?",
+              "a": [
+                "You expose the least PHI that still lets someone do their job. I applied it directly when I built read-only support endpoints: agents can see which step of a workflow failed and the shape of the payload, but the response is scoped at the API security layer so identifiers never leave the boundary."
+              ]
+            }
+          ],
+          "trap": "Saying \"we were HIPAA compliant\" as a property of the code. HIPAA compliance is organisational — policies, training, BAAs, risk assessments. Your code contributes controls. Claim the controls, not the certificate.",
+          "say": "HIPAA meant three concrete things in my work: a BAA-covered model provider, PHI never entering logs or prompts we did not control, and an audit record on every access path I added."
+        },
+        {
+          "t": "Multi-tenancy",
+          "tier": "core",
+          "resume": true,
+          "one": "One deployment serving many isolated customers. 10,000+ practices share the same code and, usually, the same database — so tenant isolation is a correctness property enforced on every query.",
+          "analogy": "An apartment block. One building, one set of pipes, but a key that opens 4B must never open 4C — and the plumbing must survive one tenant filling their bath at 3am.",
+          "points": [
+            "**Isolation models:** shared schema with a `tenant_id` column (cheapest, most dangerous), schema-per-tenant, or database-per-tenant (most isolated, worst ops).",
+            "The failure mode is a single query that forgets the tenant predicate. The fix is structural: enforce it in a base repository or with row-level security, never by developer discipline.",
+            "**Noisy neighbour:** one heavy tenant degrading everyone. Handled with per-tenant rate limits and quotas — exactly the problem behind your per-token switch on Copilot.",
+            "Per-tenant config (feature flags, BYOK keys, branding) is a lookup on every request, so it lives in Redis, not the database."
+          ],
+          "qa": [
+            {
+              "q": "How do you guarantee one tenant cannot read another's data?",
+              "a": [
+                "You do not rely on every developer remembering. The tenant ID comes off the authenticated session, is put into a request-scoped context, and the data-access layer injects it into every query — application code cannot construct a query without it.",
+                "Below that, defence in depth: row-level security in the database so even a hand-written query is filtered, and a test suite that runs the whole integration pack as tenant A while asserting tenant B's rows are never visible."
+              ]
+            },
+            {
+              "q": "A single practice is generating 40× the load of the median. What do you do?",
+              "a": [
+                "Measure first — is it request volume, one pathological query, or data size? Then contain: a per-tenant token bucket at the gateway so their burst cannot exhaust the shared pool, and if it is sustained legitimate load, shard them onto their own cluster.",
+                "This is the same reasoning behind the per-token billing switch I added: a practice heavy enough to outcost a flat subscription fee is a noisy neighbour in economic terms, not just in load terms."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Revenue Cycle Management (RCM)",
+          "tier": "core",
+          "resume": true,
+          "one": "Everything between a patient walking in and the practice getting paid: eligibility check, coding the visit, submitting a claim, chasing the denial, posting the payment.",
+          "analogy": "An invoice that a third party is allowed to argue with. You bill the insurer, not the customer, and the insurer can reject on a technicality months later.",
+          "points": [
+            "**The pipeline:** eligibility → charge capture → coding → claim scrub → submit → clearinghouse → payer adjudication → ERA/remittance → payment posting → denial management → patient balance.",
+            "**Denials** are the money. A claim denied for a coding error is revenue the practice already earned and may never collect — so anything that reduces the denial rate is directly valuable.",
+            "**Days in A/R** and **clean claim rate** are the two metrics an RCM buyer cares about. Know these two even if you never touched them.",
+            "This is where AI earns its keep: coding suggestions, denial-reason classification, and appeal-letter drafting are all high-value, bounded, text-shaped problems."
+          ],
+          "qa": [
+            {
+              "q": "What does AI actually do in revenue-cycle work?",
+              "a": [
+                "The tasks are text-in, structured-out, which is exactly what an LLM is good at. Reading a clinical note and proposing the diagnosis and procedure codes. Reading a denial and classifying the reason so it routes to the right worker. Drafting the appeal letter from the note plus the payer's stated reason.",
+                "The important design point is that none of it auto-submits. Every one is a suggestion a biller accepts or edits, because a wrong code is fraud exposure, not just a bad UX."
+              ]
+            }
+          ],
+          "trap": "Do not claim you built claim adjudication or a clearinghouse integration if you did not. Say precisely which stage of the cycle your work touches — for you that is the AI-assist layer on billing workflows.",
+          "say": "Revenue cycle is everything from eligibility check to payment posting. I work on the AI layer over it — the parts that read unstructured text and turn it into something a biller can act on."
+        },
+        {
+          "t": "Medical coding: CPT, ICD-10, HCPCS",
+          "tier": "jargon",
+          "one": "The controlled vocabularies a claim is written in. ICD-10 says what is wrong with the patient; CPT says what the provider did about it; the pair has to justify each other.",
+          "analogy": "A restaurant bill where the dish names come from a fixed government menu. Invent a name, or order a steak for a patient who came in about a headache, and payment is refused.",
+          "points": [
+            "**ICD-10-CM** — diagnosis codes, roughly 70,000 of them, alphanumeric like `E11.9`.",
+            "**CPT** — procedure/service codes, 5 digits, owned by the AMA. `99213` (an established-patient office visit) is the one you will hear most.",
+            "**Medical necessity:** the payer checks the CPT is justified by the ICD. Mismatch → denial. This pairing is the hard part of automated coding.",
+            "**Modifiers** — two-character suffixes that change meaning (`-25`, `-59`). A huge share of denials are modifier errors."
+          ],
+          "trap": "Suggesting an LLM should pick codes autonomously. Upcoding — billing for more than was done — is federal fraud. The only defensible design is suggest-and-confirm with the source text cited."
+        },
+        {
+          "t": "HL7 v2 & FHIR",
+          "tier": "jargon",
+          "one": "How health systems exchange data. HL7 v2 is the pipe-delimited legacy format still running most of US healthcare; FHIR is the modern REST + JSON replacement.",
+          "analogy": "HL7 v2 is fax-era EDI that refuses to die. FHIR is the REST API someone finally wrote — and both are in production at the same hospital.",
+          "points": [
+            "**HL7 v2** — segments and pipes: `PID|1||12345^^^MRN||DOE^JOHN`. Ugly, ambiguous, and ubiquitous.",
+            "**FHIR** — resources (`Patient`, `Observation`, `Encounter`) over REST with JSON. US regulation now mandates FHIR APIs, which is why every EHR has one.",
+            "**Interoperability** is the buzzword for all of this; **SMART on FHIR** is the OAuth2 profile that lets third-party apps launch inside an EHR.",
+            "Only claim depth here if you touched it. Knowing the words is enough to sound native."
+          ]
+        },
+        {
+          "t": "Explaining the Zoho → MedicalMine move",
+          "tier": "core",
+          "resume": true,
+          "one": "Same codebase, same product, more scope. The organisations separated, the CharmHealth product line consolidated under MedicalMine, and you moved with the product you already owned.",
+          "analogy": "A studio spins a franchise out into its own label. The film crew moves with the film; nobody quit.",
+          "points": [
+            "Lead with continuity: it is not a job change, it is the same product under a new entity.",
+            "Name the upside plainly — broader scope and better compensation. That is a normal, credible motive.",
+            "**Never** discuss the founders' personal circumstances. Indian tech is small; it reads as indiscretion and it is other people's private business.",
+            "Keep it to two sentences and move on. Length signals discomfort."
+          ],
+          "trap": "Volunteering more than asked. The interviewer is checking for a red flag, not collecting gossip. Two calm sentences close it; a five-minute explanation opens it.",
+          "say": "The organisations separated and the CharmHealth product line consolidated under MedicalMine. I moved with the product I already owned — same codebase, broader scope, better compensation."
+        },
+        {
+          "t": "Your title is \"Software Engineer\"",
+          "tier": "core",
+          "resume": true,
+          "one": "Exactly as printed on the MedicalMine offer letter. Scope you can describe verbally; title you can only state as issued.",
+          "analogy": "A passport. You can describe yourself however you like in conversation; the document says one thing and it will be checked.",
+          "points": [
+            "Google runs third-party background verification against payroll records. A title mismatch is a real, common failure — not a theoretical risk.",
+            "You may absolutely say you operate at SDE-2 / senior scope with a promotion pending. Say it; do not print it.",
+            "**4+ years, never 5+.** Internships during your B.Tech do not count under levelling guidelines. Four years is already at the top of the L4 band — claiming five gets you measured against L5 depth for no gain.",
+            "If asked directly about level: \"My title is Software Engineer; my scope has been closer to SDE-2 — I own the AI layer in billing end to end.\""
+          ],
+          "trap": "Inflating either number to look stronger. Both are verified, both are cheap to check, and both turn a strong candidate into a withdrawn offer."
+        }
+      ]
+    },
+    {
+      "id": "copilot-latency",
+      "name": "The Copilot Latency Rebuild",
+      "desc": "Your single best story. It has a number, a cause, a design decision, and a risk mitigation — which is the full shape of a senior engineering answer.",
+      "bullet": "Cut Charm Copilot latency 8-15s to 2-5s, rebuilding the backend onto an in-house agentic framework replacing OpenAI's deprecating Assistants API. Kept both runtimes flag-switchable, so rollback is a flip, not a 4-5 day hotfix.",
+      "concepts": [
+        {
+          "t": "Why the Assistants API was slow",
+          "tier": "core",
+          "resume": true,
+          "one": "It was a polling, server-managed state machine. You created a thread, added a message, started a run, then polled a status endpoint until it left `queued` and `in_progress` — every hop a network round trip you did not control.",
+          "analogy": "Ordering at a counter where you cannot see the kitchen, so you walk up and ask \"ready yet?\" every second. The food was never the slow part.",
+          "points": [
+            "**Managed threads:** conversation state lived on OpenAI's side, so every turn refetched it instead of you holding it in memory or Redis.",
+            "**Polling, not streaming:** the run status had to be polled, adding seconds of dead time even after the model had finished.",
+            "**Opaque tool loop:** when the run entered `requires_action` you submitted outputs and polled again — two more round trips per tool call, and tool calls could not be run in parallel.",
+            "**No token streaming to the user:** you got the answer only when the whole run completed, so time-to-first-token equalled time-to-last-token.",
+            "Owning the loop yourself removes the polling entirely, streams the first token immediately, and lets independent tool calls run concurrently."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Before: managed run + polling. After: your own loop, streamed.",
+            "src": "# BEFORE — Assistants API: state on their side, progress by polling\nthread = client.beta.threads.create()\nclient.beta.threads.messages.create(thread.id, role=\"user\", content=q)\nrun = client.beta.threads.runs.create(thread.id, assistant_id=A)\n\nwhile run.status in (\"queued\", \"in_progress\"):\n    time.sleep(0.5)                       # dead time, every turn\n    run = client.beta.threads.runs.retrieve(thread.id, run.id)\n\n# AFTER — own the loop: state is yours, tokens stream as they are made\nmessages = history.load(conversation_id)  # from Redis, ~1ms\nmessages.append({\"role\": \"user\", \"content\": q})\n\nwhile True:\n    stream = client.chat.completions.create(\n        model=MODEL, messages=messages, tools=TOOLS, stream=True,\n    )\n    calls = yield_from_stream(stream)      # first token reaches the UI here\n    if not calls:\n        break\n    results = await gather(*[run_tool(c) for c in calls])   # parallel\n    messages += tool_messages(calls, results)"
+          },
+          "qa": [
+            {
+              "q": "Where exactly did the 8–15 seconds go?",
+              "a": [
+                "Mostly not in the model. The breakdown was polling dead-time between run-status checks, a full thread refetch per turn because conversation state lived server-side, and serialised tool calls — each one costing two extra round trips through `requires_action` and `submit_tool_outputs`.",
+                "On top of that the user saw nothing until the entire run completed, so perceived latency was worst-case by construction. Owning the loop killed the polling, moved history into Redis, let independent tool calls run concurrently, and streamed the first token straight to the UI."
+              ]
+            },
+            {
+              "q": "How much of the win was real versus perceived?",
+              "a": [
+                "Both, and I would separate them honestly. Real: removing poll intervals and parallelising tool calls cut wall-clock end-to-end time. Perceived: streaming dropped time-to-first-token to well under a second, so the feature felt instant even on the slower tail.",
+                "If I were reporting it rigorously I would give p50 and p95 for time-to-first-token and time-to-completion separately, because a single range hides which one moved."
+              ]
+            }
+          ],
+          "trap": "Claiming the model got faster. It did not — you removed orchestration overhead. Being precise about *which* latency you cut is what separates a real engineer from someone quoting a dashboard.",
+          "say": "The model was never the bottleneck. It was polling dead-time, a server-side thread refetch per turn, and serialised tool calls. I moved conversation state into Redis, owned the tool loop so independent calls run in parallel, and streamed tokens — so time-to-first-token went sub-second and end-to-end dropped to 2–5."
+        },
+        {
+          "t": "Agentic loop",
+          "tier": "core",
+          "resume": true,
+          "one": "A while-loop around a model that can call functions. Send messages, get back either a final answer or tool calls, execute them, append results, repeat until the model stops asking.",
+          "analogy": "A junior analyst with a phone. You ask a question; they may call two colleagues before answering. Your job is to place the calls, hand back what was said, and know when to stop them dialling.",
+          "points": [
+            "The loop is ~30 lines. The engineering is everything around it: **max iterations** so it cannot spin, **timeouts** per tool, **retries** with backoff, and a **token budget** so one query cannot cost a fortune.",
+            "**Parallel tool calls** are the biggest latency lever — modern models return several calls in one turn and they are usually independent.",
+            "**Termination** is the subtle bug: a model that keeps calling the same tool needs a loop-detection guard, not just an iteration cap.",
+            "**Observability:** log each iteration's tool names, latency, and token counts. Without that you cannot debug a slow agent, only guess."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "The whole pattern, with the guards that matter",
+            "src": "async def run_agent(messages, tools, *, max_iters=8, budget=20_000):\n    used = 0\n    for i in range(max_iters):\n        resp = await llm.chat(messages, tools=tools, stream=True)\n        used += resp.usage.total_tokens\n        if used > budget:\n            raise BudgetExceeded(i, used)\n\n        if not resp.tool_calls:\n            return resp.content                 # normal exit\n\n        # Independent calls run concurrently — the main latency win.\n        results = await asyncio.gather(*[\n            asyncio.wait_for(dispatch(c), timeout=5.0)\n            for c in resp.tool_calls\n        ], return_exceptions=True)\n\n        messages.append(resp.as_message())\n        for call, out in zip(resp.tool_calls, results):\n            messages.append({\n                \"role\": \"tool\",\n                \"tool_call_id\": call.id,\n                \"content\": serialise(out),      # errors go back as text\n            })                                  # so the model can recover\n\n    raise MaxIterations(max_iters)"
+          },
+          "qa": [
+            {
+              "q": "How do you stop an agent looping forever?",
+              "a": [
+                "Three independent guards, because any one of them alone fails. A hard iteration cap. A cumulative token budget, which catches the expensive-but-short loop the iteration cap misses. And loop detection — hash the tool name plus arguments each turn, and if the same call repeats twice, break and return what you have.",
+                "The last one matters most in practice. Models rarely loop forever; they re-call the same failing tool with the same arguments because the error message did not tell them anything actionable."
+              ]
+            },
+            {
+              "q": "What happens when a tool call fails?",
+              "a": [
+                "It goes back to the model as a tool message containing the error text, not as an exception that kills the request. The model can usually recover — retry with corrected arguments, or tell the user it could not look something up.",
+                "The exception is anything non-retryable or unsafe: auth failures, permission denials, or a tool that mutates state. Those terminate the loop and surface a real error, because letting a model retry a write is how you get double-charges."
+              ]
+            },
+            {
+              "q": "Why build your own instead of using LangChain or the Agents SDK?",
+              "a": [
+                "The forcing function was that the Assistants API was being deprecated, so we were rewriting regardless. Given that, the loop itself is small, and what we actually needed was control over the things frameworks abstract away: streaming, per-tool timeouts, our own tracing, and a flag boundary that let both runtimes coexist.",
+                "I would not argue against frameworks generally — for a greenfield product I would probably start with one. Here we already had the constraints, the surface was narrow, and owning it made the latency work possible."
+              ]
+            }
+          ],
+          "trap": "Describing the loop and stopping. Anyone can write the loop. The interview signal is entirely in the guards — iteration caps, budgets, timeouts, loop detection, and how errors get back to the model."
+        },
+        {
+          "t": "Tool / function calling",
+          "tier": "core",
+          "resume": true,
+          "one": "You hand the model a JSON Schema for each function it may call. It replies with a name and arguments; your code executes it. The model never runs anything — it only asks.",
+          "analogy": "A waiter with a fixed order pad. They can write \"table 4, one steak, medium\" — they cannot walk into the kitchen and cook.",
+          "points": [
+            "The **schema is the prompt**. Vague descriptions produce wrong calls far more often than a weak model does. Describe when *not* to use the tool as well as when to.",
+            "Arguments are model-generated, therefore **untrusted input**. Validate against the schema, then authorise against the *user's* permissions — never the agent's.",
+            "Keep the tool count low. Beyond roughly 15–20 tools, selection accuracy falls off; group them or route in two stages.",
+            "**Strict mode / constrained decoding** guarantees syntactically valid JSON, which removes a whole class of parse-retry latency."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "A tool definition, and the authorisation that must wrap it",
+            "src": "TOOLS = [{\n  \"type\": \"function\",\n  \"function\": {\n    \"name\": \"get_claim_status\",\n    \"description\": (\n      \"Look up the adjudication status of a submitted claim. \"\n      \"Use only when the user names a specific claim ID. \"\n      \"Do NOT use for questions about how claims work in general.\"\n    ),\n    \"parameters\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"claim_id\": {\"type\": \"string\", \"pattern\": \"^CLM[0-9]{8}$\"},\n      },\n      \"required\": [\"claim_id\"],\n      \"additionalProperties\": False,\n    },\n    \"strict\": True,          # constrained decoding: always valid JSON\n  },\n}]\n\ndef dispatch(call, *, actor):\n    args = validate(call.arguments, SCHEMAS[call.name])   # shape\n    # Authorise as the human, never as the agent. The model chose the\n    # claim_id, so it is user input with extra steps.\n    if not can_read_claim(actor, args[\"claim_id\"]):\n        return {\"error\": \"not authorised for this claim\"}\n    return REGISTRY[call.name](**args)"
+          },
+          "qa": [
+            {
+              "q": "The model calls a tool with an ID belonging to another practice. What stops it?",
+              "a": [
+                "Authorisation at dispatch, evaluated against the authenticated human's tenant and role — not against the agent. The model's output is user-controlled input, so it gets exactly the same treatment as a request parameter someone typed.",
+                "In a multi-tenant EHR that is the whole ballgame. The agent runs inside a request context that already carries the tenant; the data layer injects it, so a cross-tenant ID simply returns not-found rather than being trusted because a model produced it."
+              ]
+            },
+            {
+              "q": "How do you get reliable tool selection with many tools?",
+              "a": [
+                "First, invest in the descriptions — most misfires are ambiguity between two tools, fixed by stating what each one is *not* for. Second, cap the count: past roughly twenty, accuracy degrades, so I would route in two stages, picking a tool group first, then the tool.",
+                "And measure it. Tool selection is a classification problem, so build a labelled set of queries with the expected call and score it on every prompt change. Otherwise you are tuning by anecdote."
+              ]
+            }
+          ],
+          "trap": "Treating model-generated arguments as trusted because they came from your own model. They are the least trusted input in the system — an attacker controls them via prompt injection in any document the agent reads."
+        },
+        {
+          "t": "Streaming & time-to-first-token",
+          "tier": "core",
+          "resume": true,
+          "one": "Two different latencies. **TTFT** is how long until the first token appears; **TPOT** is how fast the rest arrives. Streaming attacks TTFT, which is the one users actually feel.",
+          "analogy": "A kettle with a glass body. It boils in the same time either way, but watching it fill with steam is a completely different experience from staring at steel.",
+          "points": [
+            "**Prefill** processes your whole prompt in parallel — cost scales with input length, and it sets TTFT.",
+            "**Decode** generates one token at a time, each attending to all previous — it sets TPOT and scales with output length.",
+            "So: a long prompt hurts TTFT, a long answer hurts total time. Trimming retrieved context is a *latency* fix, not just a cost fix.",
+            "**Server-Sent Events (SSE)** is the right transport — one-directional, plain HTTP, reconnects for free. WebSockets are overkill for token streaming.",
+            "Streaming changes error handling: you have already sent a 200 and half an answer when the failure arrives. You need an in-band error event, not a status code."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "SSE streaming, including the mid-stream failure case",
+            "src": "@app.get(\"/copilot/stream\")\nasync def stream(q: str, request: Request):\n    async def gen():\n        try:\n            async for chunk in agent.run(q):\n                if await request.is_disconnected():\n                    break                       # stop paying for a dead client\n                yield f\"data: {json.dumps({'t': chunk})}\\n\\n\"\n            yield \"data: [DONE]\\n\\n\"\n        except Exception as e:\n            log.exception(\"stream failed\")\n            # Headers are long gone — the error must travel in-band.\n            yield f\"event: error\\ndata: {json.dumps({'msg': str(e)})}\\n\\n\"\n\n    return StreamingResponse(gen(), media_type=\"text/event-stream\")"
+          },
+          "qa": [
+            {
+              "q": "Why is TTFT the metric you optimised rather than total latency?",
+              "a": [
+                "Because it is the one the user experiences as responsiveness. Total time to a 400-token answer is dominated by decode, which is bounded by the model — I cannot make it much faster. TTFT is dominated by my own overhead: polling, state fetches, prompt length, and tool round trips, all of which I control.",
+                "That is why I quote both. Dropping TTFT under a second changed how the feature felt; dropping end-to-end from 8–15s to 2–5s is the wall-clock claim."
+              ]
+            },
+            {
+              "q": "An error occurs after you have streamed 200 tokens. What does the client see?",
+              "a": [
+                "You cannot change the status code — it was 200 the moment the first byte went out. So the contract has to carry errors in-band: a named SSE `error` event that the client listens for, distinct from the `[DONE]` sentinel.",
+                "On the client, partial output stays on screen with an explicit failure marker rather than vanishing, because silently discarding text the user already read is worse than showing it was cut short."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Percentiles: p50, p95, p99",
+          "tier": "core",
+          "resume": true,
+          "one": "Averages hide the users you are losing. p95 = 95% of requests were faster than this. In an interview, quoting p95 instead of \"average\" instantly reads as someone who has run a service.",
+          "analogy": "Average income in a room with a billionaire tells you nothing about anyone in it. The median and the tail do.",
+          "points": [
+            "A single slow dependency shows up in p99 long before it moves the mean — the tail is your early-warning system.",
+            "**Percentiles do not add.** You cannot sum the p95 of three services to get the p95 of the chain; the tail compounds worse than that.",
+            "**Fan-out amplifies tails:** if a request hits 10 backends, it is roughly as slow as the slowest, so a 1-in-100 slow backend affects ~10% of requests.",
+            "Report a **window**: \"p95 over 7 days\". A percentile without a time window is not a number.",
+            "Your `8-15s → 2-5s` is really a range. Convert it: what were p50 and p95 before and after? That is the version that survives cross-examination."
+          ],
+          "qa": [
+            {
+              "q": "Your p50 is fine but p99 tripled. Where do you look?",
+              "a": [
+                "Tail latency is almost never CPU — it is queueing, contention, or a cold path. In order: garbage-collection pauses, connection-pool exhaustion, a cache miss falling through to a slow origin, a lock, or a retry storm from a downstream that just got slower.",
+                "The way to find it is tracing, not metrics. A metric tells you the tail moved; a distributed trace on the slow requests specifically tells you which span owns it. Sampling by latency — always trace the slowest 1% — is what makes that practical."
+              ]
+            }
+          ],
+          "trap": "Being asked \"was that p50 or p95?\" and not knowing. Go and pull the real numbers from your dashboards before the interview. This is the single most likely place your best story gets punctured."
+        },
+        {
+          "t": "Feature flags & the flag-switchable rollback",
+          "tier": "core",
+          "resume": true,
+          "one": "A runtime switch that decouples deploying code from releasing behaviour. Both runtimes shipped in the same binary; a config change chose which one ran.",
+          "analogy": "A double-track railway with a points lever. The new line is already laid and tested; switching traffic is a lever pull, not a construction project.",
+          "points": [
+            "**Why it matters:** rollback becomes seconds instead of a 4–5 day hotfix cycle — build, review, QA, release train.",
+            "**Granularity is the real design:** global, per-tenant, or percentage rollout. Per-tenant lets you pilot with friendly practices first.",
+            "**Kill switch vs experiment flag:** a kill switch is permanent and must default safe; an experiment flag is temporary and must be deleted.",
+            "**Flag debt is real.** Two runtimes behind a flag means every bug reproduces twice and every test matrix doubles. Ship it, then set a date to delete the old path.",
+            "Evaluate flags once per request and pass the decision down — not scattered through the call stack, or one request can run half in each mode."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Decide once at the edge, then pass it down",
+            "src": "def handle(request):\n    # Resolve ONCE per request. Re-checking deeper down means a single\n    # request can execute half old-path, half new-path.\n    runtime = flags.variant(\n        \"copilot.runtime\",\n        default=\"assistants\",         # safe default: the known-good path\n        tenant=request.tenant_id,\n        rollout={\"agentic\": 0.10},    # 10% of tenants, sticky by hash\n    )\n    engine = AGENTIC if runtime == \"agentic\" else ASSISTANTS\n    with trace.span(\"copilot\", runtime=runtime):   # tag telemetry with it\n        return engine.run(request)"
+          },
+          "qa": [
+            {
+              "q": "How did you validate the new runtime before switching traffic?",
+              "a": [
+                "Rolled out by tenant, not by percentage of requests, so a given practice always saw one consistent experience — mixed behaviour within one clinic's session would have been confusing and unsupportable.",
+                "Started with internal and a small pilot set, watched error rate and latency tagged by runtime so the two were directly comparable on one dashboard, then widened. The flag defaulted to the old path, so any failure to read config failed safe."
+              ]
+            },
+            {
+              "q": "What is the cost of keeping both runtimes?",
+              "a": [
+                "Doubled surface area. Every bug report starts with \"which runtime\", every integration test matrix doubles, and dead code rots because nobody is reading it. It is genuinely expensive.",
+                "It was worth it during migration because the alternative was a multi-day hotfix on a clinical feature. But a migration flag with no removal date is just permanent complexity — the correct end state is deleting the old path once confidence is there."
+              ]
+            }
+          ],
+          "say": "Both runtimes shipped in the same binary behind a per-tenant flag defaulting to the old path. Rolling back was a config change measured in seconds, not a hotfix measured in days."
+        }
+      ]
+    },
+    {
+      "id": "provisioning",
+      "name": "The Provisioning CLI",
+      "desc": "Your strongest self-initiated story: you found the problem, built the tool, and shipped it as a distribution channel rather than a script. That combination is exactly what a hiring committee reads as scope.",
+      "bullet": "Cut dev-environment setup from 1-2 days and 3-4 engineers to a single 10-minute command with a self-initiated 12-phase idempotent provisioning tool, packaged as a versioned CLI so build-process changes reach all 40 engineers across India and US through one upgrade command.",
+      "concepts": [
+        {
+          "t": "Idempotency in provisioning",
+          "tier": "core",
+          "resume": true,
+          "one": "Running the tool twice leaves the machine in the same state as running it once. Every phase asks \"is this already true?\" before doing anything.",
+          "analogy": "A packing list, not a set of instructions. \"Passport in the bag\" is safe to re-read; \"put the passport in the bag\" run twice packs two passports.",
+          "points": [
+            "**Declarative, not imperative:** phases assert desired state (`user exists`, `port 3306 responds`) rather than performing actions blindly.",
+            "This is what makes the tool **resumable**. A laptop that dies at phase 8 re-runs and skips 1–7 in seconds — the difference between a tool and a script.",
+            "Idempotency is also what makes it **safe to re-run for updates**: the same command that installs also upgrades.",
+            "The hard cases are the non-idempotent primitives: appending to a config file, `INSERT` without a uniqueness constraint, generating a new secret. Each needs an explicit guard."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "The phase contract that makes the whole thing resumable",
+            "src": "class Phase:\n    name: str\n    def check(self) -> bool:  ...   # is the desired state already true?\n    def apply(self) -> None:  ...   # make it true\n    def verify(self) -> bool: ...   # prove it, independently of apply()\n\ndef provision(phases, state):\n    for i, p in enumerate(phases, 1):\n        if state.done(p.name) and p.check():\n            log.info(\"%02d %-24s skip\", i, p.name)\n            continue\n        log.info(\"%02d %-24s ...\", i, p.name)\n        p.apply()\n        if not p.verify():                     # never trust apply()\n            raise PhaseFailed(p.name)          # stop; next run resumes here\n        state.mark(p.name)                     # checkpoint to disk"
+          },
+          "qa": [
+            {
+              "q": "What actually made setup take one to two days before?",
+              "a": [
+                "It was never one big task — it was a long tail of small unknowns. Undocumented tribal steps, versions that had drifted since the wiki was written, ordering dependencies nobody had written down, and secrets you had to ask a specific person for.",
+                "The cost multiplier was that it took three or four engineers, because a new joiner would get stuck and pull someone senior in. Encoding the knowledge into checked phases turned tacit knowledge into something executable, and the verify step meant it failed loudly at the right phase instead of silently three steps later."
+              ]
+            },
+            {
+              "q": "How do you handle a phase that is genuinely not idempotent, like generating a secret?",
+              "a": [
+                "You make the *outcome* idempotent even when the operation is not. For a secret, check whether one already exists in the store and only generate when absent — so the assertion is \"a valid secret exists\", not \"generate a secret\".",
+                "For appending to a config file, write a marker-delimited block and replace the block rather than appending. Same principle: convert the imperative action into a desired-state assertion."
+              ]
+            }
+          ],
+          "trap": "Calling it idempotent when it is only \"safe to re-run\". Idempotent means the *end state* is identical. If a second run reinstalls and takes the same 10 minutes, it is re-runnable, not idempotent — know which one you built."
+        },
+        {
+          "t": "Shipping it as a versioned CLI",
+          "tier": "core",
+          "resume": true,
+          "one": "The insight that upgrades this from a script to infrastructure: packaging it means a build-process change reaches 40 engineers through one upgrade command instead of a Slack message nobody reads.",
+          "analogy": "The difference between emailing everyone a recipe and opening a restaurant. One depends on 40 people doing it right; the other has one kitchen.",
+          "points": [
+            "**Semantic versioning:** MAJOR breaks, MINOR adds, PATCH fixes. A provisioning tool's MAJOR bump means \"your existing environment needs migration\", which is a real user-facing contract.",
+            "**Version pinning per branch:** the tool version should be declared in the repo, so checking out an old branch provisions the environment that branch expects.",
+            "**Self-update check** on run — warn on drift, do not silently auto-upgrade. Silent upgrades break the one engineer mid-debug.",
+            "**Telemetry:** which version each engineer is on, and which phase fails most. Without it you are guessing where the pain is.",
+            "This is a **distribution channel**, and that framing is the senior signal. You did not automate a task; you built the path changes travel down."
+          ],
+          "qa": [
+            {
+              "q": "How do you roll out a breaking change to the provisioning tool?",
+              "a": [
+                "Same discipline as any API. Ship the new behaviour behind a minor version first with the old path still working and a deprecation warning naming the removal version. Give people a release where both work.",
+                "Then bump major, and make the tool detect an environment provisioned by the old major and either migrate it or fail with an explicit instruction. The failure mode to avoid is a half-migrated environment, because that is worse than either state."
+              ]
+            },
+            {
+              "q": "Why is this more valuable than the setup time it saved?",
+              "a": [
+                "The setup saving is one-off per engineer. The distribution channel is permanent. Before, any change to the build process was a message in a channel and a slow, uneven rollout where half the team was on a stale toolchain and nobody knew which half.",
+                "After, a build change ships as a version, and telemetry tells you adoption. That converts an unbounded coordination cost into a release."
+              ]
+            }
+          ],
+          "say": "The setup-time number is the headline, but the reason it mattered is that packaging it created a distribution channel — build-process changes now reach all 40 engineers as a version bump instead of a Slack message."
+        },
+        {
+          "t": "Self-initiated work — how to tell it",
+          "tier": "core",
+          "resume": true,
+          "one": "Nobody assigned this. That is the point, and it is the single hardest signal to demonstrate at L4 → L5. Tell it as: I noticed, I quantified, I built, I measured, it stuck.",
+          "analogy": "The difference between a firefighter and someone who noticed the wiring and rewired the building. Only one of those gets promoted for it.",
+          "points": [
+            "**Noticed:** be specific about the trigger — watching a new joiner lose two days is a better opening than \"setup was painful\".",
+            "**Quantified before building:** 1–2 days × 3–4 engineers × N joiners. Doing the arithmetic *first* is what distinguishes initiative from a side project.",
+            "**Got buy-in:** you cannot roll a tool to 40 engineers across two countries without persuading someone. Say who and how.",
+            "**Measured after:** 10 minutes, one command. And adoption — a tool nobody runs saved nothing.",
+            "Google's rubric calls this \"scope beyond your assigned work\". Say the sentence explicitly: *nobody asked me to build this.*"
+          ],
+          "qa": [
+            {
+              "q": "How did you get 40 engineers across two countries to adopt it?",
+              "a": [
+                "It had to be strictly easier than the status quo on day one, so I made the first run work end-to-end before showing anyone — a tool that half works gets abandoned and never gets a second try.",
+                "Then I used onboarding as the wedge: new joiners had no habit to unlearn, so they were pure upside, and their setup time became the visible proof. Existing engineers came across when the build process changed and the tool was the only path that had the change. Being the distribution channel is what made adoption inevitable rather than voluntary."
+              ]
+            }
+          ],
+          "trap": "Under-claiming. Engineers routinely describe self-initiated infrastructure work as \"a small tool I wrote\". Say the numbers, say nobody asked for it, and say how many people use it."
+        },
+        {
+          "t": "Reproducible environments: the alternatives",
+          "tier": "deep",
+          "one": "Expect the follow-up: why a provisioning CLI rather than Docker Compose, a devcontainer, or Nix? Having a real answer shows you chose rather than defaulted.",
+          "analogy": "Furnishing a rented flat versus shipping a prefab room. Both give you somewhere to sleep; the trade-off is how much of the building you are allowed to change.",
+          "points": [
+            "**Docker Compose:** great isolation, but a large legacy service stack in containers can be slow on macOS file mounts, and native tooling like IDE debuggers gets fiddly.",
+            "**Devcontainers:** Compose plus editor integration. Strong choice if the whole team is on VS Code, weaker if they are not.",
+            "**Nix:** genuinely reproducible, and a genuinely steep learning curve for 40 engineers.",
+            "**Provisioning the host:** best when the stack is heterogeneous and pre-existing — you meet the codebase where it is instead of containerising a decade of assumptions first.",
+            "The honest senior answer names the trade-off you accepted: host provisioning is less isolated and drifts more, which is exactly why the `verify()` step per phase matters."
+          ],
+          "qa": [
+            {
+              "q": "Why not just containerise the whole dev environment?",
+              "a": [
+                "It is the better end state and I would not argue otherwise. The reason it was not the move here is sequencing: containerising a large existing stack is itself a multi-quarter project, and the pain I was solving was immediate.",
+                "Provisioning the host got setup from two days to ten minutes without requiring the codebase to change at all. The cost I accepted is weaker isolation and more environment drift, which is why every phase verifies its own state independently rather than trusting that it ran."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ticket-agent",
+      "name": "The Debugging-Ticket Agent",
+      "desc": "A small system with a sharp idea: capture engineering knowledge at the moment it is created, when it is cheapest and most accurate.",
+      "bullet": "Built an LLM agent that turns each debugging session into a labeled, structured ticket record (root cause, fix, rationale) and appends it to a searchable AppSheet log, capturing 100+ tickets a month across the billing team.",
+      "concepts": [
+        {
+          "t": "Structured output",
+          "tier": "core",
+          "resume": true,
+          "one": "Forcing the model to emit JSON that conforms to a schema, so the output is a record you can store and query — not prose you have to parse.",
+          "analogy": "A form instead of a letter. The letter may be beautifully written; only the form goes into the database.",
+          "points": [
+            "**Constrained decoding / strict mode** masks invalid tokens during generation, so the output is *guaranteed* parseable. That is stronger than asking nicely and retrying.",
+            "Design the schema for **queryability**: enums for root-cause category, not free text. Free text cannot be aggregated, and aggregation is the entire value of the log.",
+            "Keep an `evidence` field pointing at the source — the stack trace, the commit. Structured output without provenance is unverifiable.",
+            "Always allow `\"unknown\"`. A model with no null option will invent a plausible root cause, which is worse than an empty field."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Enums for what you will aggregate, free text only for what you will read",
+            "src": "SCHEMA = {\n  \"type\": \"object\",\n  \"properties\": {\n    # Enum, not free text — this is the column you will GROUP BY.\n    \"root_cause\": {\"enum\": [\n        \"config\", \"race\", \"null_deref\", \"schema_drift\",\n        \"third_party\", \"perf\", \"auth\", \"unknown\",\n    ]},\n    \"component\":  {\"type\": \"string\"},\n    \"summary\":    {\"type\": \"string\", \"maxLength\": 280},\n    \"fix\":        {\"type\": \"string\"},\n    \"evidence\":   {\"type\": \"string\", \"description\": \"trace or commit ref\"},\n    \"confidence\": {\"enum\": [\"high\", \"medium\", \"low\"]},\n  },\n  \"required\": [\"root_cause\", \"summary\", \"fix\", \"confidence\"],\n  \"additionalProperties\": False,\n}\n\nrec = llm.extract(transcript, schema=SCHEMA, strict=True)\nif rec[\"confidence\"] == \"low\":\n    rec[\"needs_review\"] = True      # queue for a human, do not drop"
+          },
+          "qa": [
+            {
+              "q": "How do you know the extracted root cause is correct?",
+              "a": [
+                "You do not, per record — so the design has to assume some are wrong. Three mitigations: a required confidence field with low-confidence records flagged for review, an `unknown` enum value so the model has an honest exit, and an evidence field so any record can be traced back to source.",
+                "Then measure it properly: hand-label a sample against the engineer who actually fixed the bug and report accuracy per category. Some categories are easy — a null dereference is obvious from a trace. Race conditions are not, and I would expect accuracy to be visibly worse there."
+              ]
+            },
+            {
+              "q": "Why enums rather than letting the model describe the cause freely?",
+              "a": [
+                "Because the value of the log is aggregate, not individual. \"Schema drift caused 30% of billing incidents this quarter\" is an actionable finding; a thousand uniquely-worded descriptions of schema drift is not.",
+                "Free text goes in the summary field, which humans read. Anything I want to count gets a closed vocabulary."
+              ]
+            }
+          ],
+          "trap": "Saying \"I asked it to return JSON\". Prompting for JSON and *constraining* generation to a schema are different reliability classes. Know which one you used."
+        },
+        {
+          "t": "Capture at the moment of creation",
+          "tier": "core",
+          "resume": true,
+          "one": "The reason this works: engineers will never write up a debugging session afterwards, but they will let a tool do it while the context is still in their head.",
+          "analogy": "A dashcam. Nobody writes an accident report from memory a week later, and if they do it is wrong.",
+          "points": [
+            "The cost of documentation is not writing — it is the **context switch**. Removing the switch is the whole product.",
+            "Knowledge decays fast: the reasoning behind a fix is largely gone within days, even to the person who made it.",
+            "**100+ tickets a month** is the real metric here, because it proves adoption. A knowledge base nobody feeds is a dead knowledge base.",
+            "The second-order value is search: the next engineer hitting the same symptom finds the prior root cause instead of re-deriving it."
+          ],
+          "qa": [
+            {
+              "q": "What is this actually worth?",
+              "a": [
+                "Two things, and I would be careful not to overclaim either. The measurable one is duplicate-debug avoidance — the same class of bug recurring and being re-diagnosed from scratch. To claim it properly I would track how often a search precedes a resolution.",
+                "The one I would argue for even without a number is aggregate visibility. Once root causes are a closed vocabulary you can see that a third of billing incidents trace to one cause, and that turns firefighting into a fix you can prioritise."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "AppSheet as the store",
+          "tier": "jargon",
+          "one": "Google's low-code layer over Sheets. Chosen because the consumers are billing-team humans who need to search and filter, not engineers who need an API.",
+          "analogy": "Putting the fire extinguisher where people actually stand, not in the technically optimal cupboard.",
+          "points": [
+            "Be ready to defend it. The honest defence: zero infrastructure, zero access-provisioning, and the non-engineers who need it were already living in that surface.",
+            "Know the limits so you are not caught out: row limits, no real transactions, no complex joins, and latency that is fine for tens of thousands of rows and not for millions.",
+            "The migration path is obvious and worth saying — append to a proper store and keep AppSheet as a view once volume justifies it.",
+            "**Append-only** is the right model regardless of backing store: a ticket record is an event, not a mutable row."
+          ],
+          "qa": [
+            {
+              "q": "Why not a real database?",
+              "a": [
+                "Because the users were not engineers. The value only exists if billing-team people search it themselves, and AppSheet gave them filtering and views with no access-provisioning and no UI to build.",
+                "I would move it the moment volume or query complexity outgrew it — the write path is append-only, so swapping the sink is a small change. But building a service plus an admin UI first would have delayed the thing that actually mattered, which was proving people would use it."
+              ]
+            }
+          ],
+          "trap": "Being defensive about the low-code choice. Choosing the boring tool that fits the user is a senior decision — as long as you can name its limits and the migration trigger."
+        }
+      ]
+    },
+    {
+      "id": "ekyc",
+      "name": "The e-KYC Identity Platform",
+      "desc": "Your largest shipped system by user count, and the one with the most interesting trade-off in it: a threshold that trades fraud against locking out real doctors.",
+      "bullet": "Cut fraudulent accounts 67% with an e-KYC identity platform on AWS Rekognition (Java, 6 flows: signup, EPCS, admin and member self-verification): 60,000+ users onboarded, 83% demographic match, $100,000+ revenue.",
+      "concepts": [
+        {
+          "t": "e-KYC / identity proofing",
+          "tier": "core",
+          "resume": true,
+          "one": "Proving a remote person is who they claim to be: they photograph a government ID, then take a selfie, and you check the document is genuine, the faces match, and a live human is present.",
+          "analogy": "A bouncer checking a licence. Is the card real, is it you, and are you actually standing here rather than holding up a photo?",
+          "points": [
+            "**Three independent checks**, and weakness in any one breaks the chain: document authenticity, face match (selfie ↔ ID photo), and liveness.",
+            "**Demographic match** — the name and date of birth parsed off the document reconciled against what the user typed. Your 83%.",
+            "**Identity Assurance Levels (IAL)** from NIST 800-63: IAL1 self-asserted, IAL2 remote-verified with evidence, IAL3 in-person. Remote e-KYC targets IAL2. Naming this is a strong signal.",
+            "The genuinely hard part is not the tech — it is the **threshold**, because a false reject is a real doctor locked out of their own practice."
+          ],
+          "qa": [
+            {
+              "q": "How did you pick the face-match confidence threshold?",
+              "a": [
+                "It is a business decision expressed as a number, so I would frame it as the cost of a false accept versus a false reject. A false accept is a fraudulent account with prescribing capability. A false reject is a legitimate physician blocked at signup — churn, a support ticket, and a bad first impression.",
+                "In a clinical product with EPCS in scope the asymmetry favours strictness, but you cannot just crank it up: past a point you are rejecting real users for lighting and camera quality. So you set it high, and you build a manual-review queue for the band just below the threshold rather than hard-failing there. That converts false rejects into a slower path instead of a lost user."
+              ]
+            },
+            {
+              "q": "What is liveness detection and why does face matching fail without it?",
+              "a": [
+                "Face matching alone compares two images — it cannot tell whether the selfie is a live person or a photo of one. Without liveness, the attack is trivial: take a picture of someone's ID and a picture of their photo.",
+                "Passive liveness looks for signals a replay lacks — texture, depth cues, screen moiré. Active liveness asks for a randomised challenge like turning your head. Active is harder to spoof and worse for accessibility, which is the same false-reject trade-off in a different place."
+              ]
+            }
+          ],
+          "trap": "Quoting only the match rate. The interviewer's next question is the false-accept and false-reject rates, because that is where the actual engineering judgement lives."
+        },
+        {
+          "t": "AWS Rekognition",
+          "tier": "jargon",
+          "resume": true,
+          "one": "A managed vision API. `CompareFaces` returns a similarity score between two images; `DetectFaces` returns attributes and quality metrics you use to reject bad captures before you ever compare.",
+          "analogy": "Renting a forensics lab rather than building one. You send evidence, you get a confidence score, you still decide the verdict.",
+          "points": [
+            "`CompareFaces` gives a **similarity percentage**, not a yes/no. You own the threshold, and therefore you own the outcome.",
+            "`DetectFaces` quality attributes (brightness, sharpness, pose, eyes-open) let you fail fast with a *useful* message — \"too dark, try again\" beats \"verification failed\".",
+            "**Face liveness** is a separate managed flow; `CompareFaces` on its own is trivially spoofable by a photo.",
+            "Managed-service trade-off worth naming: no model to train or host, but you inherit their bias profile, their pricing, and their region availability — and biometric data means data-residency questions."
+          ],
+          "qa": [
+            {
+              "q": "What are the risks of a managed biometric API in a regulated product?",
+              "a": [
+                "Three I would raise. Bias: published research shows face-matching accuracy varies across demographic groups, so a single global threshold can disadvantage some users — that argues for measuring reject rates by segment rather than only in aggregate.",
+                "Data residency and retention: biometric data is regulated separately from PHI in several jurisdictions, so you need to know whether images are retained and where. And vendor lock-in on a scoring surface — because if the threshold semantics change under you, your fraud rate changes without a deploy."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "EPCS",
+          "tier": "jargon",
+          "resume": true,
+          "one": "Electronic Prescribing of Controlled Substances. DEA-regulated, and it mandates two-factor authentication plus identity proofing before a provider can prescribe a controlled drug electronically.",
+          "analogy": "A gun licence rather than a library card. The identity check is not a product decision — a federal regulator specifies it.",
+          "points": [
+            "This is *why* the e-KYC platform had to exist: EPCS makes identity proofing a legal requirement, not a fraud-team preference.",
+            "**Two-factor is mandated** — something you know plus something you have (hard token or a trusted device), enforced at the moment of signing.",
+            "Logical access control and an audit trail on every controlled prescription are part of the rule.",
+            "The stakes explain the strict threshold: a fraudulent prescriber account is a controlled-substance diversion route, not a chargeback."
+          ],
+          "say": "EPCS is the DEA rule for e-prescribing controlled substances — it mandates identity proofing and two-factor at signing. It's the reason the identity platform was a compliance requirement rather than a fraud optimisation."
+        },
+        {
+          "t": "Defending \"cut fraudulent accounts 67%\"",
+          "tier": "core",
+          "resume": true,
+          "one": "The most attackable number on your résumé, because measuring fraud you *prevented* is genuinely hard. Have the methodology ready.",
+          "analogy": "Claiming a lock reduced burglaries. You can count broken windows; you cannot count the burglars who walked past.",
+          "points": [
+            "Be exact about the denominator: 67% of *what* — flagged accounts, confirmed-fraud accounts, or accounts blocked at signup?",
+            "Name the measurement window and whether it is before/after the same period length. Seasonality in signups is real.",
+            "Acknowledge the confounder honestly: some of the drop is **deterrence** — fraudsters stopped trying — which you cannot separate cleanly from detection.",
+            "The strongest version quotes a **rate**, not a count: fraudulent accounts per 1,000 signups, before and after. That controls for signup volume changes.",
+            "If you genuinely do not know the methodology, find out before the interview or soften the claim. Never estimate it live."
+          ],
+          "qa": [
+            {
+              "q": "How did you measure a 67% reduction in fraud?",
+              "a": [
+                "Confirmed-fraud accounts per thousand signups, comparing equal windows before and after rollout — a rate rather than a count, so it is not just a signup-volume artefact.",
+                "I would flag the honest caveat: part of that drop is deterrence rather than detection. Once verification is visible at signup, some fraudulent attempts never start, and there is no clean way to attribute between the two. The number is real; the mechanism is mixed."
+              ]
+            }
+          ],
+          "trap": "Answering \"the dashboard said so\". Every number you print is a question you have volunteered. If you cannot describe the denominator and the window, cut the number rather than defend it badly."
+        }
+      ]
+    },
+    {
+      "id": "billing",
+      "name": "The Subscription & Metering Layer",
+      "desc": "The bullet with the best judgement moment in it — you modelled the unit economics and found a case where the pricing model loses money, then built the switch before it happened.",
+      "bullet": "Enabled $10M projected ARR building the subscription layer behind Copilot's Free and $75/provider/month tiers (trial credits, per-module usage deduction, HIPAA-compliant RBAC). Added an off-by-default per-token switch after modeling that heavy practices could outcost their flat subscription fee.",
+      "concepts": [
+        {
+          "t": "Metering & usage deduction",
+          "tier": "core",
+          "resume": true,
+          "one": "Counting consumption accurately enough to bill for it. The hard requirements are exactly-once accounting under retries and never letting a balance go negative under concurrency.",
+          "analogy": "A prepaid electricity meter. It must not double-count when the reader reconnects, and it must not let you keep drawing power at zero.",
+          "points": [
+            "**Deduct on an idempotency key** derived from the request, so a retried request does not double-charge. This is the single most important property.",
+            "**Concurrency:** two simultaneous requests at 1 credit remaining must not both succeed. Either an atomic conditional update (`UPDATE ... WHERE balance >= cost`) or a Redis Lua script — never read-then-write.",
+            "**Reserve and settle:** for LLM calls you do not know the true cost until the response completes. Reserve an estimate up front, settle the difference after — otherwise a user can start a huge generation with one credit left.",
+            "**Emit events, derive balances.** An append-only usage ledger is auditable and replayable; a mutable counter is neither, and finance will eventually ask you to explain a number.",
+            "**Per-module deduction** means the ledger carries a module dimension, so you can price and report per feature."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Reserve → run → settle, all keyed for idempotency",
+            "src": "def call_with_metering(tenant, module, req_id, est_tokens):\n    # 1. Atomic reserve. WHERE clause is the concurrency guard: two racing\n    #    requests cannot both pass it.\n    ok = db.execute(\n        \"\"\"UPDATE balances SET reserved = reserved + :est\n            WHERE tenant = :t AND (credits - reserved) >= :est\"\"\",\n        t=tenant, est=est_tokens,\n    ).rowcount\n    if not ok:\n        raise InsufficientCredits(tenant)\n\n    try:\n        resp = llm.call(...)\n    finally:\n        actual = getattr(resp, \"usage\", None)\n        # 2. Settle exactly once. The unique key on req_id makes a retry\n        #    a no-op rather than a second deduction.\n        db.execute(\n            \"\"\"INSERT INTO usage_ledger (req_id, tenant, module, tokens)\n                VALUES (:r, :t, :m, :n)\n                ON CONFLICT (req_id) DO NOTHING\"\"\",\n            r=req_id, t=tenant, m=module, n=actual.total if actual else 0,\n        )\n        release_reservation(tenant, est_tokens, actual)\n    return resp"
+          },
+          "qa": [
+            {
+              "q": "Two requests arrive at once and the tenant has one credit left. What happens?",
+              "a": [
+                "Exactly one succeeds, and it must be the database that decides — not application code. A read-then-write is a lost-update race: both read one credit, both think they can proceed.",
+                "So the check and the decrement are the same atomic statement — an `UPDATE ... WHERE credits - reserved >= cost` where the row count tells you whether you won. In Redis the equivalent is a Lua script, since it executes atomically."
+              ]
+            },
+            {
+              "q": "You cannot know the token cost before the call completes. How do you bill it?",
+              "a": [
+                "Reserve then settle. Reserve a conservative estimate against the balance before the call so a nearly-empty account cannot start an expensive generation, then write the actual usage to the ledger and release the difference when it finishes.",
+                "The settle must be idempotent, keyed on the request ID with a unique constraint, because the settle path is exactly where retries happen — a client reconnecting after a dropped stream should not be billed twice."
+              ]
+            },
+            {
+              "q": "Why an append-only ledger rather than a balance column?",
+              "a": [
+                "Auditability and recoverability. A ledger lets you answer \"why is this number what it is\" months later, replay to rebuild a balance after a bug, and give finance a breakdown by module without a separate reporting pipeline.",
+                "The balance still exists as a materialised value for the fast path — you just derive it from the ledger rather than treating it as the source of truth."
+              ]
+            }
+          ],
+          "trap": "Describing deduction without mentioning concurrency or retries. Those two are the entire difficulty of billing; everything else is CRUD."
+        },
+        {
+          "t": "The per-token switch — unit economics",
+          "tier": "core",
+          "resume": true,
+          "one": "You modelled cost per practice against a flat $75/provider/month and found the tail: heavy users whose token spend exceeds their subscription. Then you shipped the mitigation off by default.",
+          "analogy": "An all-you-can-eat buffet that is profitable on averages and ruined by one table. You do not close the buffet — you keep a per-plate price ready.",
+          "points": [
+            "**Gross margin per tenant = price − (tokens × rate) − serving costs.** Flat pricing is a bet that usage distribution stays inside your margin.",
+            "Usage is **heavy-tailed**, not normal. The mean tells you nothing; the p99 tenant is where the loss lives. Model the tail explicitly.",
+            "**Off by default** is the important decision: you built the capability before you needed it, without changing anyone's pricing or trust.",
+            "This is the strongest *judgement* moment in your résumé — you were not asked to model this. Say that.",
+            "The alternatives you can name as considered: fair-use caps, soft throttling, tiering by volume, or per-seat limits. Each trades revenue predictability against user trust."
+          ],
+          "qa": [
+            {
+              "q": "Walk me through the model.",
+              "a": [
+                "Cost per practice per month is tokens consumed times the provider rate, plus serving overhead. Revenue is seat count times the flat fee. Margin is the difference, and the question is what fraction of the usage distribution lands below zero.",
+                "The key input is not the average — it is the shape of the tail, because usage is heavy-tailed. A handful of high-volume practices can consume many multiples of the median. Once you plot margin against usage percentile you can see the crossover point where a tenant costs more than they pay, and decide whether that is an acceptable acquisition cost or a leak."
+              ]
+            },
+            {
+              "q": "Why ship it off by default instead of just switching to usage pricing?",
+              "a": [
+                "Because flat pricing was doing a real job — it is predictable for the buyer, and predictability is a selling point in a market where practices budget tightly. Switching everyone to metered pricing to solve a tail problem would have damaged the majority to fix the minority.",
+                "Off-by-default meant the capability existed the day it was needed, per-tenant, without a code change under time pressure. The engineering cost was small; the optionality was the point."
+              ]
+            }
+          ],
+          "say": "Nobody asked me to model this. I ran cost-per-practice against the flat fee, saw the tail crossed into negative margin, and built the per-token switch off by default — so the lever existed before we needed it, without changing anyone's pricing."
+        },
+        {
+          "t": "RBAC — role-based access control",
+          "tier": "core",
+          "resume": true,
+          "one": "Permissions attach to roles, users get roles. In healthcare it is not a convenience feature — it is how you enforce HIPAA's minimum-necessary rule in code.",
+          "analogy": "Hotel keycards. Housekeeping opens rooms and the linen store; the guest opens one room; neither opens the safe. Nobody hands out keys per person.",
+          "points": [
+            "**Authentication is who you are; authorisation is what you may do.** Interviewers check you never conflate them.",
+            "**RBAC vs ABAC:** roles are coarse (`biller`); attribute-based adds context (`biller AND same_practice AND business_hours`). Healthcare usually needs at least a little ABAC — same-practice scoping is an attribute.",
+            "**Enforce server-side, always.** Hiding a button is UX; the endpoint must still refuse. This is the most common real vulnerability in an otherwise sound app.",
+            "**Deny by default.** New endpoints should be inaccessible until explicitly granted, not open until someone remembers to lock them.",
+            "**Break-glass access** — emergency override with mandatory justification and loud audit alerting — is a genuine healthcare requirement worth knowing."
+          ],
+          "code": {
+            "lang": "java",
+            "cap": "Deny-by-default, enforced at the boundary",
+            "src": "@RestController\n@RequestMapping(\"/api/billing\")\npublic class ClaimController {\n\n    // Deny by default: no annotation would mean no access, not full access.\n    @PreAuthorize(\"hasRole('BILLER') and @scope.sameTenant(#claimId)\")\n    @GetMapping(\"/claims/{claimId}\")\n    public ClaimView get(@PathVariable String claimId, Principal actor) {\n        auditLog.record(actor, \"READ_CLAIM\", claimId);   // HIPAA: every access\n        return service.view(claimId);                    // view, not entity\n    }\n}"
+          },
+          "qa": [
+            {
+              "q": "RBAC or ABAC for a multi-tenant EHR?",
+              "a": [
+                "RBAC as the backbone, with attributes for the things roles cannot express. Roles capture job function cleanly — biller, provider, front desk, admin — and stay comprehensible to the customer's own administrator, which matters because they manage it.",
+                "But tenant scoping and patient-relationship checks are inherently attribute-based: a provider may read charts for patients at their practice, not all charts. Pure RBAC would need a role per practice, which explodes. So the practical answer is roles for capability, attributes for scope."
+              ]
+            }
+          ],
+          "trap": "Saying \"we hid it in the UI\". If the endpoint answers, the control does not exist. Say where the check runs and what happens when it fails."
+        },
+        {
+          "t": "ARR, MRR and \"projected\"",
+          "tier": "jargon",
+          "resume": true,
+          "one": "Annual Recurring Revenue — contracted subscription revenue annualised. Your $10M is *projected*, and that word carries all the weight.",
+          "analogy": "A restaurant's takings if every booked table shows up. Real bookings, hypothetical dinners.",
+          "points": [
+            "**ARR = MRR × 12**, counting only recurring subscription revenue — not one-off fees or services.",
+            "**Projected** means modelled from expected conversion and seat counts, not booked. Say the word out loud; do not let it be discovered.",
+            "Know roughly how the projection was built — addressable providers × expected attach rate × $75 — even if you did not build the model.",
+            "The defensible framing: you built the *mechanism* that made the revenue collectable. You did not personally generate it."
+          ],
+          "qa": [
+            {
+              "q": "Did you generate $10M?",
+              "a": [
+                "No, and I would not claim that. It is a projection built by the business from expected seat conversion at $75 per provider per month. My contribution is the layer that makes that revenue collectable at all — tiers, trial credits, per-module metering, and the access control around it.",
+                "Before the subscription layer existed, there was no mechanism to charge for Copilot. That is the honest version of the claim."
+              ]
+            }
+          ],
+          "trap": "Letting an interviewer believe you drove the revenue. Volunteer the word \"projected\" before they ask. Owning the limits of your own number is a credibility gain, not a loss."
+        }
+      ]
+    },
+    {
+      "id": "support-api",
+      "name": "Support Endpoints & Least Privilege",
+      "desc": "A small change with a large organisational effect, and the cleanest security-design story you have.",
+      "bullet": "Removed 60-80% of developer support load by exposing read-only props endpoints to support agents, scoped at the API security layer so they see the failing step but never customer PII. Adopted team-wide after joint India-US review.",
+      "concepts": [
+        {
+          "t": "Least privilege",
+          "tier": "core",
+          "resume": true,
+          "one": "Give every actor the minimum access that lets them do the job. Support agents need to know *which step failed*, which is a completely different question from *what the patient's data is*.",
+          "analogy": "A mechanic's diagnostic port. It tells them the fault code without unlocking the glovebox.",
+          "points": [
+            "The insight is that **the debugging signal and the sensitive payload are separable**. Most support escalations need shape and state, not content.",
+            "**Enforce at the security layer, not the handler.** A filter or interceptor that applies to every route cannot be forgotten on the next endpoint someone adds.",
+            "Return a **projection / view object**, never the domain entity. Serialising an entity is how a field added six months later silently leaks.",
+            "**Audit every access anyway.** Non-PII today can become PII when someone adds a field; the log is what makes that detectable.",
+            "**Read-only** removes an entire risk class — no support action can corrupt state."
+          ],
+          "code": {
+            "lang": "java",
+            "cap": "Explicit projection, so new fields cannot leak by default",
+            "src": "// Support sees the SHAPE of the failure, never the payload.\npublic record WorkflowProbe(\n        String  workflowId,\n        String  failedStep,\n        String  errorCode,\n        Instant occurredAt,\n        int     payloadFieldCount,   // \"11 fields present\"\n        boolean patientLinked        // yes/no, never who\n) {\n    // Built by hand from the entity. Adding a PHI field to Claim does not\n    // change this record, so it cannot leak through this endpoint.\n    static WorkflowProbe from(Claim c) {\n        return new WorkflowProbe(\n            c.getWorkflowId(), c.getFailedStep(), c.getErrorCode(),\n            c.getOccurredAt(), c.getPayload().size(), c.getPatient() != null);\n    }\n}"
+          },
+          "qa": [
+            {
+              "q": "How do you guarantee PII never leaks through those endpoints?",
+              "a": [
+                "By making the safe thing structural rather than remembered. The endpoints return hand-built projection records, not domain entities — so a new PHI column on the entity does not silently appear in the response, which is the failure mode with entity serialisation.",
+                "On top of that, scoping is enforced in the API security layer as a cross-cutting filter, so it applies to routes added later by people who never read this design. And every access is audit-logged, because the point of the log is to catch the case where the first two controls were wrong."
+              ]
+            },
+            {
+              "q": "How would you prove the 60–80% reduction?",
+              "a": [
+                "Escalations from support to engineering per month, before and after, normalised against total ticket volume so it is not just a quiet quarter. The cleanest cut is escalations of the specific category the endpoints addressed, since the tool cannot affect the others.",
+                "I would state it as a range because it varied by category, and be explicit that it is escalation count rather than engineer-hours — hours would be the better metric and we were not tracking them at that granularity."
+              ]
+            }
+          ],
+          "say": "The realisation was that support did not need the data — they needed the state. So I exposed which step failed and the shape of the payload as an explicit projection, scoped in the security layer rather than per-endpoint, with every access audited."
+        },
+        {
+          "t": "Getting it adopted team-wide",
+          "tier": "core",
+          "resume": true,
+          "one": "A joint India–US review is the interesting part: you took a security-sensitive change through cross-timezone consensus and it became the team standard.",
+          "analogy": "Getting a building code changed rather than getting one house approved. Slower, and every house after yours is safer.",
+          "points": [
+            "Security changes need **explicit** review sign-off — this is a case where process is protection, and being the person who sought it is the signal.",
+            "**Cross-timezone** work is real collaboration evidence: written proposals, async review, decisions that survive without you in the room.",
+            "\"Adopted team-wide\" means it became a **pattern**, not a feature. Say the word pattern.",
+            "This is the bullet to use for Googleyness-style questions on influence without authority."
+          ],
+          "qa": [
+            {
+              "q": "How did you handle disagreement in that review?",
+              "a": [
+                "The concern was the right one — any new read path into production data widens the attack surface, and reviewers were sceptical of exposing anything to non-engineers.",
+                "What resolved it was changing the shape of the proposal rather than arguing for it. I moved from 'these endpoints are safe' to 'PII cannot travel this path by construction' — explicit projections, enforcement in the shared security layer rather than per-endpoint, read-only, fully audited. Once the guarantee was structural instead of a promise about care, the objection had nothing to attach to."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ambient",
+      "name": "Ambient Capture & Clinical Notes",
+      "desc": "The highest user-visible impact on your résumé, and the one where the accuracy number needs the most careful handling.",
+      "bullet": "Saved 10,000+ practitioners 2+ hrs/day at 95% note accuracy with Copilot's ambient capture, transcription and summarization pipeline on Azure OpenAI (versioned prompts, streamed responses, Redis caching).",
+      "concepts": [
+        {
+          "t": "The ambient scribe pipeline",
+          "tier": "core",
+          "resume": true,
+          "one": "Microphone in the room during a consultation → streaming speech-to-text → speaker separation → structured clinical note → physician edits and signs.",
+          "analogy": "A court stenographer who also writes the judgment summary. The judge still signs it, and the signature is the whole point.",
+          "points": [
+            "**Stage 1 — capture:** chunked audio streamed as it is recorded, so transcription overlaps the visit rather than following it.",
+            "**Stage 2 — ASR:** speech-to-text. Medical vocabulary is the hard part; drug names and dosages are where generic models fail.",
+            "**Stage 3 — diarization:** who spoke. Attributing the patient's symptom description to the doctor corrupts the note.",
+            "**Stage 4 — summarisation:** transcript → a **SOAP note** (Subjective, Objective, Assessment, Plan) — the standard clinical structure.",
+            "**Stage 5 — human sign-off.** Non-negotiable. The physician is legally responsible for the note; the system drafts, it never files."
+          ],
+          "qa": [
+            {
+              "q": "What is the hardest part of this pipeline?",
+              "a": [
+                "Not the summarisation — the transcription of medical vocabulary. Drug names, dosages and abbreviations are exactly where general ASR degrades, and they are exactly the tokens where an error is clinically dangerous. \"Fifteen milligrams\" versus \"fifty milligrams\" is a one-phoneme error with a real consequence.",
+                "Diarization is a close second. If the model attributes a symptom the patient described to the physician's assessment, the note is wrong in a way that reads perfectly fluently — which is worse than an obvious error, because nobody catches it."
+              ]
+            },
+            {
+              "q": "How do you handle hallucination in a clinical note?",
+              "a": [
+                "Constrain the task and make verification cheap. The summariser is instructed to draft only from the transcript and to leave a section empty rather than infer — an omission is a visible gap the physician fills, an invention is a plausible sentence they may sign.",
+                "Then make review fast: link note content back to transcript spans so the physician can check a line without re-reading the visit. And the sign-off step is mandatory. The system produces a draft; a licensed human is the one who files it."
+              ]
+            }
+          ],
+          "trap": "Do not describe it as automating documentation. It drafts; a licensed physician signs. Getting that framing wrong in a healthcare interview is a serious tell."
+        },
+        {
+          "t": "Defending \"95% note accuracy\" and \"2+ hrs/day\"",
+          "tier": "core",
+          "resume": true,
+          "one": "Both numbers need a definition attached. Accuracy of *what*, measured *how*, against *whose* ground truth — and hours saved measured against what baseline.",
+          "analogy": "\"95% accurate\" on a translation could mean 95% of words or 95% of meanings. Those are wildly different claims.",
+          "points": [
+            "**Word Error Rate (WER)** is the ASR metric — substitutions + insertions + deletions over reference words. Note-level accuracy is different and softer.",
+            "Options for what 95% could mean: physician accepted without edit, clinically-significant-error rate, or a rubric score. Know which yours is.",
+            "**Not all errors are equal.** A misspelled word and a wrong dosage are both one error. A serious answer weights clinical significance.",
+            "**2+ hrs/day** is almost certainly self-reported by physicians, which is legitimate — say so. Documentation burden ('pyjama time') is genuinely measured that way in the literature.",
+            "The clean framing: \"physician-reported time saved\" and \"note-level acceptance rate\", each with its measurement method."
+          ],
+          "qa": [
+            {
+              "q": "What does 95% accuracy mean, precisely?",
+              "a": [
+                "I would want to give you the measurement rather than the headline: it is note-level, judged against physician-reviewed ground truth, not word error rate — WER is the ASR-stage metric and it is a different number.",
+                "And I would add the caveat that matters clinically: an aggregate accuracy figure weights a misspelling the same as a wrong dosage. The number worth optimising is clinically-significant error rate, and that is what I would track if I were designing the evaluation from scratch."
+              ]
+            }
+          ],
+          "trap": "This is the second-most attackable number after the fraud figure. Go and confirm how it was actually measured before your interview loop starts."
+        },
+        {
+          "t": "Prompt versioning",
+          "tier": "core",
+          "resume": true,
+          "one": "Prompts are production code: version them, review them, tie each generation to the version that produced it, and roll them back like any deploy.",
+          "analogy": "A recipe card in a restaurant. When a dish suddenly tastes wrong you need to know which version of the card the kitchen was using last Tuesday.",
+          "points": [
+            "**Store the version ID with every output.** Without it, a quality regression is unattributable and undebuggable.",
+            "**Prompts belong in version control**, not a database row someone edits live — you want diffs, review, and blame.",
+            "**Gate changes on an eval set.** A prompt edit is a model change; shipping it untested is shipping untested code.",
+            "**A/B by version** to compare quality in production, the same way you would compare two service builds.",
+            "Rollback must be a config change, exactly like the runtime flag — same principle, same reason."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Every generation carries the prompt version that made it",
+            "src": "PROMPTS = load_versioned(\"prompts/\")     # git-tracked, reviewed in PRs\n\ndef summarise(transcript, tenant):\n    v = flags.variant(\"note.prompt\", default=\"soap@v7\", tenant=tenant)\n    tmpl = PROMPTS[v]\n\n    out = llm.complete(tmpl.render(transcript=transcript))\n\n    # Version travels WITH the artefact. A quality regression next month\n    # is only debuggable if you can say which prompt produced which note.\n    store.save(note=out, prompt_version=v, model=MODEL_ID, at=now())\n    return out"
+          },
+          "qa": [
+            {
+              "q": "How do you know a prompt change did not make things worse?",
+              "a": [
+                "You cannot tell by reading it, so it has to be an eval gate. A held-out set of transcripts with reviewed reference notes, scored on the dimensions that matter — omissions, invented content, and correct SOAP structure — run on every prompt change like a test suite.",
+                "Offline eval catches regressions; it does not catch distribution shift. So in production I would tag every note with its prompt version and watch the physician edit rate per version, because the edit rate is the honest signal — it is the users telling you the draft was wrong."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Redis caching in an LLM pipeline",
+          "tier": "core",
+          "resume": true,
+          "one": "Three distinct uses, and interviewers want to hear you distinguish them: conversation state, response cache, and rate-limit counters.",
+          "analogy": "A chef's mise en place. Prepped ingredients within arm's reach so the expensive part — actual cooking — is not spent fetching.",
+          "points": [
+            "**Session/conversation state:** replaces the server-side thread fetch. Sub-millisecond, and the reason the agentic runtime could be fast.",
+            "**Exact-match response cache:** hash the normalised prompt + model + prompt version. Skips the model entirely on repeats.",
+            "**Semantic cache:** embed the query and serve a cached answer if cosine similarity is above a threshold. Powerful and dangerous — near-miss questions get confidently wrong cached answers.",
+            "**Rate limiting:** token bucket counters, atomic via Lua.",
+            "**The cache key must include the prompt version and model ID.** Otherwise a prompt rollout serves stale outputs from the previous version. This is the bug interviewers look for.",
+            "In healthcare, never cache PHI-derived output across tenants. The key is tenant-scoped, always."
+          ],
+          "qa": [
+            {
+              "q": "What are the risks of a semantic cache?",
+              "a": [
+                "It answers a question the user did not ask. Two queries can sit above your similarity threshold and still have different correct answers — 'what is the dose for an adult' and 'what is the dose for a child' are semantically close and clinically opposite.",
+                "So in a clinical context I would not use one on anything patient-specific. Where it is defensible is generic, non-patient content like documentation lookups, with a conservative threshold and the cached answer surfaced with its source so a user can see what it matched."
+              ]
+            },
+            {
+              "q": "What has to be in the cache key?",
+              "a": [
+                "Normalised prompt, model ID, prompt version, and tenant. Dropping the prompt version is the classic bug — you ship a prompt improvement and users keep getting the old output from cache, so the rollout looks like it did nothing.",
+                "Tenant scoping is a hard requirement rather than an optimisation, because anything derived from PHI must not be reachable across tenants no matter how identical the prompt looks."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "assist-barcode",
+      "name": "Charm Assist & the Licence Reader",
+      "desc": "Two shipped features that show range: a multi-tenant key-management problem, and a genuinely low-level computer-vision one.",
+      "bullet": "Shipped Charm Assist, a BYOK GPT-4 integration across 4 clinical modules (referral, lab, encounter, general), to 50,000+ practitioners, and an AAMVA PDF417 license reader (Java, ZXing) to 100,000+ users.",
+      "concepts": [
+        {
+          "t": "BYOK — bring your own key",
+          "tier": "core",
+          "resume": true,
+          "one": "Each practice supplies its own model-provider API key. Their usage, their bill, their data relationship with the provider — and a serious secret-management problem for you.",
+          "analogy": "A co-working space where each company brings its own printer contract. You provide the desk and the power; you never see their invoice.",
+          "points": [
+            "**Why it exists:** it moves cost and the data-processing relationship to the customer, which sidesteps you needing a BAA on their behalf and makes the feature shippable fast.",
+            "**Secret storage:** encrypted at rest with a KMS-managed key, decrypted only in memory at call time, never logged, never in a stack trace. Envelope encryption per tenant.",
+            "**Key rotation and revocation** must be supported, and an invalid key must degrade gracefully with a clear message — not a 500.",
+            "**Blast radius:** one tenant's leaked key affects one tenant. That is genuinely better isolation than a shared platform key.",
+            "**The downsides to name:** you cannot control their rate limits, their model version, or their spend, so your feature's reliability depends on a config you do not own."
+          ],
+          "code": {
+            "lang": "java",
+            "cap": "Envelope encryption; the plaintext key never outlives the call",
+            "src": "public String callForTenant(String tenantId, Prompt p) {\n    // Envelope: KMS holds the master key, we store only the wrapped DEK.\n    byte[] wrapped = vault.wrappedKeyFor(tenantId);\n    char[] apiKey  = kms.decrypt(wrapped);        // plaintext, in memory only\n    try {\n        return openAi.withKey(apiKey).complete(p);\n    } catch (AuthException e) {\n        // Never let the key reach a log line or a stack trace.\n        throw new TenantKeyInvalid(tenantId);\n    } finally {\n        Arrays.fill(apiKey, '\\0');                // scrub before GC\n    }\n}"
+          },
+          "qa": [
+            {
+              "q": "What are the downsides of BYOK?",
+              "a": [
+                "You inherit a dependency you cannot manage. Their rate limits throttle your feature, their quota exhaustion looks like your outage, and their key rotation breaks you silently unless you handle it explicitly. Support becomes harder because half the failure modes live in an account you cannot see.",
+                "You also lose leverage on model version and cost — you cannot negotiate volume pricing or pin a model across the fleet. The trade you get for that is a smaller blast radius per leaked key and a much shorter compliance path, which is usually why BYOK gets chosen in the first place."
+              ]
+            },
+            {
+              "q": "How do you store the keys?",
+              "a": [
+                "Envelope encryption: a KMS-managed master key wraps a per-tenant data key, and only the wrapped form is persisted. At call time you unwrap, use it in memory, and scrub it.",
+                "The operational discipline around it matters as much as the cryptography — the key must never enter a log, an exception message, or a trace attribute, and auth failures need to be caught and re-thrown as a domain error so the raw provider response cannot carry it out."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "PDF417 & the AAMVA licence standard",
+          "tier": "deep",
+          "resume": true,
+          "one": "PDF417 is the stacked 2D barcode on the back of every US driver's licence. AAMVA is the standard that says what the decoded text means — field by field.",
+          "analogy": "PDF417 is the alphabet; AAMVA is the language. Reading the letters gets you nothing until you know the grammar.",
+          "points": [
+            "**PDF417** = *Portable Data File, 4 bars and 4 spaces per 17 modules*. It is a stacked linear symbology, not a matrix code like QR.",
+            "It carries **Reed–Solomon error correction** at nine levels, which is why a scuffed licence still scans. Higher correction = more redundancy = larger symbol.",
+            "**AAMVA** defines the element IDs: `DAC` first name, `DCS` family name, `DBB` date of birth, `DAQ` licence number, in a header + subfile structure.",
+            "**ZXing** ('zebra crossing') does the decoding; you write the AAMVA parser. Real-world pain is version drift between AAMVA revisions and states that deviate.",
+            "The engineering value: replacing manual demographic entry removes transcription errors at the point they are cheapest to prevent — and it feeds the demographic match in e-KYC."
+          ],
+          "code": {
+            "lang": "java",
+            "cap": "Decode, then parse — two separate problems",
+            "src": "// 1. Decode the symbol. ZXing gives you bytes, not meaning.\nMultiFormatReader reader = new MultiFormatReader();\nMap<DecodeHintType, Object> hints = Map.of(\n    DecodeHintType.POSSIBLE_FORMATS, List.of(BarcodeFormat.PDF_417),\n    DecodeHintType.TRY_HARDER, Boolean.TRUE);   // slower, better on poor scans\n\nResult r = reader.decode(new BinaryBitmap(\n        new HybridBinarizer(new BufferedImageLuminanceSource(img))), hints);\n\n// 2. Parse AAMVA. Element IDs are 3 chars, values run to the separator.\n// Header: \"@\\n\\u001e\\rANSI 636014080102DL...\"\nMap<String, String> f = Aamva.parse(r.getText());\nString firstName = f.get(\"DAC\");\nString lastName  = f.get(\"DCS\");\nLocalDate dob    = Aamva.date(f.get(\"DBB\"), f.get(\"DCK\"));  // format varies\n                                                            // by issuer version"
+          },
+          "qa": [
+            {
+              "q": "Why PDF417 rather than QR for licences?",
+              "a": [
+                "History and capacity shape. PDF417 was standardised for this use case long before QR was ubiquitous, it holds enough data for a full demographic record, and it is a stacked linear format that scans reliably with the laser scanners that were already deployed at the time.",
+                "It also tolerates the specific damage pattern a wallet card takes — scuffs across the surface — well, because the Reed–Solomon correction is configurable and licences use a high level."
+              ]
+            },
+            {
+              "q": "What made this hard in production?",
+              "a": [
+                "Not the decode — the parse. AAMVA has gone through multiple revisions and states implement them inconsistently, so date formats and optional fields differ by issuer and issue year. You end up with a version-aware parser and a fallback path rather than one clean spec implementation.",
+                "The other half is capture quality: hologram glare, curved cards and poor lighting fail before decoding starts, so the useful engineering is in guiding the capture and failing with a message the user can act on."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faqpilot",
+      "name": "FAQPilot — Grounded RAG",
+      "desc": "Your cleanest RAG story, with the two things most RAG demos lack: citations and a real evaluation set.",
+      "bullet": "Built FAQPilot, a grounded RAG support assistant answering from cited excerpts of user guides and release notes, validated across 500+ Q&A sessions; projected to deflect 60% of support tickets and 100+ agent-hours daily.",
+      "concepts": [
+        {
+          "t": "Grounding & citations",
+          "tier": "core",
+          "resume": true,
+          "one": "The model may only answer from retrieved passages, and every claim points back at the passage that supports it. Grounding is the constraint; citation is the proof.",
+          "analogy": "An open-book exam where you must write the page number next to every answer. It does not make you smarter — it makes you checkable.",
+          "points": [
+            "**\"I don't know\" must be a first-class outcome.** If retrieval returns nothing relevant, the correct answer is a refusal plus a route to a human — not a fluent guess.",
+            "**Citations change user behaviour**, which is the real product win: a support agent who can click through to the source trusts and verifies rather than accepting blindly.",
+            "**Faithfulness vs relevance** are different failures. A faithful answer is supported by the retrieved text; a relevant answer addresses the question. You can fail either independently.",
+            "Force the model to emit a **passage ID per claim**, then verify the ID exists before rendering. A hallucinated citation is worse than none because it looks rigorous.",
+            "Release notes make **freshness** a first-class concern — the correct answer changes when the product changes, so stale chunks are actively wrong."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Refuse-by-default, and verify every citation before rendering",
+            "src": "SYSTEM = \"\"\"Answer ONLY from the passages below.\nCite the passage id in brackets after every claim, e.g. [p3].\nIf the passages do not contain the answer, reply exactly: NEED_HUMAN.\nDo not use prior knowledge about this product.\"\"\"\n\ndef answer(q):\n    hits = retrieve(q, k=6)\n    if not hits or hits[0].score < MIN_SCORE:\n        return escalate(q)                  # refuse early, do not force it\n\n    out = llm.complete(SYSTEM, passages=hits, question=q)\n    if \"NEED_HUMAN\" in out:\n        return escalate(q)\n\n    # A fabricated citation looks MORE credible than none. Verify.\n    valid = {h.id for h in hits}\n    for cid in re.findall(r\"\\[(p\\d+)\\]\", out):\n        if cid not in valid:\n            log.warn(\"fabricated citation %s\", cid)\n            return escalate(q)\n    return out, hits"
+          },
+          "qa": [
+            {
+              "q": "How do you stop it answering confidently when retrieval finds nothing?",
+              "a": [
+                "Two gates. Before generation, a relevance floor on the retrieval score — if the top hit is below it, escalate without ever calling the model, because a model handed irrelevant passages will still write something.",
+                "After generation, an explicit refusal token the prompt requires when the passages are insufficient, plus citation verification: every cited passage ID must exist in what was actually retrieved. A fabricated citation is the tell that the model went off-book, and it fails closed to a human."
+              ]
+            },
+            {
+              "q": "How did you validate it across 500+ Q&A sessions?",
+              "a": [
+                "A curated evaluation set of real support questions with reviewed reference answers, scored on the two dimensions separately: did retrieval surface the right passage, and was the generated answer faithful to it. Separating them matters because they fail for different reasons and need different fixes.",
+                "Retrieval quality I would score as recall@k against the known-correct passage, which is cheap and objective. Answer faithfulness needs human review on a sample, with an LLM-judge used to widen coverage — calibrated against the human labels rather than trusted on its own."
+              ]
+            },
+            {
+              "q": "You said 'projected to deflect 60%'. What does projected mean here?",
+              "a": [
+                "It is modelled, not observed — the share of historical tickets whose answer existed in the documentation corpus, which is the ceiling on what deflection could reach. It is not a measured deflection rate in production.",
+                "The honest measured version would be: of sessions where FAQPilot answered, what fraction still resulted in a human ticket. I would want that number before defending 60% as an outcome rather than an upper bound."
+              ]
+            }
+          ],
+          "trap": "\"Projected\" appears twice on your résumé — here and on the $10M. Both are legitimate; both must be volunteered by you rather than discovered by the interviewer."
+        }
+      ]
+    },
+    {
+      "id": "numbers",
+      "name": "Your Numbers & The Scale Gap",
+      "desc": "Ruthless section. Every number you print is a question you volunteered. And there is one category of number missing from your résumé that a Google interviewer will look for immediately.",
+      "concepts": [
+        {
+          "t": "The rule: every number is a question",
+          "tier": "core",
+          "resume": true,
+          "one": "You have printed roughly fifteen metrics. Assume each one gets \"how did you measure that?\" — and that a number you cannot defend costs more than the number gained.",
+          "analogy": "Every claim on a CV is a door you built into your own house. Some of them you have not checked are locked.",
+          "points": [
+            "For each number, know four things: **definition** (of what), **denominator**, **window**, **source** (which dashboard or query).",
+            "A number you cannot source should be **found or cut** — never estimated live. Estimating on the spot is the failure mode that ends loops.",
+            "**Volunteer the caveats.** Saying \"that's projected, not booked\" before being asked converts a vulnerability into a credibility signal.",
+            "Rehearse the three most attackable out loud: 67% fraud reduction, 95% note accuracy, $10M projected ARR.",
+            "Attribution matters as much as measurement: say what *you* built versus what the team or business did."
+          ],
+          "trap": "Rounding up under pressure, or agreeing with an interviewer's inflated restatement. If they say \"so you saved the company ten million\" — correct it immediately."
+        },
+        {
+          "t": "The scale gap — go and get these numbers",
+          "tier": "core",
+          "resume": true,
+          "one": "Your résumé is rich in business metrics and empty of engineering scale. There is no QPS, no data volume, no concurrency, no p95 anywhere. For a Google L4 loop, that is the single highest-leverage gap you can close this month.",
+          "analogy": "A chef's CV listing revenue and covers but never how many plates left the pass at peak. Peak throughput is the number the kitchen actually judges you on.",
+          "points": [
+            "**Go and find:** requests per second at peak on the services you own, and the p50/p95 latency alongside it.",
+            "**Go and find:** concurrent users or sessions at peak, and the database size — row counts on your largest tables, total storage.",
+            "**Go and find:** the real before/after percentiles for the Copilot rebuild, and how many Copilot requests per day flow through the agentic runtime.",
+            "**Go and find:** e-KYC verifications per day at peak, and the ledger's write rate in the billing layer.",
+            "Where you genuinely cannot get a number, use a bounded, honest statement: \"I don't have the exact QPS; the service backs 10,000+ practices and peaks during US clinic hours, roughly 9am–5pm across four time zones.\" That still demonstrates you think in load shapes.",
+            "This is the difference between \"built a feature\" and \"operated a system\", and it is exactly what an L4 interviewer is listening for."
+          ],
+          "qa": [
+            {
+              "q": "What scale does your service run at?",
+              "a": [
+                "This is the question you must not fumble. Have peak QPS, p95 latency, and data volume memorised for at least one service you own.",
+                "The structure that works: load shape, then throughput, then latency, then data size. 'Traffic is diurnal and follows US clinic hours across four time zones, so peak is roughly Nx the trough. At peak we serve about X requests per second with p95 at Y milliseconds. The largest table is Z rows and the working set fits in cache.'"
+              ]
+            }
+          ],
+          "say": "I don't have that number in front of me — let me give you what I do know and the shape of it. [Then give load shape, tenants, and what you do know.] I'd rather be precise than guess."
+        },
+        {
+          "t": "Rewriting a bullet with scale in it",
+          "tier": "deep",
+          "one": "Once you have the numbers, the strongest bullets carry both a business outcome and an engineering scale figure. Here is the shape.",
+          "analogy": "A before-and-after photo needs a ruler in the frame. The outcome tells them it mattered; the scale tells them it was hard.",
+          "points": [
+            "**Current:** \"Cut Charm Copilot latency 8-15s to 2-5s...\" — outcome, no scale.",
+            "**With scale:** \"...across N Copilot requests/day at M peak QPS, taking p95 from Xs to Ys and TTFT under 1s.\"",
+            "The pattern is: **what changed** + **by how much** + **at what load** + **which percentile**.",
+            "Do not fabricate to fill the template. A bullet with a real outcome and no scale beats a bullet with an invented QPS every single time — and invented numbers collapse under one follow-up.",
+            "Apply the same treatment to e-KYC (verifications/day) and the billing ledger (writes/day)."
+          ],
+          "trap": "Do not invent or round these to make the template fit. The whole point of adding scale is credibility; a number you cannot source destroys the thing you were trying to buy."
+        }
+      ]
+    }
+  ]
+}

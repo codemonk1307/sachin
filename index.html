@@ -352,7 +352,10 @@
             letter-spacing: 0.02em;
         }
 
-        .brand__name { color: var(--text); }
+        /* Never let the name wrap. In the tight band just above the nav
+           breakpoint it would break onto two lines and grow the header. */
+        .brand { flex: none; }
+        .brand__name { color: var(--text); white-space: nowrap; }
 
         .nav {
             display: none;
@@ -390,8 +393,6 @@
 
         .nav__link--lab:hover { background: var(--accent-soft); color: var(--accent); }
 
-        .header__cta { display: none; }
-
         .nav-toggle {
             display: inline-grid;
             place-items: center;
@@ -408,15 +409,12 @@
         body[data-menu="open"] .nav-toggle .icon-close { display: block; }
         body[data-menu="open"] .nav-toggle .icon-menu { display: none; }
 
-        @media (min-width: 900px) {
+        /* Two lab links now sit in the bar, so the full nav needs ~1060px
+           before it stops crowding the brand. Below that the mobile menu
+           carries every link comfortably. */
+        @media (min-width: 1080px) {
             .nav { display: flex; }
             .nav-toggle { display: none; }
-        }
-
-        /* The CTA only appears once there is real slack left in the bar,
-           so the nav can never be squeezed by it at the breakpoint edge. */
-        @media (min-width: 1080px) {
-            .header__cta { display: inline-flex; }
         }
 
         /* Mobile menu panel */
@@ -459,7 +457,7 @@
         .menu__link--lab { color: var(--accent); }
         .menu .btn { width: 100%; margin-top: 16px; }
 
-        @media (min-width: 900px) {
+        @media (min-width: 1080px) {
             .menu { display: none; }
         }
 
@@ -1701,7 +1699,12 @@
         /* footer styles moved to FOOTER WITH BACKGROUND section below */
 
         /* ============================================================
-           DSA LAB OVERLAY
+           LAB OVERLAY
+           The close control used to float over the iframe, which put it
+           straight on top of whatever the inner page kept in its own
+           top-right corner (search, drill, text size). It now sits in a
+           real bar above the frame, so the two can never collide no
+           matter what the embedded page does.
            ============================================================ */
         .lab {
             position: fixed;
@@ -1709,33 +1712,66 @@
             z-index: 200;
             background: var(--bg);
             display: none;
+            flex-direction: column;
         }
 
-        .lab[data-open="true"] { display: block; }
+        .lab[data-open="true"] { display: flex; }
 
-        .lab iframe { width: 100%; height: 100%; border: 0; display: block; }
+        .lab__bar {
+            flex: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            padding: 10px 14px;
+            padding-top: max(10px, env(safe-area-inset-top));
+            border-bottom: 1px solid var(--line);
+            background: var(--bg-soft);
+        }
+
+        /* min-height:0 lets the frame actually shrink inside the flex
+           column instead of overflowing the viewport. */
+        .lab iframe {
+            flex: 1 1 auto;
+            width: 100%;
+            min-height: 0;
+            border: 0;
+            display: block;
+        }
 
         .lab__close {
-            position: fixed;
-            top: max(14px, env(safe-area-inset-top));
-            right: 14px;
-            z-index: 201;
+            flex: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 9px 16px;
+            padding: 8px 15px;
             border-radius: 999px;
-            background: rgba(8, 9, 10, 0.9);
+            background: var(--surface);
             border: 1px solid var(--line-strong);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             color: var(--text);
             font-size: 0.8125rem;
             font-weight: 500;
+            white-space: nowrap;
+            transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
         }
 
         .lab__close:hover { border-color: var(--accent-line); color: var(--accent); }
         .lab__close svg { width: 14px; height: 14px; }
+
+        .lab__title {
+            flex: 1 1 auto;
+            min-width: 0;
+            font-size: 0.8125rem;
+            color: var(--text-3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: right;
+        }
+
+        @media (max-width: 560px) {
+            .lab__title { display: none; }
+        }
 
         /* ============================================================
            THEME TOGGLE
@@ -1774,7 +1810,6 @@
         }
         [data-theme="light"] .stat { background: var(--bg); }
         [data-theme="light"] .preview { background: #f5f0e8; }
-        [data-theme="light"] .lab__close { background: rgba(250, 246, 240, 0.9); }
         [data-theme="light"] ::selection { background: var(--accent-soft); color: var(--text); }
         [data-theme="light"] ::-webkit-scrollbar-track { background: var(--bg); }
         [data-theme="light"] ::-webkit-scrollbar-thumb { background: #d5cec4; border-color: var(--bg); }
@@ -2092,10 +2127,9 @@
                 <a class="nav__link" href="#achievements">Achievements</a>
                 <a class="nav__link" href="#clients">Collaborations</a>
                 <a class="nav__link" href="#interests">Interests</a>
-                <a class="nav__link nav__link--lab" href="#dsa-lab" data-lab-open>DSA Lab</a>
+                <a class="nav__link nav__link--lab" href="#dsa-lab" data-lab-open="dsa-master.html" data-lab-title="DSA Mastery: 30 Day Challenge">DSA Lab</a>
+                <a class="nav__link nav__link--lab" href="#war-room" data-lab-open="war-room.html" data-lab-title="War Room: interview revision guide">War Room</a>
             </nav>
-
-            <a class="btn btn--ghost header__cta" href="#contact">Get in touch</a>
 
             <button class="theme-toggle" type="button" aria-label="Toggle light/dark theme" id="themeToggle">
                 <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg>
@@ -2119,7 +2153,8 @@
         <a class="menu__link" href="#certifications"><span>Certifications</span><span class="idx">06</span></a>
         <a class="menu__link" href="#clients"><span>Collaborations</span><span class="idx">07</span></a>
         <a class="menu__link" href="#interests"><span>Interests</span><span class="idx">08</span></a>
-        <a class="menu__link menu__link--lab" href="#dsa-lab" data-lab-open><span>DSA Lab</span><span class="idx">↗</span></a>
+        <a class="menu__link menu__link--lab" href="#dsa-lab" data-lab-open="dsa-master.html" data-lab-title="DSA Mastery: 30 Day Challenge"><span>DSA Lab</span><span class="idx">↗</span></a>
+        <a class="menu__link menu__link--lab" href="#war-room" data-lab-open="war-room.html" data-lab-title="War Room: interview revision guide"><span>War Room</span><span class="idx">↗</span></a>
         <a class="btn btn--primary" href="mailto:sachinmishra030@gmail.com">
             <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mail"/></svg>
             Get in touch
@@ -3247,13 +3282,16 @@
         </div>
     </footer>
 
-    <!-- ============================ DSA LAB ============================ -->
-    <div class="lab" id="dsaLab" role="dialog" aria-modal="true" aria-label="DSA Lab">
-        <button class="lab__close" type="button" id="labClose">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg>
-            Back to portfolio
-        </button>
-        <iframe id="labFrame" title="DSA Mastery: 30 Day Challenge" data-src="dsa-master.html"></iframe>
+    <!-- ============================== LABS ============================== -->
+    <div class="lab" id="dsaLab" role="dialog" aria-modal="true" aria-label="Lab">
+        <div class="lab__bar">
+            <button class="lab__close" type="button" id="labClose">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg>
+                Back to portfolio
+            </button>
+            <span class="lab__title" id="labTitle"></span>
+        </div>
+        <iframe id="labFrame" title="Lab"></iframe>
     </div>
 
     <script>
@@ -3531,11 +3569,18 @@
         var lab = document.getElementById('dsaLab');
         var labFrame = document.getElementById('labFrame');
         var labClose = document.getElementById('labClose');
+        var labTitle = document.getElementById('labTitle');
         var scrollLock = 0;
 
-        function openLab() {
-            if (!labFrame.getAttribute('src')) {
-                labFrame.setAttribute('src', labFrame.dataset.src);
+        /* One overlay serves every lab. The iframe is only loaded on first
+           open, and reloaded only when switching to a different lab, so
+           returning to one you were already reading keeps your place. */
+        function openLab(src, title) {
+            if (labFrame.getAttribute('src') !== src) {
+                labFrame.setAttribute('src', src);
+                labFrame.setAttribute('title', title || 'Lab');
+                lab.setAttribute('aria-label', title || 'Lab');
+                labTitle.textContent = title || '';
             }
             scrollLock = window.scrollY;
             lab.dataset.open = 'true';
@@ -3553,7 +3598,7 @@
         document.querySelectorAll('[data-lab-open]').forEach(function (el) {
             el.addEventListener('click', function (e) {
                 e.preventDefault();
-                openLab();
+                openLab(el.dataset.labOpen, el.dataset.labTitle);
             });
         });
 

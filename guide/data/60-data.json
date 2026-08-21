@@ -1,0 +1,273 @@
+{
+  "id": "data",
+  "name": "Databases & Data",
+  "desc": "MySQL, MongoDB, Redis, schema design, NumPy and Pandas — all on your résumé. SQL depth in particular is a reliable filter question.",
+  "color": "#E48AB4",
+  "modules": [
+    {
+      "id": "sql",
+      "name": "SQL You Will Be Asked",
+      "desc": "Joins, indexes, EXPLAIN and window functions. Most SQL screens are one query and one why-is-this-slow question.",
+      "bullet": "Databases and Data: MySQL, MongoDB, Redis, Schema Design, NumPy, Pandas, BeautifulSoup",
+      "concepts": [
+        {
+          "t": "Joins",
+          "tier": "core",
+          "one": "INNER keeps only matches; LEFT keeps everything from the left; RIGHT the mirror; FULL keeps everything. The join condition decides correctness, the WHERE clause can silently undo it.",
+          "analogy": "Two guest lists stapled together. Inner keeps people on both; left keeps everyone from yours regardless of whether they made theirs.",
+          "points": [
+            "**INNER JOIN:** rows matching in both tables.",
+            "**LEFT JOIN:** all left rows; unmatched right columns are `NULL`. This is how you find *missing* records — `LEFT JOIN ... WHERE right.id IS NULL`.",
+            "**The classic bug:** putting a condition on the right table in `WHERE` instead of `ON` turns a LEFT JOIN into an INNER JOIN, because `NULL` fails the predicate.",
+            "**CROSS JOIN** is the Cartesian product — usually accidental, and catastrophic on large tables.",
+            "**Self-join** for hierarchies (employee → manager). **`USING(col)`** is shorthand when the column names match."
+          ],
+          "code": {
+            "lang": "sql",
+            "cap": "The LEFT JOIN trap, and finding what is missing",
+            "src": "-- BUG: this is now an INNER JOIN. Rows with no matching claim have\n-- c.status = NULL, and NULL = 'paid' is never true, so they vanish.\nSELECT p.id, c.status\n  FROM patients p\n  LEFT JOIN claims c ON c.patient_id = p.id\n WHERE c.status = 'paid';\n\n-- CORRECT: filter in the JOIN condition to keep the outer semantics.\nSELECT p.id, c.status\n  FROM patients p\n  LEFT JOIN claims c ON c.patient_id = p.id AND c.status = 'paid';\n\n-- Anti-join: patients who have never submitted a claim.\nSELECT p.id\n  FROM patients p\n  LEFT JOIN claims c ON c.patient_id = p.id\n WHERE c.id IS NULL;"
+          }
+        },
+        {
+          "t": "Indexes & EXPLAIN",
+          "tier": "core",
+          "one": "An index is a sorted structure that turns a full scan into a lookup. EXPLAIN shows what the planner will actually do — read it before changing anything.",
+          "analogy": "The index at the back of a book. It costs pages and must be updated on every reprint, and it turns a cover-to-cover search into a page number.",
+          "points": [
+            "**Composite index column order matters** — the leftmost-prefix rule. An index on `(tenant_id, status, created_at)` serves queries filtering on `tenant_id`, or `tenant_id + status`, but not `status` alone.",
+            "**A function on the column kills the index.** `WHERE YEAR(created_at) = 2026` cannot use an index on `created_at`; a range predicate can. Same for `LIKE '%foo'` with a leading wildcard.",
+            "**Covering index:** if the index contains every column the query needs, the table is never touched. In MySQL's EXPLAIN this shows as `Using index`.",
+            "**Selectivity matters.** An index on a boolean is usually useless — the planner will prefer a scan.",
+            "**Every index costs writes.** Unused indexes are pure tax on every insert and update; find and drop them.",
+            "**Read EXPLAIN for:** access type (`ALL` is a full scan), rows examined versus returned, and whether it says `Using filesort` or `Using temporary`."
+          ],
+          "code": {
+            "lang": "sql",
+            "cap": "Leftmost prefix, and the predicate that disables an index",
+            "src": "CREATE INDEX idx_claims ON claims (tenant_id, status, created_at);\n\n-- USES the index (leftmost prefix satisfied)\nWHERE tenant_id = 42\nWHERE tenant_id = 42 AND status = 'denied'\nWHERE tenant_id = 42 AND status = 'denied' AND created_at > '2026-01-01'\n\n-- DOES NOT use it (skips the leading column)\nWHERE status = 'denied'\n\n-- KILLS the index: the function hides the column from the planner\nWHERE YEAR(created_at) = 2026\n-- REWRITE as a range so the index can be used\nWHERE created_at >= '2026-01-01' AND created_at < '2027-01-01'\n\nEXPLAIN ANALYZE SELECT ...;   -- read type, rows, and extra BEFORE tuning"
+          },
+          "qa": [
+            {
+              "q": "Would you index every column?",
+              "a": [
+                "No — indexes are a read optimisation paid for on every write. Each one is another structure to maintain on insert, update and delete, plus storage and memory, so a table with fifteen indexes has a write path several times more expensive than it needs.",
+                "I would index from the actual query patterns: the columns in WHERE, JOIN and ORDER BY, as composites in the order the leftmost-prefix rule requires. And I would periodically look for unused indexes and drop them, because they accumulate — someone adds one for a report that was decommissioned a year ago and nobody removes it."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "GROUP BY, HAVING & window functions",
+          "tier": "core",
+          "one": "GROUP BY collapses rows into aggregates; HAVING filters those aggregates. Window functions compute across a set of rows *without* collapsing them.",
+          "analogy": "GROUP BY gives you the class averages. A window function writes each student's rank next to their own name, with the whole class still visible.",
+          "points": [
+            "**WHERE filters rows before grouping; HAVING filters groups after.** Putting an aggregate in WHERE is an error.",
+            "**Window functions** — `ROW_NUMBER()`, `RANK()`, `LAG()`, `SUM() OVER (...)` — keep every row. This is the modern answer to 'top N per group'.",
+            "**`PARTITION BY`** is GROUP BY for windows; **`ORDER BY` inside `OVER`** defines the running order.",
+            "**`ROW_NUMBER` vs `RANK` vs `DENSE_RANK`:** ties get distinct numbers, gapped ranks, or unbroken ranks respectively.",
+            "**Common table expressions (`WITH`)** make multi-step queries readable and are how you write recursive queries for hierarchies."
+          ],
+          "code": {
+            "lang": "sql",
+            "cap": "Top N per group — the classic window-function question",
+            "src": "-- The 3 most recent claims per tenant, without a correlated subquery.\nWITH ranked AS (\n  SELECT c.*,\n         ROW_NUMBER() OVER (\n           PARTITION BY tenant_id            -- restart per tenant\n           ORDER BY created_at DESC          -- newest first\n         ) AS rn\n    FROM claims c\n   WHERE created_at >= '2026-01-01'          -- filter BEFORE the window\n)\nSELECT * FROM ranked WHERE rn <= 3;\n\n-- Running total that keeps every row visible.\nSELECT tenant_id, occurred_at, tokens,\n       SUM(tokens) OVER (PARTITION BY tenant_id ORDER BY occurred_at)\n         AS running_tokens\n  FROM usage_ledger;"
+          }
+        },
+        {
+          "t": "Normalisation & when to denormalise",
+          "tier": "core",
+          "one": "Normalisation removes duplicated data so one fact lives in one place. Denormalisation deliberately duplicates it to avoid a join — a read optimisation with a write cost.",
+          "analogy": "One address book everyone references, versus writing the address on every envelope. The second is faster to post and wrong the moment someone moves.",
+          "points": [
+            "**1NF** atomic values, **2NF** no partial dependency on part of a composite key, **3NF** no transitive dependency. In practice: 3NF as the default.",
+            "**The point of normalisation is update integrity** — one place to change means no possibility of inconsistency.",
+            "**Denormalise when** reads vastly outnumber writes, the join is measurably expensive, and you can keep the copy in sync — via triggers, application logic or a materialised view.",
+            "**Materialised views** are managed denormalisation with a refresh policy. Usually a better answer than hand-maintained copies.",
+            "**In clinical data, integrity wins.** A denormalised allergy list that drifts is a patient-safety issue, not a performance trade."
+          ]
+        },
+        {
+          "t": "Transactions & deadlocks",
+          "tier": "core",
+          "one": "A transaction is all-or-nothing. A deadlock is two transactions each holding what the other needs, and the database resolves it by killing one.",
+          "analogy": "Two people in a corridor each stepping aside the same way, forever. Someone has to be told to go back.",
+          "points": [
+            "**Deadlocks need four conditions** — mutual exclusion, hold-and-wait, no pre-emption, circular wait. Break any one and they cannot occur.",
+            "**The practical fix is consistent lock ordering.** If every transaction touches tables in the same order, a cycle is impossible.",
+            "**Keep transactions short.** Never hold a transaction open across a network call to a third party — that is how a slow API becomes a database outage.",
+            "**Databases detect and kill a victim**, returning a deadlock error. Your application should retry — deadlocks are expected, not exceptional.",
+            "**Lock escalation and gap locks** in MySQL's REPEATABLE READ can lock more rows than you expect, which surprises people migrating from Postgres."
+          ],
+          "qa": [
+            {
+              "q": "You see intermittent deadlocks in production. How do you fix them?",
+              "a": [
+                "Read the deadlock log first — both MySQL and Postgres report the two transactions and the locks involved, so you can see the actual cycle rather than theorise about it.",
+                "The fix is almost always consistent lock ordering: if one code path updates claims then patients and another does the reverse, they will eventually meet. Making every path acquire in the same order removes the cycle entirely. Alongside that: shorten transactions so the window for collision is smaller, take the narrowest lock that works, and add bounded retry with jitter, because under concurrency some deadlocks are normal and a retry is the correct response rather than an error to surface."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stores",
+      "name": "MySQL, MongoDB & Redis",
+      "desc": "The three stores on your résumé. Know the storage engine, the document model, and Redis's persistence and eviction behaviour.",
+      "concepts": [
+        {
+          "t": "MySQL & InnoDB",
+          "tier": "core",
+          "resume": true,
+          "one": "InnoDB stores rows inside the primary key's B+tree — the table *is* the clustered index. Every secondary index stores the primary key, not a row pointer.",
+          "analogy": "A filing cabinet where the folders are physically ordered by ID. Any other index is a card that gives you the ID, so you still walk to the drawer.",
+          "points": [
+            "**Clustered index:** rows are stored in primary-key order. This makes PK range scans fast and makes the PK choice consequential.",
+            "**Secondary index lookups cost two traversals** — index to PK, then PK to row. A covering index avoids the second.",
+            "**Choose a small, monotonically increasing PK.** A random UUID as a clustered key causes page splits and bloats every secondary index. Use an auto-increment BIGINT or a time-ordered UUIDv7.",
+            "**MVCC via undo logs** gives consistent reads without blocking writers. Default isolation is REPEATABLE READ, unlike Postgres's READ COMMITTED.",
+            "**Replication is logical (binlog)** — statement, row, or mixed. Row-based is safer and the modern default.",
+            "**`SELECT ... FOR UPDATE`** takes row locks; under REPEATABLE READ it may also take gap locks, which lock ranges you did not expect."
+          ],
+          "qa": [
+            {
+              "q": "Why is a random UUID a bad primary key in InnoDB?",
+              "a": [
+                "Because the primary key defines physical row order. An auto-increment key appends to the end of the B+tree, which is sequential and cache-friendly. A random UUID inserts into the middle of the tree, causing page splits, fragmentation and far more random I/O.",
+                "It compounds too: every secondary index stores the primary key as its pointer, so a 16-byte random key makes every index on the table bigger and less cacheable. If I need globally unique IDs I would use a time-ordered scheme like UUIDv7 or ULID, which keeps insertion sequential while staying unique."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "MongoDB",
+          "tier": "core",
+          "resume": true,
+          "one": "Document store — BSON documents in collections, no enforced schema by default. The design question is always embed or reference.",
+          "analogy": "A folder per case with everything stapled inside, rather than sheets filed across many cabinets.",
+          "points": [
+            "**Embed** when data is accessed together and is bounded — one round trip, atomic per document. **Reference** when data is shared, unbounded, or updated independently.",
+            "**The 16MB document limit** is the hard constraint that kills naive embedding of an unbounded array.",
+            "**Indexes work like any B-tree** — compound indexes follow the same leftmost-prefix rule as SQL.",
+            "**Aggregation pipeline** (`$match`, `$group`, `$lookup`, `$project`) is the query language for anything beyond a find. Put `$match` first so it can use an index.",
+            "**Multi-document transactions exist** since 4.0 but are more expensive than in a relational store — if you need them constantly, the data model is wrong.",
+            "**Write concern** (`w: majority`) and read concern are your durability and consistency dials. Defaults are not always what you want."
+          ],
+          "qa": [
+            {
+              "q": "Embed or reference the line items on a claim?",
+              "a": [
+                "Embed, given the access pattern. Line items are always read with their claim, they are bounded — tens, not thousands — and they change with the claim, so embedding gives one round trip and atomic updates without a transaction.",
+                "I would reference instead if the array were unbounded, since documents cap at 16MB and an ever-growing array also causes the document to be rewritten and relocated on every append. Also if line items were queried independently across claims, or shared between documents. The rule I would state is: embed for contains-and-bounded, reference for shared-or-unbounded."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Redis: data types & persistence",
+          "tier": "core",
+          "resume": true,
+          "one": "An in-memory data-structure server, single-threaded for commands so every operation is atomic. Persistence is optional and comes in two flavours.",
+          "analogy": "A whiteboard next to the filing cabinet. Instant to read and write, and you must decide how often to photograph it.",
+          "points": [
+            "**Types:** String, Hash (objects), List (queues), Set, Sorted Set (leaderboards, rate limits, delayed queues), plus Streams, HyperLogLog and Bitmaps.",
+            "**Single-threaded command execution** means individual commands are atomic — no locking needed. It also means one slow command (`KEYS *` on a large database) blocks everything.",
+            "**RDB:** point-in-time snapshots. Compact, fast restart, loses writes since the last snapshot. **AOF:** append-only command log. More durable, larger, slower restart.",
+            "**Redis can lose data.** Even AOF with `everysec` can lose a second. Never use it as the source of truth for money — which is exactly why your billing ledger lives in Postgres.",
+            "**Eviction policies:** `allkeys-lru` for a pure cache, `volatile-ttl` when only some keys should expire, `noeviction` (the default) which starts erroring on write when memory fills.",
+            "**Lua scripts execute atomically** — how you do check-and-decrement for rate limiting and credit deduction in one round trip."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Sorted sets: rate windows, leaderboards and delayed queues",
+            "src": "# Sliding-window rate limit with a sorted set scored by timestamp.\nnow = time.time()\npipe = r.pipeline()\npipe.zremrangebyscore(key, 0, now - WINDOW)   # drop expired entries\npipe.zcard(key)                              # how many left in window\npipe.zadd(key, {str(uuid4()): now})\npipe.expire(key, WINDOW)\n_, count, _, _ = pipe.execute()\nallowed = count < LIMIT\n\n# Delayed queue: score = when it should run.\nr.zadd(\"due\", {job_id: run_at_epoch})\ndue_now = r.zrangebyscore(\"due\", 0, time.time(), start=0, num=10)\n\n# NEVER on a large database: O(n), blocks the single thread.\n# r.keys(\"claim:*\")        ->  use SCAN with a cursor instead"
+          },
+          "qa": [
+            {
+              "q": "Redis is at its memory limit. What happens?",
+              "a": [
+                "It depends entirely on `maxmemory-policy`, and the default surprises people: `noeviction` means writes start returning errors while reads keep working. If Redis is your cache, that is the wrong behaviour — you want it to evict rather than fail.",
+                "So for a cache I would set `allkeys-lru`, which evicts the least recently used regardless of TTL. `volatile-lru` only evicts keys that have a TTL, which is right when the instance mixes cache data with data that must not disappear — though mixing those in one instance is itself something I would avoid. And I would alert on memory usage and eviction rate, because a rising eviction rate means the working set has outgrown the instance and hit rate is quietly collapsing."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "datalibs",
+      "name": "NumPy, Pandas & Scraping",
+      "desc": "The data-handling tail of your skills list. One or two questions deep, mostly about vectorisation.",
+      "concepts": [
+        {
+          "t": "NumPy & vectorisation",
+          "tier": "core",
+          "resume": true,
+          "one": "A contiguous typed array with operations implemented in C. Vectorising means expressing a loop as an array operation so the loop runs in C, not Python.",
+          "analogy": "Telling the whole class to turn the page, instead of walking to each desk in turn.",
+          "points": [
+            "**Why it is fast:** contiguous memory, one dtype, no per-element Python object overhead, and SIMD instructions.",
+            "**Broadcasting** lets arrays of different shapes combine without copying — `arr - arr.mean(axis=0)` works because the row vector is stretched implicitly.",
+            "**Views versus copies:** slicing returns a *view* sharing memory. Mutating a slice mutates the original — a real source of bugs. `.copy()` when you need independence.",
+            "**Avoid Python loops over arrays.** A vectorised operation is typically 10–100× faster than the equivalent `for` loop.",
+            "**This is where Numba fits:** when the loop has a sequential dependency NumPy cannot express."
+          ]
+        },
+        {
+          "t": "Pandas",
+          "tier": "core",
+          "resume": true,
+          "one": "Labelled tabular data on top of NumPy. The DataFrame is a dict of columns, each a typed array — which explains most of its performance behaviour.",
+          "analogy": "A spreadsheet with a programming interface — and the same trap, where a formula dragged down a million rows is slow.",
+          "points": [
+            "**Column-oriented.** Operating on a column is fast; iterating rows with `iterrows()` is very slow and almost always avoidable.",
+            "**`apply` is a disguised loop.** Prefer vectorised operations; use `np.where` or `.map` on a dict for conditionals.",
+            "**`groupby().agg()`** is the workhorse — split, apply, combine. Same mental model as SQL's GROUP BY.",
+            "**`merge`** is a SQL join with the same semantics; watch out for duplicated keys silently multiplying rows.",
+            "**`SettingWithCopyWarning`** means you may be writing to a view, not the frame. Use `.loc[row, col] = value` to be explicit.",
+            "**Memory:** an object dtype column stores Python objects. Convert repeated strings to `category` for large frames."
+          ]
+        },
+        {
+          "t": "BeautifulSoup & scraping ethics",
+          "tier": "jargon",
+          "resume": true,
+          "one": "An HTML parser that tolerates malformed markup. The engineering question is rarely the parsing — it is rate limiting, robustness and whether you should be scraping at all.",
+          "analogy": "Reading a badly photocopied form. The reader copes with the smudges; the real question is whether you were given permission to read it.",
+          "points": [
+            "**Parser choice matters:** `html.parser` is built in, `lxml` is much faster, `html5lib` is the most lenient and the slowest.",
+            "**Select by structure, not by brittle full paths.** CSS selectors on stable attributes survive markup changes; a long chain of `div > div > span` does not.",
+            "**Scrapers break constantly** — sites change. Fail loudly with a clear error rather than silently returning `None` and poisoning downstream data.",
+            "**Be a good citizen:** respect `robots.txt`, rate-limit, identify yourself in the user agent, and cache so you do not refetch.",
+            "**Prefer an API if one exists.** Saying this first in an interview signals judgement, not just capability."
+          ]
+        },
+        {
+          "t": "Schema design in practice",
+          "tier": "core",
+          "resume": true,
+          "one": "The decisions that are expensive to reverse: primary keys, tenant scoping, soft deletes, temporal data, and where you put the audit trail.",
+          "analogy": "The foundations. Everything else can be renovated; these cannot without moving out.",
+          "points": [
+            "**Every multi-tenant table carries `tenant_id`**, and it is the leading column of most indexes. This is a correctness constraint, not a convenience.",
+            "**Soft delete (`deleted_at`) over hard delete** in regulated data — but every query must then filter it, so enforce that in the data layer, not by convention.",
+            "**Append-only for anything auditable.** Clinical notes and usage ledgers are amended or superseded, never updated in place.",
+            "**Store timestamps in UTC with a timezone-aware type.** Then store the originating timezone separately if it matters clinically — 'the morning dose' depends on the patient's local time.",
+            "**Money and quantities:** `DECIMAL`, never floating point. `0.1 + 0.2 != 0.3` is a real billing bug.",
+            "**Constraints are documentation the database enforces.** Foreign keys, unique constraints and check constraints prevent whole categories of data corruption that application code will eventually let through."
+          ],
+          "qa": [
+            {
+              "q": "How would you model an amendable clinical note?",
+              "a": [
+                "Versioned and append-only, never updated in place, because the prior version is legally part of the record — an amendment has to preserve what was originally signed.",
+                "Concretely: a `note` row for identity, and a `note_version` table holding each revision with its author, timestamp, signed status and content, plus a pointer to the current version for the fast read path. Signing creates an immutable version; amending creates a new one that references the previous. That gives you the audit trail for free rather than bolting it on, and it means the 'current' query stays a single indexed lookup instead of a scan over history."
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

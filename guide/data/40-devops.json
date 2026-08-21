@@ -1,0 +1,492 @@
+{
+  "id": "ops",
+  "name": "CI/CD, Cloud & Ops",
+  "desc": "Everything between your laptop and production. Your provisioning CLI and flag-switchable rollback live here — this track makes those stories mechanically defensible.",
+  "color": "#55D68B",
+  "modules": [
+    {
+      "id": "git",
+      "name": "Git in Anger",
+      "desc": "Not the tutorial. The commands and models that come up when something has gone wrong or a reviewer asks how you keep history clean.",
+      "concepts": [
+        {
+          "t": "Merge vs rebase",
+          "tier": "core",
+          "one": "Merge preserves what actually happened and creates a merge commit. Rebase rewrites your commits onto a new base for a linear history — and rewriting shared history is the one unforgivable sin.",
+          "analogy": "Merge is stapling your notes into the shared binder as they were. Rebase is recopying them neatly after everyone else's pages.",
+          "points": [
+            "**The golden rule:** never rebase commits that others have pulled. You rewrite their history and every subsequent merge conflicts.",
+            "**Rebase your own feature branch** onto `main` before opening a PR — clean, reviewable, bisectable history.",
+            "**Squash merge** collapses a PR into one commit. Great for a readable `main`; loses intermediate detail, which is usually fine.",
+            "**`git pull --rebase`** avoids the noisy merge commits from pulling a branch you also committed to.",
+            "**Fast-forward** happens when there is nothing to merge — the branch pointer just moves. `--no-ff` forces a merge commit to record that a branch existed."
+          ],
+          "code": {
+            "lang": "bash",
+            "cap": "The daily loop, and the recovery when you break it",
+            "src": "# Keep your feature branch current, cleanly\ngit fetch origin\ngit rebase origin/main          # replay your commits on top of latest main\n# ... fix conflicts, then:\ngit rebase --continue\n\n# Rewrote something you should not have? The reflog remembers everything.\ngit reflog                      # every HEAD position for ~90 days\ngit reset --hard HEAD@{3}       # go back to before the mistake\n\n# Which commit broke it? Binary search the history.\ngit bisect start\ngit bisect bad                  # current is broken\ngit bisect good v2.4.0          # this tag was fine\n# git checks out midpoints; mark each good/bad; ~10 steps for 1000 commits\ngit bisect run ./test.sh        # or fully automate it"
+          },
+          "qa": [
+            {
+              "q": "You pushed a commit containing a secret. What do you do?",
+              "a": [
+                "Rotate the secret first — that is the only step that actually reduces risk. Assume it is compromised the moment it hit a remote, because it is in clones, CI caches and possibly a mirror. Rewriting history without rotating is the mistake people make.",
+                "Then clean the history with `filter-repo` or BFG, force-push, and have everyone re-clone. And treat it as a process failure rather than an individual one — add secret scanning as a pre-commit hook and a CI gate, because this will happen again otherwise."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Trunk-based development",
+          "tier": "core",
+          "resume": true,
+          "one": "Everyone commits to one main branch in small increments, with incomplete work hidden behind feature flags rather than long-lived branches.",
+          "analogy": "A shared kitchen where everyone puts dishes on the same pass as they finish, instead of each cooking a full banquet in a separate room and colliding at service.",
+          "points": [
+            "**Why it works:** merge pain grows superlinearly with branch age. Small, frequent merges are almost free; a three-week branch is a project.",
+            "**Feature flags are the enabler** — you merge incomplete code that is switched off, which is exactly the pattern behind your dual-runtime rollout.",
+            "**Main must always be releasable.** That requires a fast, trustworthy CI gate; without one, trunk-based development is chaos.",
+            "**GitFlow** (develop/release/hotfix branches) is the alternative — heavier, appropriate for versioned software with supported releases, overkill for a SaaS.",
+            "**Short-lived branches** (hours to two days) plus PR review is the pragmatic middle ground most teams actually run."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ci",
+      "name": "Continuous Integration",
+      "desc": "The gate that decides whether main stays releasable. Interviewers probe here for whether you have owned a pipeline or just watched one.",
+      "concepts": [
+        {
+          "t": "The pipeline",
+          "tier": "core",
+          "one": "An automated sequence run on every push: lint, build, test, security scan, package. Its job is to fail fast and tell you precisely why.",
+          "analogy": "A production line with inspection at each station. A defect caught at station two costs pennies; the same defect found by a customer costs a recall.",
+          "points": [
+            "**Order by cost:** lint and type-check first (seconds), unit tests next (a minute), integration and e2e last (minutes). Cheap failures should fail first.",
+            "**Fail fast, report fully.** Stop the pipeline on failure, but surface *all* the lint errors, not the first one.",
+            "**Cache aggressively:** dependencies, build outputs, container layers. A slow pipeline gets bypassed, and a bypassed gate is no gate.",
+            "**Under 10 minutes** for the PR gate is the target. Past that, people context-switch and the feedback loop breaks.",
+            "**The artifact is built once** and promoted through environments. Rebuilding per environment means you never test what you ship."
+          ],
+          "code": {
+            "lang": "yaml",
+            "cap": "Cheap checks first, one build, cached deps",
+            "src": "jobs:\n  static:                       # seconds — fail here before burning minutes\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with: { python-version: '3.12', cache: 'pip' }\n      - run: ruff check . && mypy src/\n\n  test:\n    needs: static               # do not run if lint failed\n    strategy:\n      matrix: { python: ['3.11', '3.12'] }\n      fail-fast: false          # see ALL matrix failures, not the first\n    steps:\n      - run: pytest -x --cov=src --cov-fail-under=80\n\n  build:\n    needs: test\n    steps:\n      # Build ONCE. The same digest is promoted dev -> staging -> prod,\n      # so what you tested is bit-for-bit what you ship.\n      - run: docker build -t app:${{ github.sha }} .\n      - run: docker push app:${{ github.sha }}"
+          },
+          "qa": [
+            {
+              "q": "Your CI takes 45 minutes. How do you fix it?",
+              "a": [
+                "Measure per-stage first — the instinct is to parallelise everything, but usually one or two stages dominate and the rest is noise.",
+                "Then in order: cache dependencies and build layers, which is often the single biggest win and costs nothing. Parallelise independent suites across runners. Split the gate so the PR runs unit and integration tests while the slow end-to-end suite runs post-merge on main. And look hard at the test suite itself — a 45-minute pipeline usually means integration tests standing in for unit tests, each spinning up a database it did not need."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "The test pyramid",
+          "tier": "core",
+          "one": "Many fast unit tests, fewer integration tests, very few end-to-end tests. Inverted — mostly e2e — you get a slow, flaky suite nobody trusts.",
+          "analogy": "Checking each ingredient, then each dish, then the whole banquet. Tasting only the banquet tells you something is wrong but not what.",
+          "points": [
+            "**Unit:** one function or class, no I/O, milliseconds. Should be the bulk of the suite.",
+            "**Integration:** real database, real HTTP boundary. Slower, catches wiring and schema bugs unit tests structurally cannot.",
+            "**E2E:** the whole system through the UI. Highest confidence, slowest, flakiest. Keep a handful covering critical journeys.",
+            "**Contract tests** between services — verify the interface without spinning up the whole world. Underused and very effective in a microservice estate.",
+            "**Coverage is a smoke detector, not a goal.** 80% with meaningful assertions beats 95% of tests that assert nothing."
+          ]
+        },
+        {
+          "t": "Flaky tests",
+          "tier": "core",
+          "one": "Tests that pass and fail without a code change. The real damage is not the failed build — it is that people stop believing red means broken.",
+          "analogy": "A car alarm that goes off in the wind. After a week nobody looks, including the night the car is actually stolen.",
+          "points": [
+            "**Common causes:** time and timezone assumptions, test-order dependence, shared mutable state, real network calls, and race conditions in async code.",
+            "**Quarantine, do not ignore.** Move a flaky test out of the blocking gate with a ticket and an owner. Retrying it silently hides a real race.",
+            "**A flaky test is sometimes a real bug** — a race in the test often mirrors a race in the code. Investigate before you assume it is the test.",
+            "**Detect them systematically:** track pass/fail history per test. A test that fails 3% of the time on unchanged code is flaky by definition.",
+            "**Determinism levers:** freeze time, seed randomness, isolate per-test databases, and never depend on execution order."
+          ],
+          "qa": [
+            {
+              "q": "A test fails once a day in CI and passes locally. How do you approach it?",
+              "a": [
+                "Assume it is a real race until proven otherwise, because a test that only fails under CI's timing and parallelism is often exposing a genuine concurrency bug that just does not surface on a quiet laptop.",
+                "Practically: get the failure history to find the actual rate, run it in a tight loop under load locally to reproduce, and look at the usual suspects — shared state between tests, order dependence, an unawaited async call, or a fixed sleep standing in for a proper wait. While that is in progress I would quarantine it out of the blocking gate with an owner and a ticket, because leaving it red teaches the team to ignore red."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cd",
+      "name": "Deployment & Release",
+      "desc": "Directly your flag-switchable rollback story. Know the four strategies and what each costs.",
+      "concepts": [
+        {
+          "t": "Rolling, blue-green, canary",
+          "tier": "core",
+          "resume": true,
+          "one": "Three ways to replace running code. Rolling replaces instances gradually, blue-green swaps two full environments, canary sends a slice of real traffic to the new version first.",
+          "analogy": "Replacing a fleet of buses one at a time; running two complete fleets and switching the depot; or putting one new bus on the route and watching it.",
+          "points": [
+            "**Rolling:** default in Kubernetes. Cheap, no extra capacity, but both versions serve simultaneously — so the code must be backward compatible.",
+            "**Blue-green:** full duplicate environment, switch the load balancer. Instant rollback, doubles infrastructure cost during the switch.",
+            "**Canary:** 1% → 10% → 50% → 100%, watching error rate and latency between steps. Best risk profile, needs good metrics to be meaningful.",
+            "**Feature flags are orthogonal and stronger** — they separate deploy from release entirely, so rollback needs no deployment at all. That is your Copilot story.",
+            "**Backward compatibility is the constraint that binds all of them.** During any rollout, old and new run together against the same database."
+          ],
+          "qa": [
+            {
+              "q": "How do you deploy a breaking database migration with zero downtime?",
+              "a": [
+                "Expand, migrate, contract — never change a column in place while old code is running, because during any rollout both versions are live against the same schema.",
+                "Concretely, for renaming a column: add the new column, deploy code that writes both and reads the old, backfill the existing rows, deploy code that reads the new one, then in a later release stop writing the old and finally drop it. Four deploys instead of one, and every intermediate state is safe to roll back to. The temptation is to compress it, and that is exactly how you end up with an outage that cannot be rolled back because the old code no longer has a column it needs."
+              ]
+            },
+            {
+              "q": "Canary looks fine at 10% but breaks at 100%. What did you miss?",
+              "a": [
+                "Something that only appears at full load or full coverage. Most often a resource limit — connection pool, memory, cache capacity — that was comfortable at a tenth of the traffic and saturates at full.",
+                "The other big one is traffic composition: 10% sampled randomly may not include the heavy tenant, the rare endpoint, or the batch job that runs at 2am. That is why canary duration matters as much as canary percentage — a 10% canary for five minutes misses every daily pattern in the system."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Rollback vs roll-forward",
+          "tier": "core",
+          "resume": true,
+          "one": "Rollback returns to the last known-good version. Roll-forward ships a fix. Rollback is almost always correct during an incident — you can debug later, you cannot un-break users.",
+          "analogy": "Reversing out of a wrong turn versus reading the map while still driving into the field.",
+          "points": [
+            "**Default to rollback.** Restore service, then diagnose. Fixing forward under pressure is how a small incident becomes a long one.",
+            "**Rollback is not always possible** — a completed destructive migration cannot be undone. That is why expand-contract migrations matter.",
+            "**Feature flags make rollback instant** and decoupled from deployment. Seconds instead of a build-review-QA-release cycle.",
+            "**Practise it.** An untested rollback path fails when you need it, and you find out during the incident.",
+            "**Roll forward when** the fix is trivial and certain, or when rolling back would lose data written by the new version."
+          ]
+        },
+        {
+          "t": "Blue-green for databases: expand and contract",
+          "tier": "deep",
+          "one": "The schema-change discipline that makes zero-downtime deploys possible: every change is additive first, destructive last, with a fully compatible state in between.",
+          "analogy": "Building the new bridge alongside the old one, moving traffic across, then demolishing. Never demolishing first.",
+          "points": [
+            "**Expand:** add the new column, table or index. Old code ignores it, so this is always safe to deploy.",
+            "**Migrate:** deploy code that writes to both old and new. Backfill existing rows in batches, not one giant transaction.",
+            "**Contract:** once nothing reads the old column, stop writing it, then drop it — in a *separate, later* release.",
+            "**Index creation must be concurrent** (`CREATE INDEX CONCURRENTLY` in Postgres) or you lock the table and take an outage.",
+            "**Backfill in batches** with a sleep between them. A single `UPDATE` over ten million rows holds locks and blows up replication lag."
+          ],
+          "code": {
+            "lang": "sql",
+            "cap": "Renaming a column with zero downtime — four releases, not one",
+            "src": "-- R1 EXPAND: additive only. Old code is unaffected.\nALTER TABLE claims ADD COLUMN payer_ref TEXT;\nCREATE INDEX CONCURRENTLY idx_claims_payer_ref ON claims (payer_ref);\n\n-- R2 code writes BOTH columns, still reads the old one.\n\n-- R2b BACKFILL in batches. Never one statement over 10M rows: it holds\n-- locks, bloats WAL, and blows up replication lag.\nUPDATE claims SET payer_ref = payer_id\n WHERE payer_ref IS NULL AND id BETWEEN :lo AND :hi;\n\n-- R3 code reads the NEW column, still writes both (rollback stays safe).\n\n-- R4 CONTRACT: only once nothing reads or writes the old column.\nALTER TABLE claims DROP COLUMN payer_id;"
+          }
+        }
+      ]
+    },
+    {
+      "id": "containers",
+      "name": "Containers",
+      "desc": "You list Docker. Expect questions on layers, image size and the container-versus-VM distinction — these are the standard filters.",
+      "concepts": [
+        {
+          "t": "Container vs VM",
+          "tier": "core",
+          "one": "A VM virtualises hardware and runs its own kernel. A container is an isolated process on the *host's* kernel, using namespaces and cgroups.",
+          "analogy": "A VM is a separate house with its own foundations. A container is a flat in a shared building — its own front door, the same structure underneath.",
+          "points": [
+            "**Namespaces** provide isolation (PID, network, mount, user). **cgroups** provide resource limits (CPU, memory, I/O). That is the whole mechanism.",
+            "**Containers start in milliseconds** and add near-zero overhead because there is no guest kernel to boot.",
+            "**Weaker isolation** — a kernel exploit escapes to the host. VMs are the stronger boundary, which matters for multi-tenant untrusted workloads.",
+            "**They share the host kernel**, so a Linux container cannot run on a Windows kernel — Docker Desktop runs a hidden Linux VM.",
+            "**The real win is packaging**, not isolation: the image bundles dependencies, so dev and prod run the identical filesystem."
+          ]
+        },
+        {
+          "t": "Image layers & multi-stage builds",
+          "tier": "core",
+          "one": "Each Dockerfile instruction creates a cached layer. Ordering instructions from least to most frequently changed is what makes builds fast.",
+          "analogy": "Transparent sheets stacked on a projector. Change the top sheet and you reuse everything under it; change the bottom and you redraw everything.",
+          "points": [
+            "**Order matters enormously:** copy the dependency manifest and install *before* copying source. Source changes every commit; dependencies rarely do.",
+            "**Multi-stage builds:** compile in a fat builder image, copy only the artefact into a slim runtime image. Order-of-magnitude size reductions.",
+            "**Smaller images** mean faster pulls, faster scaling, and a smaller attack surface. Distroless or Alpine for the runtime stage.",
+            "**Never bake secrets into layers.** Layers are immutable and shipped — a deleted secret in an earlier layer is still in the image.",
+            "**`.dockerignore`** keeps `.git` and `node_modules` out of the build context. Frequently forgotten, often the reason a build is slow."
+          ],
+          "code": {
+            "lang": "bash",
+            "cap": "Multi-stage, cache-ordered, non-root",
+            "src": "# ---- build stage: fat, has compilers, thrown away ----\nFROM python:3.12 AS build\nWORKDIR /app\n# Deps FIRST — this layer is cached until requirements.txt changes.\nCOPY requirements.txt .\nRUN pip install --prefix=/install -r requirements.txt\n\n# ---- runtime stage: slim, only what runs ----\nFROM python:3.12-slim\nWORKDIR /app\nCOPY --from=build /install /usr/local     # artefact only, no toolchain\nCOPY src/ src/                            # changes every commit: last\n\n# Never run as root: a container escape inherits this user.\nRUN useradd -r -u 10001 app\nUSER app\n\nHEALTHCHECK --interval=30s CMD curl -f http://localhost:8000/healthz || exit 1\nCMD [\"gunicorn\", \"-b\", \"0.0.0.0:8000\", \"src.main:app\"]"
+          },
+          "qa": [
+            {
+              "q": "Your image is 2GB and takes four minutes to build. What do you do?",
+              "a": [
+                "Two separate problems. For size: multi-stage build so compilers and build caches never reach the runtime image, a slim or distroless base, and check what is actually in there — usually it is a package manager cache or the whole source tree including `.git`.",
+                "For build time: instruction ordering is almost always the cause. If source is copied before dependencies are installed, every commit invalidates the dependency layer and reinstalls everything. Moving the manifest copy above the source copy typically takes a four-minute build to under thirty seconds on the common path."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "k8s",
+      "name": "Kubernetes",
+      "desc": "You list it. Know the object model and the two things that cause most production incidents: probes and resource limits.",
+      "concepts": [
+        {
+          "t": "The object model",
+          "tier": "core",
+          "one": "Pod is the smallest unit; ReplicaSet keeps N pods running; Deployment manages ReplicaSets for rollouts; Service gives a stable address; Ingress routes external HTTP in.",
+          "analogy": "A pod is a desk, a ReplicaSet is 'always keep five desks staffed', a Deployment is HR swapping staff without emptying the floor, and a Service is the department phone number that never changes.",
+          "points": [
+            "**Pod:** one or more containers sharing a network namespace and volumes. Ephemeral by design — never rely on a pod's identity or IP.",
+            "**Deployment** does rolling updates via `maxSurge` and `maxUnavailable`, and keeps old ReplicaSets so `kubectl rollout undo` works.",
+            "**Service:** stable virtual IP and DNS name load-balancing across pods. ClusterIP (internal), NodePort, LoadBalancer (cloud LB).",
+            "**ConfigMap** for config, **Secret** for credentials — Secrets are only base64-encoded by default, so enable encryption at rest and use a real secret manager.",
+            "**StatefulSet** for pods needing stable identity and storage (databases). **DaemonSet** for one pod per node (log collectors)."
+          ]
+        },
+        {
+          "t": "Probes: liveness, readiness, startup",
+          "tier": "core",
+          "one": "Readiness controls whether traffic is sent to a pod. Liveness controls whether the pod is killed and restarted. Confusing them causes some of the most damaging outages in Kubernetes.",
+          "analogy": "Readiness is 'I am not ready to take calls yet'. Liveness is 'I have passed out, send someone to wake me'. Answering the second wrong gets you repeatedly defibrillated.",
+          "points": [
+            "**Readiness failing** removes the pod from the Service endpoints. No traffic, no restart. Safe and recoverable.",
+            "**Liveness failing** kills the container. If your liveness check depends on a downstream database, a database blip restarts your entire fleet — turning a dependency outage into a total outage.",
+            "**Liveness must only check the process itself.** A trivial in-process endpoint. Never check dependencies in a liveness probe.",
+            "**Readiness may check dependencies** — that is exactly what it is for, since you want traffic diverted, not pods killed.",
+            "**Startup probe** protects slow-booting apps: liveness does not begin until startup succeeds, so a slow JVM start does not trigger a restart loop."
+          ],
+          "code": {
+            "lang": "yaml",
+            "cap": "The distinction that prevents a fleet-wide restart storm",
+            "src": "livenessProbe:\n  httpGet: { path: /healthz, port: 8000 }   # process only. NO db check.\n  periodSeconds: 10\n  failureThreshold: 3\n\nreadinessProbe:\n  httpGet: { path: /readyz, port: 8000 }    # db, cache, deps — fine here\n  periodSeconds: 5\n  failureThreshold: 2\n\nstartupProbe:                                # slow boot? liveness waits\n  httpGet: { path: /healthz, port: 8000 }\n  failureThreshold: 30\n  periodSeconds: 5                           # up to 150s to start\n\nresources:\n  requests: { cpu: 200m, memory: 256Mi }     # scheduling + guaranteed floor\n  limits:   { memory: 512Mi }                # OOM-kill ceiling\n  # CPU limit deliberately omitted: CPU throttling causes latency spikes\n  # that look like application bugs. Requests already guarantee a share."
+          },
+          "qa": [
+            {
+              "q": "Every pod restarted at once during a database blip. What went wrong?",
+              "a": [
+                "The liveness probe was checking the database. When the database became briefly unavailable every pod's liveness failed simultaneously, so the kubelet killed all of them — converting a recoverable dependency blip into a full outage, and then a restart storm that hammered the database as it recovered.",
+                "The fix is the separation of concerns: liveness checks only whether the process itself is functioning, so a hung event loop gets restarted and nothing else does. Dependency health belongs in readiness, where the consequence is traffic being diverted rather than pods being destroyed."
+              ]
+            }
+          ],
+          "trap": "This is the single most common Kubernetes interview question with a wrong-answer trap. Putting a dependency check in liveness is the mistake; know why it is catastrophic rather than merely suboptimal."
+        },
+        {
+          "t": "Requests, limits & autoscaling",
+          "tier": "core",
+          "one": "Requests are what the scheduler guarantees you; limits are the ceiling. Memory over the limit gets OOM-killed; CPU over the limit gets throttled, which is worse because it is invisible.",
+          "analogy": "A reserved seat versus a maximum headcount. Exceed the memory cap and you are removed; exceed the CPU cap and you are simply served more slowly, silently.",
+          "points": [
+            "**Requests drive scheduling.** Set too low and pods get packed onto a node and starve; set too high and you waste money on idle capacity.",
+            "**Memory limit exceeded = OOMKill**, an abrupt process death. Set memory limits and set them realistically.",
+            "**CPU limit exceeded = throttling** via cgroup quota. The pod is not killed, just slowed — which shows up as mysterious p99 latency. Many teams deliberately omit CPU limits for this reason.",
+            "**HPA** scales pod count on CPU, memory or custom metrics. **VPA** adjusts requests. **Cluster Autoscaler** adds nodes.",
+            "**Scale on the right metric:** for a queue consumer, queue depth is far better than CPU. For an LLM gateway, concurrent in-flight requests beats both."
+          ],
+          "qa": [
+            {
+              "q": "p99 latency spikes but CPU usage looks fine. What do you check?",
+              "a": [
+                "CPU throttling first, because throttled containers show *low* CPU usage by construction — the cgroup is preventing them from using more, so the metric looks healthy while requests queue. `container_cpu_cfs_throttled_seconds_total` is the one to look at, and it is the trap in this question.",
+                "After that: garbage-collection pauses, connection-pool saturation waiting on a downstream, and noisy neighbours on the node. All of them produce the same signature of high tail latency with unremarkable average CPU."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "observability",
+      "name": "Observability",
+      "desc": "You list Prometheus and Grafana. This is also where your latency claims get their evidence, so it is worth being genuinely strong here.",
+      "concepts": [
+        {
+          "t": "Metrics, logs, traces",
+          "tier": "core",
+          "one": "Metrics tell you something is wrong. Logs tell you what happened on one request. Traces tell you where the time went across services. You need all three and they answer different questions.",
+          "analogy": "The dashboard warning light, the mechanic's notes on one car, and the GPS record of the whole journey.",
+          "points": [
+            "**Metrics:** numeric time series, cheap, aggregatable, low cardinality. Alert on these.",
+            "**Logs:** discrete events with detail. Expensive at volume. **Structured (JSON) logs** are queryable; unstructured strings are not.",
+            "**Traces:** a request's path across services with timing per span. The only tool that answers 'which hop is slow'.",
+            "**Cardinality is the killer.** Never put a user ID or request ID in a metric label — you create millions of time series and take down Prometheus.",
+            "**Correlation ID** threaded through all three is what makes them useful together. Without it you have three separate haystacks."
+          ],
+          "qa": [
+            {
+              "q": "How do you debug a request that is slow only sometimes?",
+              "a": [
+                "Tracing, with latency-biased sampling. Uniform sampling at 1% will almost always miss the slow requests, which are the only ones that matter — so the trick is tail-based sampling: buffer the trace and keep it if the request exceeded a threshold. Always trace the slowest 1% rather than a random 1%.",
+                "Then read the span breakdown for those specific traces. Intermittent slowness is usually queueing rather than computation — a connection pool, a lock, a cold cache falling through to origin, or a GC pause. The span durations tell you which, and metrics alone never will."
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Prometheus & PromQL",
+          "tier": "core",
+          "one": "A pull-based metrics system: it scrapes HTTP endpoints on your services. Four metric types, and knowing which to use is the actual question.",
+          "analogy": "A meter reader walking the route rather than every house phoning in. One system decides the schedule, so nothing gets overwhelmed.",
+          "points": [
+            "**Counter:** only goes up (requests, errors). Query with `rate()` — never use the raw value, and `rate()` handles counter resets on restart.",
+            "**Gauge:** goes up and down (queue depth, memory, in-flight requests).",
+            "**Histogram:** bucketed observations. This is what gives you percentiles, via `histogram_quantile()`. Use it for latency.",
+            "**Summary:** client-computed quantiles. Cannot be aggregated across instances — usually prefer a histogram.",
+            "**Pull vs push:** pull gives you service discovery and a free liveness signal. Push (via Pushgateway) is for batch jobs that exit before a scrape.",
+            "**Prometheus is not durable long-term storage** — use Thanos, Cortex or Mimir for retention beyond weeks."
+          ],
+          "code": {
+            "lang": "text",
+            "cap": "The four queries you will actually write",
+            "src": "# Request rate per second, by endpoint (5m window)\nsum by (path) (rate(http_requests_total[5m]))\n\n# Error ratio — always a ratio, never a raw count\nsum(rate(http_requests_total{status=~\"5..\"}[5m]))\n  / sum(rate(http_requests_total[5m]))\n\n# p95 latency from a histogram. Note rate() INSIDE the quantile.\nhistogram_quantile(0.95,\n  sum by (le, path) (rate(http_request_duration_seconds_bucket[5m])))\n\n# CPU throttling — the metric behind \"latency spikes, CPU looks fine\"\nrate(container_cpu_cfs_throttled_seconds_total[5m]) > 0"
+          }
+        },
+        {
+          "t": "RED, USE & alerting on symptoms",
+          "tier": "core",
+          "one": "RED for services (Rate, Errors, Duration), USE for resources (Utilisation, Saturation, Errors). Alert on user-visible symptoms, not on causes.",
+          "analogy": "Call the doctor because you are in pain, not because a blood marker moved. The marker is for diagnosis, the pain is for the appointment.",
+          "points": [
+            "**RED:** request Rate, Error rate, Duration. The three dashboards every service needs, and enough to run most incidents.",
+            "**USE:** Utilisation, Saturation, Errors — for CPU, memory, disk, network. Saturation (queue depth) is the leading indicator; utilisation is lagging.",
+            "**Alert on symptoms:** high error rate, high latency, SLO burn. Not on CPU at 80% — that may be perfectly healthy.",
+            "**Every alert must be actionable** and link to a runbook. An alert nobody acts on trains the team to ignore the pager.",
+            "**SLO burn-rate alerting** is the modern approach: page when you are consuming the error budget fast enough to exhaust it, with a fast burn for urgent and a slow burn for ticket-worthy."
+          ],
+          "qa": [
+            {
+              "q": "What would you alert on for the LLM gateway?",
+              "a": [
+                "Symptoms the user feels, and one leading indicator. So: p95 time-to-first-token above target, error rate above the SLO threshold, and escalation or fallback rate — because that one moves before anyone files a bug and it is the honest signal that quality has degraded.",
+                "Then two that are specific to this system: provider circuit-breaker state, since an open breaker means we are serving degraded responses and nobody would otherwise notice; and cost per request, because a runaway agent loop shows up as tokens-per-request rising long before it shows up on an invoice. I would not page on CPU or on raw request volume — those are diagnostic, not symptomatic."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cloud",
+      "name": "AWS & Infrastructure as Code",
+      "desc": "You built on AWS with Rekognition. Know the core services well enough to place them in a design, plus what IaC buys you.",
+      "concepts": [
+        {
+          "t": "The core AWS services",
+          "tier": "core",
+          "one": "You do not need certification depth. You need to place the right service in a design and know its one significant limitation.",
+          "analogy": "Knowing which shop sells what on the high street, not the inventory of each.",
+          "points": [
+            "**EC2** virtual machines; **ECS/EKS** container orchestration; **Lambda** serverless functions (cold starts, 15-min ceiling, no persistent connections).",
+            "**S3** object storage — cheap, durable (11 nines), eventually consistent for overwrites historically, now strongly consistent for reads after write.",
+            "**RDS/Aurora** managed relational; **DynamoDB** managed key-value with predictable latency but rigid access patterns you must design up front.",
+            "**SQS** queue, **SNS** pub/sub, **Kinesis** streaming log. **ElastiCache** managed Redis.",
+            "**CloudFront** CDN; **ALB** layer-7 load balancer; **Route 53** DNS with health-check-based failover.",
+            "**IAM** is the one to actually understand: roles over long-lived keys, least privilege, and never an access key in code."
+          ]
+        },
+        {
+          "t": "IAM & the shared responsibility model",
+          "tier": "core",
+          "one": "AWS secures the cloud; you secure what you put in it. IAM is where most real-world breaches actually originate — over-broad policies and leaked long-lived keys.",
+          "analogy": "The bank guarantees the vault. Whether you left your safe-deposit key on the counter is your problem.",
+          "points": [
+            "**Roles, not access keys.** An EC2 instance profile or an IRSA role for a pod gives temporary rotating credentials. A long-lived key in an env file is the classic breach.",
+            "**Least privilege, deny by default.** Start with nothing and add. `Action: \"*\"` in a policy is a finding, not a shortcut.",
+            "**Resource-level scoping:** `s3:GetObject` on `arn:aws:s3:::bucket/tenant-42/*`, not on the whole bucket.",
+            "**Assume-role for cross-account** access with an external ID. Never share credentials between accounts.",
+            "**Separate accounts per environment** — the strongest blast-radius boundary AWS offers, and it makes a prod-versus-dev mistake structurally impossible."
+          ]
+        },
+        {
+          "t": "Infrastructure as Code",
+          "tier": "core",
+          "resume": true,
+          "one": "Infrastructure defined in version-controlled files and applied by a tool. Terraform declares desired state and computes the diff — the same declarative idea as your provisioning phases.",
+          "analogy": "A blueprint rather than a memory of how the building was put up. You can rebuild it, review changes to it, and see who changed what.",
+          "points": [
+            "**Declarative:** you describe the end state, the tool computes the plan. `terraform plan` shows exactly what will change before it changes.",
+            "**State file** maps your config to real resources. It is sensitive and must be remote and locked — two concurrent applies against a local state file corrupt your infrastructure.",
+            "**Drift** is manual change made outside the tool. It is why console access to production should be read-only for humans.",
+            "**Modules** for reuse across environments; variables and workspaces for the differences.",
+            "**Idempotent by construction** — re-applying an unchanged config is a no-op. Exactly the property your 12-phase tool has.",
+            "**Terraform vs CloudFormation vs CDK/Pulumi:** Terraform is multi-cloud and declarative; CDK/Pulumi let you use a real programming language, at the cost of making the diff harder to reason about."
+          ],
+          "qa": [
+            {
+              "q": "Someone changed a security group in the console. What is the problem and how do you prevent it?",
+              "a": [
+                "That is drift: real infrastructure no longer matches the code. The immediate danger is that the next `terraform apply` silently reverts it — possibly during an unrelated deploy, possibly reopening whatever the change was closing. And there is no review record of why it happened.",
+                "Prevention is structural rather than procedural. Human console access to production should be read-only, with changes going through the pipeline. Then run `terraform plan` on a schedule and alert on any non-empty diff, so drift is detected in hours rather than discovered during an incident. Break-glass write access should exist, but as an audited, time-limited exception."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "linux",
+      "name": "Linux & Debugging a Box",
+      "desc": "You list Bash and Linux. Expect one practical question: something is wrong on this machine, what do you type?",
+      "concepts": [
+        {
+          "t": "Processes, threads & signals",
+          "tier": "core",
+          "one": "A process has its own memory space; threads share one. Signals are how the kernel and other processes ask a process to do something — including to stop.",
+          "analogy": "A process is a company with its own office; threads are employees sharing it. A signal is a note slid under the door.",
+          "points": [
+            "**fork** creates a copy-on-write child; **exec** replaces the process image. Together they are how every process starts.",
+            "**SIGTERM (15)** is a polite request to exit — catchable, and where you run graceful shutdown. **SIGKILL (9)** cannot be caught; the kernel just ends you.",
+            "**Graceful shutdown matters in containers:** Kubernetes sends SIGTERM, waits `terminationGracePeriodSeconds`, then SIGKILL. Handle SIGTERM to drain connections or you drop in-flight requests on every deploy.",
+            "**Zombie process:** exited but its parent has not reaped it. **Orphan:** parent died, adopted by init. In containers, PID 1 must reap children or zombies accumulate.",
+            "**OOM killer** picks a victim when memory runs out, scored by usage. Your process can be killed for someone else's allocation."
+          ],
+          "code": {
+            "lang": "python",
+            "cap": "Graceful shutdown — without this, every deploy drops requests",
+            "src": "import signal, sys\n\nshutting_down = False\n\ndef on_term(signum, frame):\n    global shutting_down\n    shutting_down = True\n    # 1. Fail readiness so the load balancer stops sending new work.\n    health.set_ready(False)\n    # 2. Finish in-flight requests, then exit. K8s waits for\n    #    terminationGracePeriodSeconds before SIGKILL.\n    server.shutdown(graceful_timeout=25)\n    sys.exit(0)\n\nsignal.signal(signal.SIGTERM, on_term)   # k8s sends this first\nsignal.signal(signal.SIGINT, on_term)    # ctrl-c locally"
+          }
+        },
+        {
+          "t": "Debugging a box",
+          "tier": "core",
+          "one": "A known sequence: load, then memory, then disk, then network, then the process itself. Having a sequence is the signal — flailing is not.",
+          "analogy": "A doctor's triage order. Pulse, breathing, bleeding — in that order, every time, so nothing gets missed.",
+          "points": [
+            "**Load and CPU:** `uptime` (1/5/15-min load), `top`/`htop`. Load above core count means queueing. High `wa` means you are I/O-bound, not CPU-bound.",
+            "**Memory:** `free -h`. Look at *available*, not free — Linux uses spare RAM as page cache and that is healthy. Check `dmesg | grep -i oom` for kills.",
+            "**Disk:** `df -h` for space, `df -i` for **inodes** (full inodes with free space is the classic confusing outage), `iostat -x` for saturation.",
+            "**Network:** `ss -tnp` for sockets and states. Many `TIME_WAIT` is usually fine; many `CLOSE_WAIT` means your app is not closing sockets — a real bug.",
+            "**Process:** `strace -p PID` for syscalls, `lsof -p PID` for open files, `/proc/PID/status` for the details.",
+            "**Logs last, not first:** `journalctl -u svc --since '10 min ago'`. Establish the shape of the problem before reading text."
+          ],
+          "code": {
+            "lang": "bash",
+            "cap": "The first sixty seconds on a sick box",
+            "src": "uptime                    # load avg vs core count -> is it queueing?\ndmesg -T | tail -40       # OOM kills, disk errors, network resets\nvmstat 1 5                # r=runnable queue, wa=io wait, si/so=swapping\nfree -h                   # look at AVAILABLE, not free\ndf -h && df -i            # disk full... or INODES full with space left\nss -s                     # socket summary; CLOSE_WAIT piling up = app bug\ntop -o %CPU -b -n1 | head -20\n\n# Find what is actually eating the disk\ndu -xh / --max-depth=2 2>/dev/null | sort -rh | head -20\n\n# What is this process blocked on?\nstrace -f -p $(pgrep -f myapp) -e trace=network,file -T"
+          },
+          "qa": [
+            {
+              "q": "Disk shows 40% free but writes are failing with 'no space left on device'. Why?",
+              "a": [
+                "Inodes are exhausted. Each file consumes an inode regardless of size, so millions of tiny files — session files, cached fragments, unrotated log shards — can exhaust the inode table while leaving most of the blocks free. `df -i` shows it and `df -h` never will.",
+                "The fix is finding and clearing the directory with the file count, then addressing the cause: log rotation, a cleanup job, or moving ephemeral files off that filesystem. It is worth knowing because the error message points you at the wrong thing."
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

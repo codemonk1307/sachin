@@ -1,0 +1,3 @@
+# Local, machine-specific Claude Code permission grants.
+# .claude/launch.json is shared deliberately — it defines the preview server.
+.claude/settings.local.json
