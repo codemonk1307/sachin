@@ -1,7 +1,7 @@
 {
   "id": "dsa",
   "name": "DSA Interview Layer",
-  "desc": "Not a replacement for the 30-day program in the DSA Lab — this is the layer on top: how to run the 45 minutes, which pattern the trigger words point to, and the Python templates worth having in muscle memory.",
+  "desc": "Not a replacement for the 30-day program in the DSA Lab - this is the layer on top: how to run the 45 minutes, which pattern the trigger words point to, and the Python templates worth having in muscle memory.",
   "color": "#F2706B",
   "modules": [
     {
@@ -17,13 +17,13 @@
           "points": [
             "**1. Clarify (2 min):** input types, size bounds, duplicates, negatives, empty input, sorted or not, is the input mutable, what to return on no-answer.",
             "**2. Examples (1 min):** work one small case by hand. This catches misunderstanding before it costs you twenty minutes.",
-            "**3. Brute force (2 min):** state it and its complexity out loud. Never skip it — it proves you understand the problem and gives you a correctness baseline.",
+            "**3. Brute force (2 min):** state it and its complexity out loud. Never skip it - it proves you understand the problem and gives you a correctness baseline.",
             "**4. Optimise (5 min):** what is the repeated work? Name the pattern. Say the target complexity before you write it.",
-            "**5. Confirm:** \"I'm going to use a hash map for O(n) time, O(n) space — shall I code that?\" Interviewers will redirect you here if you are wrong.",
+            "**5. Confirm:** \"I'm going to use a hash map for O(n) time, O(n) space - shall I code that?\" Interviewers will redirect you here if you are wrong.",
             "**6. Code (15 min):** narrate as you go. Clean names, small helpers, no cleverness.",
             "**7. Test (5 min):** walk a real example line by line, then the edge cases you listed in step 1."
           ],
-          "trap": "Jumping straight to the optimal solution in silence. Even if it is right, you have shown none of the problem-solving signal the round exists to measure — and if it is wrong, you have nothing to fall back on."
+          "trap": "Jumping straight to the optimal solution in silence. Even if it is right, you have shown none of the problem-solving signal the round exists to measure - and if it is wrong, you have nothing to fall back on."
         },
         {
           "t": "Thinking out loud",
@@ -31,7 +31,7 @@
           "one": "Your reasoning is the product, not your code. An interviewer cannot give credit for thinking they did not hear.",
           "analogy": "Showing your working in an exam. The final number earns some marks; the method earns most of them.",
           "points": [
-            "**Narrate the search, not just the answer:** \"Sorting would let me two-pointer this, but that's O(n log n) — a hash map gets me O(n) if I can trade space.\"",
+            "**Narrate the search, not just the answer:** \"Sorting would let me two-pointer this, but that's O(n log n) - a hash map gets me O(n) if I can trade space.\"",
             "**Say why you rejected things.** Rejecting an approach for a stated reason is a positive signal.",
             "**When stuck, say what you are stuck on.** Silence reads as being lost; \"I'm trying to find a way to avoid recomputing this subarray sum\" invites a hint you can be given credit for using.",
             "**Take the hint gracefully.** Interviewers expect to nudge. Fighting a hint is far worse than taking it.",
@@ -42,12 +42,12 @@
         {
           "t": "The clarifying questions that always pay",
           "tier": "core",
-          "one": "A short fixed list you can run on any problem. It takes ninety seconds and prevents the single most expensive failure — solving the wrong problem.",
+          "one": "A short fixed list you can run on any problem. It takes ninety seconds and prevents the single most expensive failure - solving the wrong problem.",
           "analogy": "Measuring twice. The cut takes the same time either way.",
           "points": [
-            "**Size:** how large can n be? This tells you the target complexity — n ≤ 20 hints at exponential/bitmask, n ≤ 10⁵ at O(n log n), n ≤ 10⁹ at O(log n) or maths.",
+            "**Size:** how large can n be? This tells you the target complexity - n ≤ 20 hints at exponential/bitmask, n ≤ 10⁵ at O(n log n), n ≤ 10⁹ at O(log n) or maths.",
             "**Contents:** negatives? duplicates? empty? already sorted? all one type?",
-            "**Output:** return the value or the index? All answers or any one? What if there is no answer — null, empty, or an exception?",
+            "**Output:** return the value or the index? All answers or any one? What if there is no answer - null, empty, or an exception?",
             "**Constraints:** may I mutate the input? Is extra space allowed? Is it a stream or all in memory?",
             "**Ambiguity:** for anything string-related, ask about case sensitivity, whitespace and unicode.",
             "**Then state your assumptions explicitly** and move on. Do not spend five minutes here."
@@ -67,22 +67,22 @@
           "analogy": "Describing a road as uphill rather than giving the gradient. It tells you what happens over distance, not your speed today.",
           "points": [
             "**The ladder:** O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!).",
-            "**Constants are dropped but matter in practice.** An O(n) pass with a huge constant can lose to O(n log n) at realistic sizes — say this when it is relevant.",
+            "**Constants are dropped but matter in practice.** An O(n) pass with a huge constant can lose to O(n log n) at realistic sizes - say this when it is relevant.",
             "**Analyse the dominant term.** Two sequential loops are O(n); nested loops are O(n²).",
             "**Recursion:** cost = number of nodes in the call tree × work per node. Fibonacci naively is O(2ⁿ) because the tree branches twice at every level.",
-            "**Space complexity includes the call stack.** A recursive tree traversal is O(h) space even with no explicit data structure — this is frequently forgotten.",
+            "**Space complexity includes the call stack.** A recursive tree traversal is O(h) space even with no explicit data structure - this is frequently forgotten.",
             "**Amortised** is average-per-operation over a sequence. `list.append` is amortised O(1): occasional O(n) resizes spread over many cheap appends."
           ],
           "code": {
             "lang": "python",
             "cap": "State the complexity of every branch, including the stack",
-            "src": "# O(n) time, O(n) space — the hash map is the space cost\ndef two_sum(nums, target):\n    seen = {}                      # value -> index\n    for i, x in enumerate(nums):\n        if target - x in seen:     # O(1) average lookup\n            return [seen[target - x], i]\n        seen[x] = i\n    return []\n\n# O(n) time, O(h) space — h = tree height. The call stack IS space.\n# Balanced: O(log n). Degenerate (a linked list): O(n).\ndef depth(node):\n    if not node:\n        return 0\n    return 1 + max(depth(node.left), depth(node.right))"
+            "src": "# O(n) time, O(n) space - the hash map is the space cost\ndef two_sum(nums, target):\n    seen = {}                      # value -> index\n    for i, x in enumerate(nums):\n        if target - x in seen:     # O(1) average lookup\n            return [seen[target - x], i]\n        seen[x] = i\n    return []\n\n# O(n) time, O(h) space - h = tree height. The call stack IS space.\n# Balanced: O(log n). Degenerate (a linked list): O(n).\ndef depth(node):\n    if not node:\n        return 0\n    return 1 + max(depth(node.left), depth(node.right))"
           },
           "qa": [
             {
               "q": "What is the space complexity of a recursive in-order traversal?",
               "a": [
-                "O(h), where h is the height of the tree — the call stack holds one frame per level on the current path, even though the code allocates nothing explicitly. That is the part people miss.",
+                "O(h), where h is the height of the tree - the call stack holds one frame per level on the current path, even though the code allocates nothing explicitly. That is the part people miss.",
                 "For a balanced tree that is O(log n); for a degenerate tree that has become a linked list it is O(n), which is also where you get a stack overflow in practice. If you needed guaranteed O(1) extra space, Morris traversal achieves it by temporarily rewiring right pointers, at the cost of mutating the tree during the walk."
               ]
             }
@@ -91,7 +91,7 @@
         {
           "t": "Reading the constraints",
           "tier": "core",
-          "one": "The stated input bounds tell you the intended complexity. Use them — it converts an open search into a narrow one.",
+          "one": "The stated input bounds tell you the intended complexity. Use them - it converts an open search into a narrow one.",
           "analogy": "A recipe that says it serves four tells you the pan size before you start cooking.",
           "points": [
             "**n ≤ 12** → permutations, O(n!). **n ≤ 20** → subsets or bitmask DP, O(2ⁿ).",
@@ -134,14 +134,14 @@
           "analogy": "Guessing a price with hot-or-cold feedback. You never enumerate every price; you halve the range each guess.",
           "points": [
             "**The trigger phrases:** \"minimise the maximum\", \"maximise the minimum\", \"smallest capacity such that...\", \"least time to complete\".",
-            "**Requirement: monotonicity.** If X works, everything above X works (or below, depending on direction). Say this out loud — it is what justifies the approach.",
+            "**Requirement: monotonicity.** If X works, everything above X works (or below, depending on direction). Say this out loud - it is what justifies the approach.",
             "**Write the feasibility check first** as a separate function. It is usually a simple greedy pass, and separating it makes the binary search trivial.",
-            "**Complexity is O(n log(range))** — the log is over the value range, not the array length.",
+            "**Complexity is O(n log(range))** - the log is over the value range, not the array length.",
             "**Classic problems:** ship packages within D days, split array largest sum, koko eating bananas, minimum time to make bouquets."
           ],
           "code": {
             "lang": "python",
-            "cap": "The shape — feasibility function, then search the range",
+            "cap": "The shape - feasibility function, then search the range",
             "src": "def min_capacity(weights, days):\n    # Feasibility: can we finish within `days` at this capacity?\n    # Monotonic: if cap works, cap+1 works. That is what licenses\n    # binary search over the ANSWER instead of over an array.\n    def feasible(cap):\n        need, cur = 1, 0\n        for w in weights:\n            if cur + w > cap:\n                need += 1\n                cur = 0\n            cur += w\n        return need <= days\n\n    lo = max(weights)          # must fit the heaviest single item\n    hi = sum(weights)          # everything in one day always works\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if feasible(mid):\n            hi = mid           # keep mid: it might be the answer\n        else:\n            lo = mid + 1\n    return lo"
           }
         }
@@ -153,14 +153,14 @@
       "desc": "The dozen shapes that cover most of what you will be asked. Type them from memory until the boilerplate costs no thought.",
       "concepts": [
         {
-          "t": "Binary search — the bounds that never go wrong",
+          "t": "Binary search - the bounds that never go wrong",
           "tier": "core",
           "one": "Use the half-open `lo < hi` form. It eliminates the off-by-one and the infinite-loop bugs that cost people whole interviews.",
           "analogy": "A ruler marked at the edges rather than the middle of each unit. The arithmetic stops being ambiguous.",
           "points": [
             "**`while lo < hi` with `hi = mid` and `lo = mid + 1`** cannot infinite-loop, because `mid` is always strictly less than `hi`.",
             "**`bisect_left` / `bisect_right`** from the standard library handle sorted-array insertion directly. Use them when allowed.",
-            "**Rotated sorted array:** one half is always sorted — determine which by comparing `nums[lo]` to `nums[mid]`, then decide which half contains the target.",
+            "**Rotated sorted array:** one half is always sorted - determine which by comparing `nums[lo]` to `nums[mid]`, then decide which half contains the target.",
             "**Say the invariant out loud:** \"the answer is always in `[lo, hi)`\". That is what makes the bounds obviously correct."
           ],
           "code": {
@@ -178,7 +178,7 @@
             "**Variable window:** grow right, shrink left while a constraint is violated. For longest/shortest-subarray problems.",
             "**Fixed window:** move both edges together, adding the entering element and removing the leaving one.",
             "**The state is usually a counter or a hash map** of what is currently inside the window.",
-            "**Say the invariant:** \"the window `[l, r]` is always valid after the inner while loop\" — that is the proof of correctness.",
+            "**Say the invariant:** \"the window `[l, r]` is always valid after the inner while loop\" - that is the proof of correctness.",
             "**Monotonic deque** variant for sliding window maximum, which keeps it O(n) instead of O(n·k)."
           ],
           "code": {
@@ -194,10 +194,10 @@
           "analogy": "BFS is a ripple spreading evenly; DFS is one explorer going as deep as possible before backtracking.",
           "points": [
             "**BFS gives shortest path in unweighted graphs** because it visits in order of distance. DFS does not.",
-            "**Mark visited when you enqueue, not when you dequeue** — otherwise a node can be added many times before it is processed.",
+            "**Mark visited when you enqueue, not when you dequeue** - otherwise a node can be added many times before it is processed.",
             "**Level-order:** capture `len(queue)` at the top of the loop to process one level at a time.",
-            "**Grid problems** are graphs — neighbours are the four (or eight) adjacent cells with bounds checks.",
-            "**Topological sort (Kahn's):** repeatedly remove nodes with in-degree zero. If you cannot empty the graph, there is a cycle — which is also how you detect one.",
+            "**Grid problems** are graphs - neighbours are the four (or eight) adjacent cells with bounds checks.",
+            "**Topological sort (Kahn's):** repeatedly remove nodes with in-degree zero. If you cannot empty the graph, there is a cycle - which is also how you detect one.",
             "**Cycle detection in a directed graph** with DFS needs three states (unvisited, in-progress, done), not a boolean."
           ],
           "code": {
@@ -221,7 +221,7 @@
           ],
           "code": {
             "lang": "python",
-            "cap": "Same problem three ways — derive, tabulate, compress",
+            "cap": "Same problem three ways - derive, tabulate, compress",
             "src": "from functools import cache\n\n# 1. Top-down: write the recurrence, add one decorator.\n@cache\ndef rob(i, houses):\n    if i < 0: return 0\n    return max(rob(i - 1, houses),                    # skip\n               rob(i - 2, houses) + houses[i])        # take\n\n# 2. Bottom-up: same recurrence, filled in dependency order.\ndef rob_table(houses):\n    n = len(houses)\n    dp = [0] * (n + 1)\n    dp[1] = houses[0] if n else 0\n    for i in range(2, n + 1):\n        dp[i] = max(dp[i - 1], dp[i - 2] + houses[i - 1])\n    return dp[n]\n\n# 3. Space-optimised: dp[i] only needs the last two values.\ndef rob_opt(houses):\n    prev2 = prev1 = 0\n    for x in houses:\n        prev2, prev1 = prev1, max(prev1, prev2 + x)\n    return prev1                                      # O(1) space"
           }
         },
@@ -233,9 +233,9 @@
           "points": [
             "**The invariant:** the state must be identical before and after each recursive call returns. The un-choose step is what guarantees it.",
             "**Append a copy** (`path[:]`) when recording a result, or every entry aliases the same list and you end up with a list of empty lists.",
-            "**Pruning is where the performance is** — sort first, then skip branches that cannot lead to a valid answer.",
+            "**Pruning is where the performance is** - sort first, then skip branches that cannot lead to a valid answer.",
             "**Duplicate handling:** sort the input and skip `i > start and nums[i] == nums[i-1]` to avoid emitting the same combination twice.",
-            "**Complexity:** roughly the number of nodes in the search tree times the work per node — usually O(n · 2ⁿ) or O(n · n!). State it honestly."
+            "**Complexity:** roughly the number of nodes in the search tree times the work per node - usually O(n · 2ⁿ) or O(n · n!). State it honestly."
           ],
           "code": {
             "lang": "python",
@@ -249,7 +249,7 @@
           "one": "The three data structures whose absence turns an elegant solution into a quadratic one.",
           "analogy": "A priority queue at triage, an index by prefix, and a way to ask instantly whether two people are already in the same group.",
           "points": [
-            "**Heap:** `heapq` is a min-heap on a list. For top-k, keep a heap of size k and evict — O(n log k), not O(n log n).",
+            "**Heap:** `heapq` is a min-heap on a list. For top-k, keep a heap of size k and evict - O(n log k), not O(n log n).",
             "**Max-heap in Python:** push `-value`, or push tuples `(-priority, item)`.",
             "**Trie:** a tree keyed by character, for prefix queries and autocomplete. O(length of word) lookup, independent of dictionary size.",
             "**Union-find (disjoint set):** near-O(1) with path compression and union by rank. For connectivity, cycle detection in undirected graphs, and Kruskal's MST.",
@@ -274,12 +274,12 @@
           "one": "A fixed list to run against any solution before you say you are done. Finding your own bug scores better than the interviewer finding it.",
           "analogy": "Pre-flight checks. Boring, fast, and the reason planes rarely fall out of the sky.",
           "points": [
-            "**Empty input** — empty list, empty string, null root. The single most common miss.",
+            "**Empty input** - empty list, empty string, null root. The single most common miss.",
             "**One element**, and **two elements**. Many two-pointer and window solutions break at n = 1.",
             "**All identical values**, and **all distinct**.",
-            "**Negatives and zero** — especially in sums, products and division.",
-            "**Overflow** — not in Python, but say it if the interviewer is thinking in Java or C++.",
-            "**Already sorted, and reverse sorted** — the worst case for naive quicksort and for many greedy approaches.",
+            "**Negatives and zero** - especially in sums, products and division.",
+            "**Overflow** - not in Python, but say it if the interviewer is thinking in Java or C++.",
+            "**Already sorted, and reverse sorted** - the worst case for naive quicksort and for many greedy approaches.",
             "**Cycles** in a graph or linked list, and **disconnected components**.",
             "**Boundaries:** first and last index, and the exact threshold value in any comparison."
           ],
@@ -289,10 +289,10 @@
           "t": "Trace, do not skim",
           "tier": "core",
           "one": "Walk a real example line by line with actual values, out loud. Skimming your own code finds nothing, because you read what you meant to write.",
-          "analogy": "Proofreading your own essay. You see the intended sentence, not the one on the page — until you read it aloud.",
+          "analogy": "Proofreading your own essay. You see the intended sentence, not the one on the page - until you read it aloud.",
           "points": [
             "**Write the variable values down** as you step through. Do not hold them in your head.",
-            "**Trace a case with at least three elements** — one and two-element cases hide off-by-one errors rather than exposing them.",
+            "**Trace a case with at least three elements** - one and two-element cases hide off-by-one errors rather than exposing them.",
             "**Check loop boundaries specifically:** does the last element get processed? Does the first?",
             "**If you find a bug, say so and fix it calmly.** Finding your own bug is a strong positive signal, not a failure.",
             "**Then state the complexity again**, in both time and space, as your closing line."

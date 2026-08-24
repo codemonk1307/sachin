@@ -78,7 +78,7 @@ def plain(text: str) -> str:
 # ────────────────────────────────────────────────────────────── highlighting ──
 #
 # Build-time syntax highlighting: no client JS, nothing to go wrong at runtime,
-# and the page still works with scripting off. Deliberately shallow — enough to
+# and the page still works with scripting off. Deliberately shallow - enough to
 # make a template readable at a glance, not a real parser.
 
 KW = {
@@ -442,8 +442,8 @@ def render_home(tracks: list) -> str:
         '<header class="hero">'
         '<div class="hero__eyebrow">Sachin Mishra &middot; interview prep</div>'
         "<h1>Every line of your r&eacute;sum&eacute;, defensible.</h1>"
-        "<p>The whole stack you claim &mdash; résumé bullets, AI systems, system design, "
-        "CI/CD, languages, fundamentals &mdash; broken into one-breath explanations, a "
+        "<p>The whole stack you claim, résumé bullets, AI systems, system design, "
+        "CI/CD, languages, fundamentals, broken into one-breath explanations, a "
         "real-life analogy, the mechanism, a template, and the exact follow-up an "
         "interviewer will use to find out whether you actually did the work.</p>"
         '<div class="stats">'
@@ -600,7 +600,7 @@ PAGE = """<!DOCTYPE html>
   var views = Array.prototype.slice.call(main.querySelectorAll('.view'));
 
   /* Confidence is three-state, not a checkbox: 0 unrated, 1 shaky, 2 solid.
-     Binary "done" lies to you the night before an interview — the whole point
+     Binary "done" lies to you the night before an interview - the whole point
      is to find the shaky ones fast. */
   var CONF_LABEL = ['Rate it', 'Shaky', 'Solid'];
   var conf = {};
@@ -658,9 +658,9 @@ PAGE = """<!DOCTYPE html>
     var next = i >= 0 && i < NAV.length - 1 ? NAV[i + 1] : null;
     nav.innerHTML =
       '<button type="button" class="prev"' + (prev ? ' data-go="#/m/' + prev.id + '"' : ' disabled') + '>' +
-        '<div class="dir">&larr; Previous</div><div class="nm">' + (prev ? esc(prev.n) : '&mdash;') + '</div></button>' +
+        '<div class="dir">&larr; Previous</div><div class="nm">' + (prev ? esc(prev.n) : '&middot;') + '</div></button>' +
       '<button type="button" class="next"' + (next ? ' data-go="#/m/' + next.id + '"' : ' disabled') + '>' +
-        '<div class="dir">Next &rarr;</div><div class="nm">' + (next ? esc(next.n) : '&mdash;') + '</div></button>';
+        '<div class="dir">Next &rarr;</div><div class="nm">' + (next ? esc(next.n) : '&middot;') + '</div></button>';
     nav.dataset.built = '1';
   }
 
@@ -915,7 +915,7 @@ PAGE = """<!DOCTYPE html>
     q = q.trim().toLowerCase();
     if (!q) {
       hits = [];
-      sResults.innerHTML = '<div class="search__empty">Type a term &mdash; RAG, GIL, idempotent, HPA, quorum, KV cache&hellip;</div>';
+      sResults.innerHTML = '<div class="search__empty">Type a term: RAG, GIL, idempotent, HPA, quorum, KV cache&hellip;</div>';
       return;
     }
     var terms = q.split(/\\s+/);

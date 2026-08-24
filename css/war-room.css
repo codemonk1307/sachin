@@ -1,5 +1,5 @@
 /* ============================================================================
-   WAR ROOM — interview revision guide
+   WAR ROOM - interview revision guide
    Companion stylesheet to the portfolio shell. Same token language as
    dsa-master.html so both surfaces feel like one product.
 
@@ -443,7 +443,7 @@ p, li, h1, h2, h3, h4, .wrap-any { overflow-wrap: anywhere; word-break: break-wo
   overflow-wrap: anywhere;
 }
 
-/* generic labelled box — analogy / trap / say-this */
+/* generic labelled box - analogy / trap / say-this */
 .box {
   margin-top: 12px; padding: 12px 14px; min-width: 0;
   border: 1px solid var(--box-line, var(--line));
@@ -626,7 +626,7 @@ body.drill .cpt[data-revealed="true"] .reveal-btn { border-color: var(--accent-l
 .scrollbar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.1s linear; }
 
 /* ---------------------------------------------------------------- SPINE --
-   "On this page" index. Wide screens only — below that the rail and the
+   "On this page" index. Wide screens only - below that the rail and the
    module toolbar already cover navigation, so it would be noise.          */
 .spine { display: none; }
 

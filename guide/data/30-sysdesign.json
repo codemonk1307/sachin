@@ -1,7 +1,7 @@
 {
   "id": "sd",
   "name": "System Design",
-  "desc": "The round that decides L4 versus L5. Structure, numbers, trade-offs stated out loud — plus five worked designs drawn from systems you have actually built.",
+  "desc": "The round that decides L4 versus L5. Structure, numbers, trade-offs stated out loud - plus five worked designs drawn from systems you have actually built.",
   "color": "#6BB8F0",
   "modules": [
     {
@@ -28,11 +28,11 @@
         {
           "t": "Back-of-envelope estimation",
           "tier": "core",
-          "one": "Turn users into QPS, storage and bandwidth. The point is not precision — it is showing that you size a system before you build it.",
+          "one": "Turn users into QPS, storage and bandwidth. The point is not precision - it is showing that you size a system before you build it.",
           "analogy": "A builder estimating concrete before pouring. Nobody expects the cubic metre to be exact; everyone expects the estimate to exist.",
           "points": [
             "**Seconds in a day ≈ 100,000** (86,400). Memorise this one; every QPS calculation starts here.",
-            "**QPS = daily requests / 100,000.** **Peak QPS ≈ 2–3× average** — say which multiplier you are using and why.",
+            "**QPS = daily requests / 100,000.** **Peak QPS ≈ 2–3× average** - say which multiplier you are using and why.",
             "**Read:write ratios** are usually 10:1 to 1000:1. Ask, or state your assumption. It changes the entire design.",
             "**Storage:** rows/day × bytes/row × retention days. Then × replication factor. People forget the replication factor.",
             "**Round to powers of ten.** 86,400 → 100,000. 1.7M → 2M. The interviewer is watching the method, not the arithmetic.",
@@ -56,11 +56,11 @@
         {
           "t": "Latency numbers worth knowing",
           "tier": "core",
-          "one": "Rough orders of magnitude every engineer is assumed to carry. You do not need precision — you need to never be wrong by a factor of a thousand.",
+          "one": "Rough orders of magnitude every engineer is assumed to carry. You do not need precision - you need to never be wrong by a factor of a thousand.",
           "analogy": "Knowing a flight is hours and a walk to the shop is minutes. You do not need a stopwatch to plan the day.",
           "points": [
             "**Memory read:** ~100 ns. **SSD random read:** ~100 µs (1,000× slower). **Disk seek:** ~10 ms (100,000× slower).",
-            "**Same-datacentre round trip:** ~0.5 ms. **Cross-continent round trip:** ~150 ms. Physics, not engineering — you cannot optimise it away.",
+            "**Same-datacentre round trip:** ~0.5 ms. **Cross-continent round trip:** ~150 ms. Physics, not engineering - you cannot optimise it away.",
             "**Redis GET:** well under 1 ms including network. **Simple indexed DB query:** 1–10 ms. **Uncached page render:** 100 ms+.",
             "**The takeaway:** memory beats SSD beats disk beats network beats cross-region. Every caching decision follows from this ordering.",
             "**For LLM work:** TTFT is hundreds of milliseconds at best, generation is tens of milliseconds per token. An LLM call is a network call plus a small eternity."
@@ -70,7 +70,7 @@
               "q": "Why can't you serve US and India users from one region?",
               "a": [
                 "Speed of light. A round trip between continents is on the order of 150 milliseconds before your service does any work, and a page that makes several sequential calls multiplies that. No amount of optimisation removes it.",
-                "The fixes are architectural: put static assets on a CDN at the edge, replicate read paths regionally, and keep writes in one region if you need strong consistency — accepting the write latency for far-away users. In an EHR, clinical writes are the ones you cannot make eventually consistent, so that trade is usually the right one."
+                "The fixes are architectural: put static assets on a CDN at the edge, replicate read paths regionally, and keep writes in one region if you need strong consistency - accepting the write latency for far-away users. In an EHR, clinical writes are the ones you cannot make eventually consistent, so that trade is usually the right one."
               ]
             }
           ]
@@ -88,7 +88,7 @@
           "one": "During a network partition you must choose consistency or availability. PACELC adds the part people forget: even without a partition, you are still trading latency against consistency.",
           "analogy": "Two shop tills that lose contact. Either both stop selling the last item (consistent) or both sell it and you sort it out later (available).",
           "points": [
-            "**Partition tolerance is not optional** in a distributed system — networks fail. So CAP is really CP or AP.",
+            "**Partition tolerance is not optional** in a distributed system - networks fail. So CAP is really CP or AP.",
             "**CP:** refuse writes during a partition to stay correct. Banks, inventory, clinical records.",
             "**AP:** keep accepting writes and reconcile later. Feeds, likes, analytics, shopping carts.",
             "**PACELC** is the more useful framing: *if Partition, then A or C; Else, then Latency or Consistency.* Most of the time there is no partition and you are still choosing.",
@@ -98,7 +98,7 @@
             {
               "q": "Is your EHR CP or AP?",
               "a": [
-                "Both, depending on the operation — and I think that is the real answer rather than a dodge. Anything clinical is CP: a prescription, an allergy record, a signed note. If we cannot guarantee correctness during a partition, refusing the write is the right failure, because a stale allergy list is a patient-safety event.",
+                "Both, depending on the operation - and I think that is the real answer rather than a dodge. Anything clinical is CP: a prescription, an allergy record, a signed note. If we cannot guarantee correctness during a partition, refusing the write is the right failure, because a stale allergy list is a patient-safety event.",
                 "Plenty of the product is AP though. Read-only chart viewing can serve slightly stale data from a replica, activity feeds and last-viewed timestamps can reconcile later, and analytics can lag by minutes. Treating the whole system as one choice would either make it unnecessarily unavailable or unsafely inconsistent."
               ]
             }
@@ -110,7 +110,7 @@
           "one": "A spectrum, not a binary. Strong (every read sees the latest write), eventual (reads catch up), and the useful middle ground of read-your-writes.",
           "analogy": "A noticeboard. Strong: everyone sees a pin the instant it goes up. Eventual: it propagates around the building over a minute. Read-your-writes: you always see your own pin immediately.",
           "points": [
-            "**Strong / linearizable:** behaves like a single copy. Expensive — needs coordination on every write.",
+            "**Strong / linearizable:** behaves like a single copy. Expensive - needs coordination on every write.",
             "**Eventual:** replicas converge if writes stop. Cheap, fast, and surprising to users.",
             "**Read-your-writes:** you always see your own updates. Usually the minimum acceptable for a UI, and cheap to implement by pinning a user's session to the primary briefly after a write.",
             "**Monotonic reads:** you never see time go backwards. Prevents the classic bug where refreshing shows older data because you hit a different replica.",
@@ -120,7 +120,7 @@
             {
               "q": "A user updates their profile and the next page load shows the old value. What happened and how do you fix it?",
               "a": [
-                "The write went to the primary and the subsequent read hit a replica that had not caught up yet — classic replication lag with no read-your-writes guarantee.",
+                "The write went to the primary and the subsequent read hit a replica that had not caught up yet - classic replication lag with no read-your-writes guarantee.",
                 "The cheapest fix is to pin that user's reads to the primary for a short window after a write, typically via a session flag with a TTL longer than your observed replication lag. Alternatively pass the write's log position back to the client and require the replica to have reached it before serving. The first is simpler and usually enough; the second is correct under all conditions and costs more to build."
               ]
             }
@@ -143,7 +143,7 @@
               "q": "How do you decide the right availability target?",
               "a": [
                 "From consequence, not ambition. In an EHR, a clinic mid-visit that cannot open a chart is a patient-safety issue, so the target is genuinely high for the clinical read path. A reporting dashboard being down for an hour is an annoyance.",
-                "So I would set different SLOs per user journey rather than one number for the system, and I would be honest that each additional nine is roughly an order of magnitude more expensive. The useful discipline is the error budget — it turns 'should we ship this' into arithmetic instead of a debate about how careful everyone feels."
+                "So I would set different SLOs per user journey rather than one number for the system, and I would be honest that each additional nine is roughly an order of magnitude more expensive. The useful discipline is the error budget - it turns 'should we ship this' into arithmetic instead of a debate about how careful everyone feels."
               ]
             }
           ]
@@ -159,13 +159,13 @@
             "**Idempotency key:** client-generated ID, stored server-side with the response. Atomic insert-if-absent, or two concurrent retries both proceed.",
             "**At-least-once + idempotent consumer = effectively exactly-once.** This is the phrase to use; it is what every real system actually does.",
             "**Natural idempotency:** setting a value is idempotent, incrementing is not. Prefer absolute assignment over deltas where you can.",
-            "This is the property behind your usage ledger, your provisioning phases, and your retry handling — it is the thread running through your whole résumé."
+            "This is the property behind your usage ledger, your provisioning phases, and your retry handling - it is the thread running through your whole résumé."
           ],
           "qa": [
             {
               "q": "Can you guarantee exactly-once message processing?",
               "a": [
-                "Not delivery — that is impossible in the presence of network failure, because the sender can never distinguish a lost message from a lost acknowledgement. What you can guarantee is exactly-once *effect*.",
+                "Not delivery - that is impossible in the presence of network failure, because the sender can never distinguish a lost message from a lost acknowledgement. What you can guarantee is exactly-once *effect*.",
                 "The pattern is at-least-once delivery plus an idempotent consumer: the broker may deliver twice, and the consumer deduplicates on a message ID with a unique constraint so the second delivery is a no-op. If the side effect is external and non-idempotent, like charging a card, you need the transactional outbox pattern so the state change and the event publication commit together."
               ]
             }
@@ -186,7 +186,7 @@
           "points": [
             "**Algorithms:** round-robin, least-connections (better with uneven request cost), consistent hashing (sticky by key), weighted (heterogeneous servers).",
             "**Health checks** are the point. A balancer without them faithfully routes traffic to dead servers.",
-            "**Sticky sessions** are a smell — they break scaling and failover. Prefer stateless servers with shared session state in Redis.",
+            "**Sticky sessions** are a smell - they break scaling and failover. Prefer stateless servers with shared session state in Redis.",
             "**The LB is a single point of failure** unless it is redundant. DNS round-robin or an anycast VIP in front of a pair.",
             "**L7 gives you:** TLS termination, path routing, header-based canary routing, and request-level observability."
           ]
@@ -198,7 +198,7 @@
           "one": "Four patterns with different consistency and failure behaviour: cache-aside, read-through, write-through, write-behind. Know which one you are describing.",
           "analogy": "A desk drawer versus the stockroom. The question is who refills the drawer, and what happens when it burns down with the only copy.",
           "points": [
-            "**Cache-aside (lazy):** app checks cache, misses, reads DB, populates cache. The default. Simple, resilient — a cache outage degrades rather than breaks.",
+            "**Cache-aside (lazy):** app checks cache, misses, reads DB, populates cache. The default. Simple, resilient - a cache outage degrades rather than breaks.",
             "**Read-through:** the cache itself fetches on miss. Cleaner app code, cache becomes a dependency.",
             "**Write-through:** write to cache and DB together. Consistent, slower writes.",
             "**Write-behind:** write to cache, flush to DB async. Fast, and you *will* lose data on a cache failure. Never for financial or clinical writes.",
@@ -214,15 +214,15 @@
             {
               "q": "What is a cache stampede and how do you prevent it?",
               "a": [
-                "A popular key expires and every concurrent request misses at once, so they all hit the database simultaneously — the cache was the only thing protecting it, and its expiry becomes a self-inflicted load spike.",
-                "Three mitigations, and I would use more than one. A lock so a single request does the fill while the others wait. Jittered TTLs so keys that were populated together do not expire together — that is the one that prevents the synchronised version of this. And for the hottest keys, refresh ahead of expiry in the background so there is never a window with no value."
+                "A popular key expires and every concurrent request misses at once, so they all hit the database simultaneously - the cache was the only thing protecting it, and its expiry becomes a self-inflicted load spike.",
+                "Three mitigations, and I would use more than one. A lock so a single request does the fill while the others wait. Jittered TTLs so keys that were populated together do not expire together - that is the one that prevents the synchronised version of this. And for the hottest keys, refresh ahead of expiry in the background so there is never a window with no value."
               ]
             },
             {
               "q": "How do you keep the cache consistent with the database?",
               "a": [
                 "You accept that you cannot, perfectly, and choose the staleness you can tolerate. TTL is the honest default: bounded staleness, no coordination, and it self-heals.",
-                "Where correctness matters more, invalidate on write — but delete the key rather than updating it, because a concurrent read can otherwise repopulate a stale value after your update. And for anything with a strict requirement, do not cache it. In billing I would not cache a balance; I would cache the immutable things around it."
+                "Where correctness matters more, invalidate on write - but delete the key rather than updating it, because a concurrent read can otherwise repopulate a stale value after your update. And for anything with a strict requirement, do not cache it. In billing I would not cache a balance; I would cache the immutable things around it."
               ]
             }
           ]
@@ -231,21 +231,21 @@
           "t": "Message queues & pub/sub",
           "tier": "core",
           "one": "Decouple producer from consumer in time. A queue distributes work to competing consumers; pub/sub broadcasts each event to every interested subscriber.",
-          "analogy": "A queue is a ticket dispenser at a deli — one customer per server. Pub/sub is a radio broadcast — everyone tuned in hears it.",
+          "analogy": "A queue is a ticket dispenser at a deli - one customer per server. Pub/sub is a radio broadcast - everyone tuned in hears it.",
           "points": [
             "**Why queue:** absorb bursts, retry failures, decouple deploys, and smooth a slow consumer behind a fast producer.",
             "**Queue (SQS, RabbitMQ):** one consumer per message, work distribution. **Log (Kafka):** ordered, replayable, many independent consumer groups.",
-            "**Kafka's key property is the retained log** — you can replay from an offset. That is what makes it right for event sourcing and CDC.",
+            "**Kafka's key property is the retained log** - you can replay from an offset. That is what makes it right for event sourcing and CDC.",
             "**Ordering is per-partition**, not global. Key by entity ID so all events for one claim land in the same partition and stay ordered.",
-            "**Dead letter queue** for messages that keep failing — otherwise one poison message blocks the partition forever.",
+            "**Dead letter queue** for messages that keep failing - otherwise one poison message blocks the partition forever.",
             "**Consumer lag** is your key metric. Rising lag means you are falling behind and it is the earliest warning you get."
           ],
           "qa": [
             {
               "q": "Kafka or SQS for this?",
               "a": [
-                "It comes down to whether you need replay and ordering. SQS if it is task distribution — send this email, resize this image — where each message is independent, consumers are competing, and once it is done it is done. It is far simpler to operate and scales without thought.",
-                "Kafka if multiple independent consumers need the same stream, if ordering per entity matters, or if you need to replay history — rebuilding a projection after a bug, or adding a new consumer that needs the last month of events. For a usage ledger feeding both billing and analytics, that replay property is exactly what I would want."
+                "It comes down to whether you need replay and ordering. SQS if it is task distribution - send this email, resize this image - where each message is independent, consumers are competing, and once it is done it is done. It is far simpler to operate and scales without thought.",
+                "Kafka if multiple independent consumers need the same stream, if ordering per entity matters, or if you need to replay history - rebuilding a projection after a bug, or adding a new consumer that needs the last month of events. For a usage ledger feeding both billing and analytics, that replay property is exactly what I would want."
               ]
             }
           ]
@@ -259,21 +259,21 @@
           "points": [
             "**Token bucket:** tokens refill at a steady rate, each request takes one. **Allows bursts** up to bucket size. The usual right answer.",
             "**Leaky bucket:** requests drain at a fixed rate. Smooths output, no bursts.",
-            "**Fixed window:** count per minute. Simple, and broken at the boundary — 2× the limit across two adjacent windows.",
+            "**Fixed window:** count per minute. Simple, and broken at the boundary - 2× the limit across two adjacent windows.",
             "**Sliding window log/counter:** accurate, more memory. The counter variant interpolates and is the usual compromise.",
-            "**Distributed enforcement** needs shared state — Redis with a Lua script so check-and-decrement is atomic.",
+            "**Distributed enforcement** needs shared state - Redis with a Lua script so check-and-decrement is atomic.",
             "**Return 429 with `Retry-After`.** A rate limiter that does not tell the client when to come back causes the retry storm it was meant to prevent."
           ],
           "code": {
             "lang": "python",
-            "cap": "Token bucket in Redis — atomic, so concurrent requests cannot overdraw",
-            "src": "LUA = \"\"\"\nlocal key, rate, cap, now, cost = KEYS[1], tonumber(ARGV[1]),\n    tonumber(ARGV[2]), tonumber(ARGV[3]), tonumber(ARGV[4])\nlocal b = redis.call('HMGET', key, 'tokens', 'ts')\nlocal tokens = tonumber(b[1]) or cap\nlocal ts     = tonumber(b[2]) or now\n\n-- Refill lazily: no background job, just compute elapsed time.\ntokens = math.min(cap, tokens + (now - ts) * rate)\nif tokens < cost then return 0 end\n\nredis.call('HMSET', key, 'tokens', tokens - cost, 'ts', now)\nredis.call('EXPIRE', key, math.ceil(cap / rate) * 2)\nreturn 1\n\"\"\"\n# One round trip, executed atomically — two concurrent requests at the\n# last token cannot both succeed.\nallowed = redis.eval(LUA, 1, f\"rl:{tenant}\", rate, cap, time.time(), 1)"
+            "cap": "Token bucket in Redis - atomic, so concurrent requests cannot overdraw",
+            "src": "LUA = \"\"\"\nlocal key, rate, cap, now, cost = KEYS[1], tonumber(ARGV[1]),\n    tonumber(ARGV[2]), tonumber(ARGV[3]), tonumber(ARGV[4])\nlocal b = redis.call('HMGET', key, 'tokens', 'ts')\nlocal tokens = tonumber(b[1]) or cap\nlocal ts     = tonumber(b[2]) or now\n\n-- Refill lazily: no background job, just compute elapsed time.\ntokens = math.min(cap, tokens + (now - ts) * rate)\nif tokens < cost then return 0 end\n\nredis.call('HMSET', key, 'tokens', tokens - cost, 'ts', now)\nredis.call('EXPIRE', key, math.ceil(cap / rate) * 2)\nreturn 1\n\"\"\"\n# One round trip, executed atomically - two concurrent requests at the\n# last token cannot both succeed.\nallowed = redis.eval(LUA, 1, f\"rl:{tenant}\", rate, cap, time.time(), 1)"
           },
           "qa": [
             {
               "q": "Design a rate limiter for a multi-tenant API.",
               "a": [
-                "Token bucket in Redis, keyed per tenant, evaluated at the API gateway so it runs before any application work. Token bucket because clients legitimately burst — a clinic opening in the morning fires a cluster of requests — and a leaky bucket would penalise a pattern that is normal.",
+                "Token bucket in Redis, keyed per tenant, evaluated at the API gateway so it runs before any application work. Token bucket because clients legitimately burst - a clinic opening in the morning fires a cluster of requests - and a leaky bucket would penalise a pattern that is normal.",
                 "The check and decrement must be atomic, so a Lua script rather than read-then-write, and the refill is computed lazily from elapsed time rather than a background job. I would layer the limits: per tenant to prevent noisy neighbours, per endpoint for expensive routes, and a global circuit breaker as the backstop. And return 429 with `Retry-After`, because a limiter that does not tell clients when to return creates the retry storm it exists to prevent."
               ]
             }
@@ -285,7 +285,7 @@
           "one": "Copies of static content in datacentres near users. Cuts latency by cutting distance, and cuts origin load by absorbing most requests.",
           "analogy": "Local warehouses instead of one national depot. The parcel travels a mile, not a continent.",
           "points": [
-            "**Best for static, cacheable assets** — JS, CSS, images, video. Increasingly for cached API responses and edge compute too.",
+            "**Best for static, cacheable assets** - JS, CSS, images, video. Increasingly for cached API responses and edge compute too.",
             "**Cache-Control** headers drive everything. `max-age` for the browser, `s-maxage` for the CDN, `stale-while-revalidate` to serve stale while refreshing.",
             "**Cache busting by filename hash** (`app.a1b2c3.js`) lets you cache forever and still deploy. Never version by query string.",
             "**Purge is slow and eventually consistent** across edges. Design so you rarely need it.",
@@ -299,10 +299,10 @@
           "analogy": "A building reception. One place that checks ID, logs visitors and directs them, rather than a guard on every office door.",
           "points": [
             "**Cross-cutting concerns belong here:** authn, rate limiting, request ID injection, TLS, CORS, response compression.",
-            "**Authorisation usually does not** — fine-grained permission needs domain knowledge the gateway lacks. Authenticate at the edge, authorise in the service.",
+            "**Authorisation usually does not** - fine-grained permission needs domain knowledge the gateway lacks. Authenticate at the edge, authorise in the service.",
             "**It is a bottleneck and a SPOF** by construction. Must be horizontally scaled and stateless.",
             "**Resist business logic in the gateway.** It becomes an undeployable shared monolith that every team is blocked on.",
-            "This is exactly where your read-only support scoping was enforced — a cross-cutting rule applied once rather than per-endpoint."
+            "This is exactly where your read-only support scoping was enforced - a cross-cutting rule applied once rather than per-endpoint."
           ]
         }
       ]
@@ -319,17 +319,17 @@
           "analogy": "A second copy of the ledger. Writing both before confirming is slower and safer; posting the copy later is faster and occasionally loses a page.",
           "points": [
             "**Leader–follower:** all writes to the leader, reads from followers. Simple, and the standard for relational databases.",
-            "**Async replication** means **replication lag** — a follower can be seconds behind. This is the cause of most read-your-writes bugs.",
+            "**Async replication** means **replication lag** - a follower can be seconds behind. This is the cause of most read-your-writes bugs.",
             "**Semi-sync** waits for one follower to acknowledge. A good middle ground: bounded data loss without full synchronous cost.",
             "**Failover** promotes a follower. The dangers are split-brain (two leaders) and lost writes that never replicated.",
-            "**Multi-leader / leaderless (Dynamo-style)** accepts writes anywhere and needs conflict resolution — last-write-wins, vector clocks, or CRDTs.",
+            "**Multi-leader / leaderless (Dynamo-style)** accepts writes anywhere and needs conflict resolution - last-write-wins, vector clocks, or CRDTs.",
             "**Quorum:** with N replicas, if W + R > N you always read a copy of the latest write. This is the formula to state."
           ],
           "qa": [
             {
               "q": "What breaks when you add read replicas?",
               "a": [
-                "Read-your-writes, immediately. A user updates something, the next read hits a lagging replica, and they see the old value — which they interpret as data loss, not eventual consistency.",
+                "Read-your-writes, immediately. A user updates something, the next read hits a lagging replica, and they see the old value - which they interpret as data loss, not eventual consistency.",
                 "You also get non-monotonic reads, where refreshing shows older data because a different replica served it. The fixes are to route reads for a user to the primary for a window after their write, or to pass the write's log position and require the replica to have caught up. And you have to decide per-endpoint, because reporting can tolerate lag and a chart view after an edit cannot."
               ]
             }
@@ -341,11 +341,11 @@
           "one": "Splitting one dataset across machines because it no longer fits or no longer keeps up. The shard key is the decision that is expensive to change later.",
           "analogy": "Splitting a library across buildings. Split by author surname and everyone searching for a title has to visit every building.",
           "points": [
-            "**Shard only when you must** — vertical scaling, read replicas and caching are all cheaper and reversible. Say this first.",
+            "**Shard only when you must** - vertical scaling, read replicas and caching are all cheaper and reversible. Say this first.",
             "**Range partitioning:** easy range scans, prone to hotspots (everything today lands on one shard).",
             "**Hash partitioning:** even distribution, no efficient range scans.",
             "**Consistent hashing** so adding a node moves ~1/N of keys rather than remapping everything.",
-            "**A good shard key is high-cardinality, evenly distributed, and present in most queries.** In multi-tenant SaaS, `tenant_id` is usually right — queries carry it naturally and it isolates blast radius.",
+            "**A good shard key is high-cardinality, evenly distributed, and present in most queries.** In multi-tenant SaaS, `tenant_id` is usually right - queries carry it naturally and it isolates blast radius.",
             "**Cross-shard queries and transactions are the cost.** Joins and aggregations across shards mean scatter-gather; distributed transactions mean two-phase commit or sagas."
           ],
           "qa": [
@@ -353,7 +353,7 @@
               "q": "What shard key for a multi-tenant EHR?",
               "a": [
                 "Tenant ID, almost certainly. Nearly every query already carries it because of tenant isolation, so queries stay single-shard; it gives natural blast-radius isolation; and it makes per-tenant operations like export, migration or deletion tractable.",
-                "The risk is skew — a very large practice on a shard with small ones. I would handle that by keeping the mapping in a lookup table rather than pure hashing, so an oversized tenant can be moved or given a dedicated shard without rehashing everything. The other cost is cross-tenant analytics, which becomes scatter-gather, and I would push that to a separate warehouse rather than trying to serve it from the operational store."
+                "The risk is skew - a very large practice on a shard with small ones. I would handle that by keeping the mapping in a lookup table rather than pure hashing, so an oversized tenant can be moved or given a dedicated shard without rehashing everything. The other cost is cross-tenant analytics, which becomes scatter-gather, and I would push that to a separate warehouse rather than trying to serve it from the operational store."
               ]
             }
           ]
@@ -361,13 +361,13 @@
         {
           "t": "Indexes: B-tree vs LSM",
           "tier": "core",
-          "one": "B-trees update in place — fast reads, slower random writes. LSM trees append and merge later — fast writes, reads may check several files.",
+          "one": "B-trees update in place - fast reads, slower random writes. LSM trees append and merge later - fast writes, reads may check several files.",
           "analogy": "A B-tree is a filing cabinet kept in order as you file. An LSM is an in-tray you dump into and tidy in batches overnight.",
           "points": [
             "**B-tree** (Postgres, MySQL InnoDB): balanced, O(log n) reads, in-place updates. The default for OLTP.",
             "**LSM tree** (Cassandra, RocksDB, LevelDB): writes go to an in-memory table, flush to sorted files, compact in the background. Excellent write throughput.",
             "**LSM read amplification:** a read may check several SSTables. **Bloom filters** make it cheap to skip files that definitely lack the key.",
-            "**Compaction** is the LSM tax — background I/O that can spike latency at the worst moment.",
+            "**Compaction** is the LSM tax - background I/O that can spike latency at the worst moment.",
             "**Covering index:** if the index contains every column the query needs, the query never touches the table. A huge and often-forgotten win.",
             "**Indexes cost writes.** Every index is another structure to update on insert. Unused indexes are pure tax."
           ],
@@ -375,8 +375,8 @@
             {
               "q": "A query is slow. Walk me through diagnosing it.",
               "a": [
-                "`EXPLAIN ANALYZE` first, and read the actual plan rather than guessing — I want to know whether it is a sequential scan on a large table, an index that exists but is not being used, or a bad join order.",
-                "Sequential scan on a big table means a missing index, or a predicate written so it cannot use one — a function wrapped around the column, or a leading wildcard in a LIKE. If the index exists but is skipped, the planner may believe the selectivity is poor, so I would check whether statistics are stale. And I would look at rows-examined versus rows-returned: a large gap means the index is not selective enough, which is where a composite or covering index helps. Only after all that would I consider caching, because caching a slow query hides the problem rather than fixing it."
+                "`EXPLAIN ANALYZE` first, and read the actual plan rather than guessing - I want to know whether it is a sequential scan on a large table, an index that exists but is not being used, or a bad join order.",
+                "Sequential scan on a big table means a missing index, or a predicate written so it cannot use one - a function wrapped around the column, or a leading wildcard in a LIKE. If the index exists but is skipped, the planner may believe the selectivity is poor, so I would check whether statistics are stale. And I would look at rows-examined versus rows-returned: a large gap means the index is not selective enough, which is where a composite or covering index helps. Only after all that would I consider caching, because caching a slow query hides the problem rather than fixing it."
               ]
             }
           ]
@@ -392,7 +392,7 @@
             "**Repeatable Read:** same row reads the same twice. MySQL InnoDB default. Phantoms possible in theory.",
             "**Serializable:** as if transactions ran one at a time. Correct, and costly under contention.",
             "**The anomalies:** dirty read (uncommitted data), non-repeatable read (row changed between reads), phantom read (new rows match your predicate).",
-            "**MVCC** is how modern databases give you snapshot isolation without read locks — readers see a consistent snapshot and never block writers."
+            "**MVCC** is how modern databases give you snapshot isolation without read locks - readers see a consistent snapshot and never block writers."
           ],
           "code": {
             "lang": "sql",
@@ -403,7 +403,7 @@
             {
               "q": "Optimistic or pessimistic locking?",
               "a": [
-                "Optimistic when conflicts are rare, which is most of the time. Read a version number, and on write assert it has not changed — if it has, the update affects zero rows and you retry. No locks held, so no blocking and no deadlocks, and the cost only appears when there was genuinely a conflict.",
+                "Optimistic when conflicts are rare, which is most of the time. Read a version number, and on write assert it has not changed - if it has, the update affects zero rows and you retry. No locks held, so no blocking and no deadlocks, and the cost only appears when there was genuinely a conflict.",
                 "Pessimistic when contention is high or a retry is expensive or unsafe. `SELECT ... FOR UPDATE` on a hot row like a shared balance avoids a retry storm where every transaction fails and re-attempts. The cost is lock hold time and deadlock risk, so you keep the transaction short and always acquire locks in a consistent order."
               ]
             }
@@ -419,13 +419,13 @@
             "**Document (MongoDB):** good when data is naturally nested and read as a whole. Bad when you need joins or cross-document transactions.",
             "**Key-value (Redis, DynamoDB):** simple access by key at very high throughput. Sessions, caches, counters, rate limits.",
             "**Column-family (Cassandra):** huge write volume, tunable consistency, no joins. Time-series and event data.",
-            "**Polyglot persistence** is normal — Postgres for clinical records, Redis for sessions and rate limits, a warehouse for analytics. Say which store holds what and why."
+            "**Polyglot persistence** is normal - Postgres for clinical records, Redis for sessions and rate limits, a warehouse for analytics. Say which store holds what and why."
           ],
           "qa": [
             {
               "q": "Would you use MongoDB for clinical records?",
               "a": [
-                "No, and the reason is the access pattern rather than any dislike of the technology. Clinical data is highly relational — patients to encounters to orders to results to claims — and the queries cross those relationships constantly. Modelling that in documents means either deep nesting that becomes unupdatable or manual joins in application code.",
+                "No, and the reason is the access pattern rather than any dislike of the technology. Clinical data is highly relational - patients to encounters to orders to results to claims - and the queries cross those relationships constantly. Modelling that in documents means either deep nesting that becomes unupdatable or manual joins in application code.",
                 "There is also the transactional requirement: a note, its diagnoses and its charges have to commit together. And an EHR carries a decade of regulatory reporting queries you cannot anticipate at design time, which is exactly what a query planner over a normalised schema is for. Where I would use a document store is somewhere genuinely schema-varying, like third-party payload capture."
               ]
             }
@@ -447,7 +447,7 @@
             {
               "q": "How do you publish an event only if the database write succeeded?",
               "a": [
-                "Transactional outbox. Insert the event row into an outbox table inside the same transaction as the state change, so they commit or roll back together — the dual-write problem disappears because there is only one write.",
+                "Transactional outbox. Insert the event row into an outbox table inside the same transaction as the state change, so they commit or roll back together - the dual-write problem disappears because there is only one write.",
                 "A separate relay polls the outbox, publishes to the broker, and marks rows done. That gives at-least-once delivery, so consumers must deduplicate on the event ID. CDC is the variant where you skip the outbox table and tail the replication log instead, which is nice because it needs no application change, at the cost of coupling your event schema to your table schema."
               ]
             }
@@ -468,20 +468,20 @@
           "points": [
             "**No timeout is a bug.** The default in most clients is infinite, which means a hung dependency exhausts your connection pool and your threads.",
             "**Budget timeouts down the chain:** if your SLA is 2s, a downstream call gets less, not the same. Otherwise the chain cannot meet its own promise.",
-            "**Exponential backoff:** 1s, 2s, 4s. **Jitter** breaks synchronisation — without it every client retries in lockstep and you DDoS yourself.",
+            "**Exponential backoff:** 1s, 2s, 4s. **Jitter** breaks synchronisation - without it every client retries in lockstep and you DDoS yourself.",
             "**Only retry idempotent operations.** Retrying a non-idempotent write is how you get double charges.",
             "**Retry budgets / token buckets:** cap retries as a fraction of total traffic so a broad failure does not triple your own load at the worst moment."
           ],
           "code": {
             "lang": "python",
-            "cap": "Full jitter — the version that actually prevents thundering herds",
+            "cap": "Full jitter - the version that actually prevents thundering herds",
             "src": "async def call(fn, *, attempts=3, base=0.2, cap=5.0):\n    for i in range(attempts):\n        try:\n            return await asyncio.wait_for(fn(), timeout=2.0)\n        except (Timeout, ServiceUnavailable):\n            if i == attempts - 1:\n                raise\n            # Full jitter beats \"exponential + small random\": it spreads\n            # retries across the whole window instead of clustering.\n            await asyncio.sleep(random.uniform(0, min(cap, base * 2 ** i)))"
           },
           "qa": [
             {
               "q": "A downstream service slows from 50ms to 3s. Describe the failure cascade.",
               "a": [
-                "Requests to it start occupying your worker threads or connections for sixty times longer, so your pool fills. New incoming requests queue, then time out, then your own latency rises for endpoints that have nothing to do with that dependency. That is the important part — the blast radius is your whole service, not just the affected feature.",
+                "Requests to it start occupying your worker threads or connections for sixty times longer, so your pool fills. New incoming requests queue, then time out, then your own latency rises for endpoints that have nothing to do with that dependency. That is the important part - the blast radius is your whole service, not just the affected feature.",
                 "Then retries make it worse: your clients retry, tripling the load on something already struggling. The defences are a tight timeout so a slow call fails fast, a bulkhead so that dependency has its own bounded connection pool and cannot starve unrelated endpoints, and a circuit breaker so after repeated failures you stop calling and degrade gracefully instead of queueing."
               ]
             }
@@ -495,7 +495,7 @@
           "points": [
             "**Three states:** closed (normal), open (fail immediately), half-open (let a trickle through to test recovery).",
             "**Why fail fast is kinder:** an immediate error lets the caller degrade; a 30-second timeout consumes their resources too.",
-            "**Half-open is the subtle part** — allow a small number of probes so you recover automatically rather than waiting for a human.",
+            "**Half-open is the subtle part** - allow a small number of probes so you recover automatically rather than waiting for a human.",
             "**Bulkhead:** separate connection pools or thread pools per dependency. The LLM provider getting slow must not consume the threads serving chart reads.",
             "**Pair with a fallback**, or the breaker just converts a slow failure into a fast one. Cached data, a degraded response, or a queued retry."
           ]
@@ -503,14 +503,14 @@
         {
           "t": "Backpressure",
           "tier": "deep",
-          "one": "Telling the producer to slow down instead of silently buffering. Unbounded queues do not absorb overload — they defer and amplify it.",
+          "one": "Telling the producer to slow down instead of silently buffering. Unbounded queues do not absorb overload - they defer and amplify it.",
           "analogy": "A sink filling faster than it drains. Adding a bigger basin does not fix it; turning the tap down does.",
           "points": [
             "**Unbounded buffers are the anti-pattern.** They convert a throughput problem into an out-of-memory crash plus terrible latency.",
             "**Bounded queues** force a decision at the boundary: block the producer, drop the request, or shed load explicitly.",
             "**Load shedding:** reject early with 429/503 when saturated. Rejecting 10% cleanly beats degrading 100%.",
             "**Prioritised shedding:** drop analytics before clinical writes. Not all requests deserve the same treatment.",
-            "**TCP has backpressure built in** via the receive window — the pattern is not exotic, it is how the network already works."
+            "**TCP has backpressure built in** via the receive window - the pattern is not exotic, it is how the network already works."
           ]
         },
         {
@@ -520,17 +520,17 @@
           "analogy": "Fire doors. The building does not become fireproof; the fire stays in one corridor.",
           "points": [
             "**Cell-based / shard isolation:** a failure takes down one tenant group, not everyone. Tenant sharding gives you this almost for free.",
-            "**Degradation ladder — decide it in advance:** full → cached → read-only → static fallback → maintenance page.",
+            "**Degradation ladder - decide it in advance:** full → cached → read-only → static fallback → maintenance page.",
             "**Feature-level kill switches** so you can shed an expensive feature and keep the core alive. Your Copilot flag is exactly this.",
             "**Critical path minimalism:** the clinical read path should depend on as few services as possible. Every dependency multiplies into your availability.",
-            "**Test it.** A degradation path never exercised does not work — that is what game days and chaos testing are for."
+            "**Test it.** A degradation path never exercised does not work - that is what game days and chaos testing are for."
           ],
           "qa": [
             {
               "q": "The LLM provider is down. What do users see?",
               "a": [
-                "Not an error page, and not a hang — the copilot is one feature and everything else in the EHR must be unaffected. That is a bulkhead question first: the LLM path has its own pool so it cannot consume threads serving charts.",
-                "Then a degradation ladder. Try the secondary provider. If that fails, fall back to something honestly useful — for FAQPilot that is plain search results with no generated answer, which is worse but not useless. The copilot entry point shows a clear, specific message rather than a generic failure, and the feature flag lets us disable it outright if it is flapping. The principle is that the AI features are additive, so their failure should be visible and contained, never load-bearing."
+                "Not an error page, and not a hang - the copilot is one feature and everything else in the EHR must be unaffected. That is a bulkhead question first: the LLM path has its own pool so it cannot consume threads serving charts.",
+                "Then a degradation ladder. Try the secondary provider. If that fails, fall back to something honestly useful - for FAQPilot that is plain search results with no generated answer, which is worse but not useless. The copilot entry point shows a clear, specific message rather than a generic failure, and the feature flag lets us disable it outright if it is flapping. The principle is that the AI features are additive, so their failure should be visible and contained, never load-bearing."
               ]
             }
           ]
@@ -546,13 +546,13 @@
           "t": "Polling, long-polling, SSE, WebSocket",
           "tier": "core",
           "resume": true,
-          "one": "Four ways to get server updates to a client, in increasing order of capability and cost. Pick the simplest that works — usually SSE for streaming text.",
+          "one": "Four ways to get server updates to a client, in increasing order of capability and cost. Pick the simplest that works - usually SSE for streaming text.",
           "analogy": "Checking the letterbox every minute; waiting at the door until post arrives; a letter slot that stays open one way; a phone line open both ways.",
           "points": [
             "**Short polling:** request on a timer. Simple, wasteful, high latency. Fine for low-frequency updates.",
             "**Long polling:** server holds the request until there is data. Better latency, ties up a connection per client.",
             "**SSE:** one-way server→client over plain HTTP. **Auto-reconnects**, works through proxies, trivially simple. The right answer for LLM token streaming.",
-            "**WebSocket:** full duplex over a persistent upgraded connection. Needed for chat, collaborative editing, games — anything with frequent client→server messages.",
+            "**WebSocket:** full duplex over a persistent upgraded connection. Needed for chat, collaborative editing, games - anything with frequent client→server messages.",
             "**Why SSE for LLM output:** you only need one direction, HTTP semantics keep auth and load balancing simple, and reconnection is built in.",
             "**Scaling consideration:** persistent connections are stateful. You need sticky routing or a shared pub/sub layer so any node can deliver to any client."
           ],
@@ -561,7 +561,7 @@
               "q": "Why SSE rather than WebSocket for streaming model output?",
               "a": [
                 "Because the traffic is one-directional and SSE is strictly simpler for that. Tokens flow server to client; the user's next message is an ordinary POST. Paying for a full-duplex upgraded connection buys nothing.",
-                "SSE also stays inside HTTP, which means existing auth, load balancing, proxies and observability all keep working — WebSocket needs special handling at each of those. And reconnection with `Last-Event-ID` is part of the protocol rather than something I have to write. I would move to WebSocket if the interaction became genuinely bidirectional and high-frequency, like live collaborative editing of a note."
+                "SSE also stays inside HTTP, which means existing auth, load balancing, proxies and observability all keep working - WebSocket needs special handling at each of those. And reconnection with `Last-Event-ID` is part of the protocol rather than something I have to write. I would move to WebSocket if the interaction became genuinely bidirectional and high-frequency, like live collaborative editing of a note."
               ]
             }
           ]
@@ -572,7 +572,7 @@
           "one": "Getting one event to many connected clients across many servers. The client is connected to one node; the event happens on another.",
           "analogy": "A tannoy system. The announcement is made in one room and has to reach every room, including ones you did not know were occupied.",
           "points": [
-            "**Redis pub/sub** for simple fan-out: any node publishes, every node with an interested client delivers. Fire-and-forget — no durability.",
+            "**Redis pub/sub** for simple fan-out: any node publishes, every node with an interested client delivers. Fire-and-forget - no durability.",
             "**Fan-out on write** (push to each recipient's inbox) versus **fan-out on read** (assemble on request). The classic timeline trade-off.",
             "**Hybrid:** push for normal users, pull for celebrity accounts with millions of followers. Naming this shows you know the pathological case.",
             "**Presence and connection registry:** which node holds which client. Usually Redis with a TTL and heartbeats.",
@@ -596,7 +596,7 @@
             "**Why it exists:** without it, every team hardcodes a provider, nobody can attribute cost, and a provider migration touches twenty repos.",
             "**Responsibilities:** provider routing and failover, per-tenant rate limiting, prompt-version resolution, response caching, token accounting, PHI redaction, and full request tracing.",
             "**Routing policy:** by model tier, by cost, by tenant BYOK key, or by provider health. Config-driven, not hardcoded.",
-            "**Streaming must pass through** — the gateway proxies SSE rather than buffering, or you destroy the TTFT you worked for.",
+            "**Streaming must pass through** - the gateway proxies SSE rather than buffering, or you destroy the TTFT you worked for.",
             "**Cost attribution is the sleeper feature:** tokens tagged by tenant, feature and prompt version is what makes the billing model possible at all.",
             "**Failure mode to address:** the gateway is now a SPOF on every AI feature. Stateless, horizontally scaled, with a per-provider bulkhead."
           ],
@@ -610,7 +610,7 @@
               "q": "What breaks first as this scales?",
               "a": [
                 "The metering write path, most likely. Every request produces a ledger row, so at high QPS you are doing a synchronous write to a relational table on the hot path, and that becomes the bottleneck before the proxying does.",
-                "The fix is to make metering asynchronous — emit to a queue or an append-only log and aggregate downstream — while keeping the *reservation* synchronous, since that is the part that must be correct before you spend money. So the balance check stays on the hot path and the accounting moves off it. The second thing to break is the cache, because a hot key expiring under load stampedes the providers, which is expensive rather than merely slow."
+                "The fix is to make metering asynchronous - emit to a queue or an append-only log and aggregate downstream - while keeping the *reservation* synchronous, since that is the part that must be correct before you spend money. So the balance check stays on the hot path and the accounting moves off it. The second thing to break is the cache, because a hot key expiring under load stampedes the providers, which is expensive rather than merely slow."
               ]
             }
           ]
@@ -631,7 +631,7 @@
           ],
           "code": {
             "lang": "sql",
-            "cap": "The ledger schema — idempotency is a constraint, not a code path",
+            "cap": "The ledger schema - idempotency is a constraint, not a code path",
             "src": "CREATE TABLE usage_ledger (\n    id           BIGSERIAL PRIMARY KEY,\n    request_id   UUID        NOT NULL,\n    tenant_id    BIGINT      NOT NULL,\n    module       TEXT        NOT NULL,   -- per-module deduction\n    prompt_ver   TEXT        NOT NULL,   -- attribute cost to a prompt\n    tokens_in    INT         NOT NULL,\n    tokens_out   INT         NOT NULL,\n    occurred_at  TIMESTAMPTZ NOT NULL DEFAULT now(),\n\n    -- The whole idempotency guarantee, in one line. A retried settle\n    -- violates this and is swallowed by ON CONFLICT DO NOTHING.\n    CONSTRAINT uq_request UNIQUE (request_id)\n);\n\n-- Billing period aggregation. Append-only means any past invoice can\n-- be regenerated and every line explained.\nCREATE INDEX idx_bill ON usage_ledger (tenant_id, occurred_at)\n    INCLUDE (tokens_in, tokens_out, module);"
           },
           "qa": [
@@ -639,7 +639,7 @@
               "q": "Redis says 40 credits left, the ledger says 35. Which is right?",
               "a": [
                 "The ledger, always. Redis is a fast approximation for the enforcement path; the append-only ledger is the source of truth because it is durable, auditable and reconstructible. Anything involving money resolves to the durable store.",
-                "The drift itself is expected — a Redis restart, a failed settle, a race — so the design has to include a periodic reconciliation that recomputes counters from the ledger and corrects them. And the direction of error matters: I would rather Redis be conservative and occasionally block a request that was actually within budget than over-permit and let a tenant consume beyond their limit, because the first is a support ticket and the second is unrecoverable revenue."
+                "The drift itself is expected - a Redis restart, a failed settle, a race - so the design has to include a periodic reconciliation that recomputes counters from the ledger and corrects them. And the direction of error matters: I would rather Redis be conservative and occasionally block a request that was actually within budget than over-permit and let a tenant consume beyond their limit, because the first is a support ticket and the second is unrecoverable revenue."
               ]
             }
           ]
@@ -654,15 +654,15 @@
             "**Ingestion pipeline:** source docs → structural chunking → embed → index, triggered by document change events so freshness is automatic rather than a cron job someone forgets.",
             "**Query pipeline:** rewrite → hybrid retrieve (vector + BM25) → rerank → relevance floor → grounded generation with citations → citation verification.",
             "**Escalation is a feature, not a failure.** Below the relevance floor, route to a human with the transcript attached.",
-            "**Metadata filtering** on version and product area — release-note questions are implicitly temporal.",
+            "**Metadata filtering** on version and product area - release-note questions are implicitly temporal.",
             "**Eval loop:** golden set in CI for retrieval recall and faithfulness; production escalation rate as the online signal.",
-            "**Scale story:** the corpus is small (thousands of chunks) so ANN is unnecessary — say this. The load is on generation, not retrieval."
+            "**Scale story:** the corpus is small (thousands of chunks) so ANN is unnecessary - say this. The load is on generation, not retrieval."
           ],
           "qa": [
             {
               "q": "How do you keep the index fresh when the docs change daily?",
               "a": [
-                "Event-driven rather than scheduled. The documentation system emits a change event, and the ingestion pipeline re-chunks and re-embeds just that document — a full nightly reindex is both wasteful and leaves a window where the assistant confidently gives yesterday's answer.",
+                "Event-driven rather than scheduled. The documentation system emits a change event, and the ingestion pipeline re-chunks and re-embeds just that document - a full nightly reindex is both wasteful and leaves a window where the assistant confidently gives yesterday's answer.",
                 "Two details matter. Deletion has to be handled explicitly: removing a document must remove its chunks, or you keep answering from content that no longer exists, which is the worst failure mode because it is invisible. And chunks carry a version and a timestamp so retrieval can filter or at least surface age, since for release notes the correct answer changes when the product does."
               ]
             }
@@ -675,19 +675,19 @@
           "one": "Your e-KYC platform as a design: an async pipeline with a manual review queue, strict PII handling and a threshold that is configurable rather than compiled in.",
           "analogy": "A passport office. Documents in, checks run, most pass automatically, the uncertain ones go to a human desk rather than being refused.",
           "points": [
-            "**Async by necessity** — image processing and third-party calls are slow. Upload returns a job ID; the client polls or receives a webhook.",
+            "**Async by necessity** - image processing and third-party calls are slow. Upload returns a job ID; the client polls or receives a webhook.",
             "**Pipeline:** upload to object storage (encrypted, short-lived) → quality pre-check → barcode/document parse → face compare → liveness → demographic match → decision.",
             "**Fail fast on quality.** Rejecting a dark photo before spending money on the vision API is both cheaper and a better error message.",
             "**Three outcomes, not two:** pass, fail, and *manual review*. The review queue is what makes a strict threshold acceptable.",
             "**Images are the most sensitive data in the system.** Encrypted at rest, short retention, access audited, never in logs or a CDN.",
-            "**Threshold as configuration**, per flow — signup can be looser than EPCS. Changing it must not require a deploy."
+            "**Threshold as configuration**, per flow - signup can be looser than EPCS. Changing it must not require a deploy."
           ],
           "qa": [
             {
               "q": "How do you handle the third-party vision API being down?",
               "a": [
-                "Because the pipeline is async, this degrades rather than fails — jobs stay queued and retry with backoff, and the user is told verification is in progress rather than shown an error. That is a real advantage of not doing it synchronously.",
-                "Beyond that: a circuit breaker so we stop hammering a dead provider, and a decision about the business behaviour during an extended outage. For signup I would let users proceed into a limited state and verify later. For EPCS I would not, because the identity check is a regulatory precondition for prescribing — that one blocks, and the right response is an honest status message rather than a workaround."
+                "Because the pipeline is async, this degrades rather than fails - jobs stay queued and retry with backoff, and the user is told verification is in progress rather than shown an error. That is a real advantage of not doing it synchronously.",
+                "Beyond that: a circuit breaker so we stop hammering a dead provider, and a decision about the business behaviour during an extended outage. For signup I would let users proceed into a limited state and verify later. For EPCS I would not, because the identity check is a regulatory precondition for prescribing - that one blocks, and the right response is an honest status message rather than a workaround."
               ]
             }
           ]
@@ -710,7 +710,7 @@
             {
               "q": "The summarisation step fails halfway through a visit. What happens?",
               "a": [
-                "Nothing the physician notices immediately, because summarisation happens after the transcript is durably stored — the transcript is the expensive artefact and it survives independently. Losing a draft is recoverable; losing the audio or transcript is not.",
+                "Nothing the physician notices immediately, because summarisation happens after the transcript is durably stored - the transcript is the expensive artefact and it survives independently. Losing a draft is recoverable; losing the audio or transcript is not.",
                 "The job retries with backoff, and if it keeps failing the note surfaces in a 'transcript ready, draft failed' state so the physician can write from the transcript rather than being blocked. That is the important design point: the AI stage is additive, so its failure degrades the feature to manual rather than taking the visit documentation down with it."
               ]
             }

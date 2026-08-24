@@ -12,15 +12,15 @@
         {
           "t": "The four scoring attributes",
           "tier": "core",
-          "one": "General Cognitive Ability, Role-Related Knowledge, Leadership, and Googleyness. Every interviewer submits scores against these, and a hiring committee reads the packet — not the interviewers' overall impressions.",
+          "one": "General Cognitive Ability, Role-Related Knowledge, Leadership, and Googleyness. Every interviewer submits scores against these, and a hiring committee reads the packet - not the interviewers' overall impressions.",
           "analogy": "A driving test scored on four separate sheets. Being brilliant at parallel parking does not offset failing to check mirrors.",
           "points": [
-            "**GCA** — how you approach an ambiguous problem. Measured mostly in the coding and design rounds, and it is about *process*, not just the answer.",
-            "**RRK** — do you know the craft. Your résumé depth, system design, and language fundamentals.",
-            "**Leadership** — emergent leadership, not management. Influencing without authority, stepping up, driving something nobody assigned.",
-            "**Googleyness** — ambiguity tolerance, bias to action, collaboration, intellectual humility, doing the right thing.",
+            "**GCA** - how you approach an ambiguous problem. Measured mostly in the coding and design rounds, and it is about *process*, not just the answer.",
+            "**RRK** - do you know the craft. Your résumé depth, system design, and language fundamentals.",
+            "**Leadership** - emergent leadership, not management. Influencing without authority, stepping up, driving something nobody assigned.",
+            "**Googleyness** - ambiguity tolerance, bias to action, collaboration, intellectual humility, doing the right thing.",
             "**The packet is written**, so the interviewer is taking notes to justify a score. Give them quotable, specific evidence.",
-            "**A hiring committee that never met you decides.** That is why vague answers fail — they do not survive being written down."
+            "**A hiring committee that never met you decides.** That is why vague answers fail - they do not survive being written down."
           ]
         },
         {
@@ -29,29 +29,29 @@
           "one": "Typically a recruiter screen, one phone/virtual technical screen, then an onsite of four to five rounds: two to three coding, often one design, and one Googleyness & Leadership.",
           "analogy": "A qualifying lap followed by the race. The screen only decides whether you start.",
           "points": [
-            "**Recruiter screen:** logistics, level calibration, and your 90-second intro. Have your YOE, title and target level straight — this is where levelling is set.",
+            "**Recruiter screen:** logistics, level calibration, and your 90-second intro. Have your YOE, title and target level straight - this is where levelling is set.",
             "**Technical screen (45 min):** one or two coding problems, usually medium. Python is your language; say so up front.",
             "**Onsite coding rounds:** medium to medium-hard, 45 minutes each, usually two problems or one with follow-ups. Communication is scored, not just correctness.",
             "**Design round:** at L4 this is often present but weighted less than at L5. Structure and trade-off articulation matter more than exotic components.",
             "**Googleyness & Leadership:** behavioural, STAR format, roughly five to six questions in 45 minutes. Prepared and specific beats spontaneous and vague every time.",
-            "**Team match** comes after the loop passes and is the unpredictable tail — this is why the realistic offer date is Jan–Feb 2027, not December."
+            "**Team match** comes after the loop passes and is the unpredictable tail - this is why the realistic offer date is Jan–Feb 2027, not December."
           ],
           "trap": "Treating the behavioural round as the easy one. It is the round most commonly under-prepared, and a weak Leadership or Googleyness score sinks packets with strong coding."
         },
         {
           "t": "STAR, done properly",
           "tier": "core",
-          "one": "Situation, Task, Action, Result — with roughly 70% of your words in Action, and the Result quantified. Most people invert this and spend three minutes on context.",
+          "one": "Situation, Task, Action, Result - with roughly 70% of your words in Action, and the Result quantified. Most people invert this and spend three minutes on context.",
           "analogy": "A news report. Headline and outcome up front, then what was actually done. Nobody buries the story in paragraph nine.",
           "points": [
             "**Situation (15%):** two sentences of context. Not the company history.",
             "**Task (10%):** what specifically was *yours*. Be precise about the boundary of your ownership.",
             "**Action (60%):** what *you* did, decision by decision, including the trade-offs you weighed and what you rejected. Say \"I\", not \"we\".",
             "**Result (15%):** quantified, plus what you learned or would do differently. The reflection is where senior signal lives.",
-            "**Two to three minutes total.** Time yourself out loud — written and spoken length differ enormously.",
+            "**Two to three minutes total.** Time yourself out loud - written and spoken length differ enormously.",
             "**\"We\" is the most common failure.** Interviewers cannot score a team. Credit the team once, then speak in first person."
           ],
-          "say": "I'll give you the context quickly and then spend most of the time on what I actually did and why — stop me if you want more background."
+          "say": "I'll give you the context quickly and then spend most of the time on what I actually did and why - stop me if you want more background."
         }
       ]
     },
@@ -61,7 +61,7 @@
       "desc": "Eight stories drawn from your résumé, mapped to the questions they answer. Rehearse these out loud until each runs to two and a half minutes without notes.",
       "concepts": [
         {
-          "t": "Story 1 — The provisioning CLI (initiative)",
+          "t": "Story 1 - The provisioning CLI (initiative)",
           "tier": "core",
           "resume": true,
           "one": "Your best Leadership story, because nobody assigned it, you quantified it before building, and it changed how 40 engineers work.",
@@ -70,14 +70,14 @@
             "**Answers:** \"tell me about something you did that nobody asked for\", \"a time you improved a process\", \"how do you handle inefficiency\", \"influencing without authority\".",
             "**S:** New engineers were losing 1–2 days to environment setup, pulling in 3–4 existing engineers each time.",
             "**T:** Nobody owned this. I decided to, alongside my normal work.",
-            "**A:** Quantified the cost first. Built a 12-phase idempotent provisioner where each phase checks, applies and independently verifies — so a failed run resumes rather than restarting. Then made the key decision: packaged it as a versioned CLI rather than a script, so build-process changes ship as a version bump.",
+            "**A:** Quantified the cost first. Built a 12-phase idempotent provisioner where each phase checks, applies and independently verifies - so a failed run resumes rather than restarting. Then made the key decision: packaged it as a versioned CLI rather than a script, so build-process changes ship as a version bump.",
             "**R:** 1–2 days and 3–4 engineers became a single 10-minute command, adopted by all 40 engineers across India and the US.",
             "**Reflection:** the setup time was the visible win; the durable one was creating a distribution channel for build changes that previously travelled by Slack message."
           ],
-          "say": "Nobody asked me to build this. I'd watched three new joiners each lose two days to environment setup while pulling in senior engineers to unblock them, so I did the arithmetic first — and it was clearly worth a week of my time."
+          "say": "Nobody asked me to build this. I'd watched three new joiners each lose two days to environment setup while pulling in senior engineers to unblock them, so I did the arithmetic first - and it was clearly worth a week of my time."
         },
         {
-          "t": "Story 2 — The Copilot rebuild (technical depth)",
+          "t": "Story 2 - The Copilot rebuild (technical depth)",
           "tier": "core",
           "resume": true,
           "one": "Your best Role-Related Knowledge story. It has a forcing function, a measured before and after, a mechanism, and a risk mitigation.",
@@ -86,14 +86,14 @@
             "**Answers:** \"most technically challenging project\", \"a time you had to make a risky change\", \"how do you approach performance work\".",
             "**S:** Charm Copilot ran on OpenAI's Assistants API, which was being deprecated. Responses took 8–15 seconds.",
             "**T:** I owned rebuilding the backend without regressing a clinical feature in production.",
-            "**A:** Profiled first and found the model was not the bottleneck — polling dead-time, a server-side thread refetch per turn, and serialised tool calls were. Built an in-house agentic runtime: conversation state in Redis, an owned tool loop with parallel execution and per-tool timeouts, and token streaming. Then the risk decision: shipped both runtimes in the same binary behind a per-tenant flag defaulting to the old path.",
+            "**A:** Profiled first and found the model was not the bottleneck - polling dead-time, a server-side thread refetch per turn, and serialised tool calls were. Built an in-house agentic runtime: conversation state in Redis, an owned tool loop with parallel execution and per-tool timeouts, and token streaming. Then the risk decision: shipped both runtimes in the same binary behind a per-tenant flag defaulting to the old path.",
             "**R:** 8–15 seconds down to 2–5, with time-to-first-token sub-second. Rollback became a config flip rather than a 4–5 day hotfix.",
-            "**Reflection:** the flag cost real complexity — every bug reproduced twice — and it was still the right call for a clinical feature."
+            "**Reflection:** the flag cost real complexity - every bug reproduced twice - and it was still the right call for a clinical feature."
           ],
           "trap": "Have p50 and p95 for both runtimes ready. \"8–15 seconds\" is a range, and the follow-up is always \"was that median or tail?\""
         },
         {
-          "t": "Story 3 — The per-token switch (judgement)",
+          "t": "Story 3 - The per-token switch (judgement)",
           "tier": "core",
           "resume": true,
           "one": "Your best judgement story: you modelled a problem nobody had noticed, found a real risk, and shipped the mitigation off by default.",
@@ -102,29 +102,29 @@
             "**Answers:** \"a decision you made with incomplete information\", \"a time you thought beyond your immediate task\", \"how do you balance business and engineering concerns\".",
             "**S:** Copilot was priced as a flat $75 per provider per month.",
             "**T:** I was building the subscription layer. Modelling the unit economics was not part of it.",
-            "**A:** Ran cost per practice against the flat fee and found the tail — usage is heavy-tailed, and high-volume practices crossed into negative margin. Considered fair-use caps, throttling and volume tiers; each damaged the majority to fix a minority. Built a per-token switch instead, per-tenant, **off by default**.",
+            "**A:** Ran cost per practice against the flat fee and found the tail - usage is heavy-tailed, and high-volume practices crossed into negative margin. Considered fair-use caps, throttling and volume tiers; each damaged the majority to fix a minority. Built a per-token switch instead, per-tenant, **off by default**.",
             "**R:** The lever existed before it was needed, with no change to anyone's pricing and no time pressure.",
             "**Reflection:** the engineering was small; the value was optionality. I would now want a dashboard tracking margin per tenant so it is monitored, not modelled once."
           ],
-          "say": "Nobody asked me to model this. I was building the metering and it seemed worth checking whether the pricing model held at the tail — it didn't, for a small number of heavy practices."
+          "say": "Nobody asked me to model this. I was building the metering and it seemed worth checking whether the pricing model held at the tail - it didn't, for a small number of heavy practices."
         },
         {
-          "t": "Story 4 — Support endpoints (influence & security)",
+          "t": "Story 4 - Support endpoints (influence & security)",
           "tier": "core",
           "resume": true,
-          "one": "Influencing without authority, through a security review, across two timezones — and the result became a team pattern.",
+          "one": "Influencing without authority, through a security review, across two timezones - and the result became a team pattern.",
           "analogy": "Changing the building code rather than getting one house approved.",
           "points": [
             "**Answers:** \"influencing without authority\", \"handling disagreement\", \"a time you improved things for other people\", \"a security decision you made\".",
             "**S:** Support agents escalated to engineers for anything they could not see, consuming a large share of developer time.",
-            "**T:** I proposed exposing read-only diagnostic endpoints — in a HIPAA product, a genuinely contentious idea.",
-            "**A:** Reviewers were rightly sceptical of any new read path to production data. What resolved it was changing the shape of the proposal: from 'these endpoints are safe' to 'PHI cannot travel this path by construction' — explicit projection records rather than serialised entities, enforcement in the shared API security layer rather than per-endpoint, read-only, fully audited. Took it through a joint India–US review.",
+            "**T:** I proposed exposing read-only diagnostic endpoints - in a HIPAA product, a genuinely contentious idea.",
+            "**A:** Reviewers were rightly sceptical of any new read path to production data. What resolved it was changing the shape of the proposal: from 'these endpoints are safe' to 'PHI cannot travel this path by construction' - explicit projection records rather than serialised entities, enforcement in the shared API security layer rather than per-endpoint, read-only, fully audited. Took it through a joint India–US review.",
             "**R:** 60–80% of that escalation load removed, and the pattern was adopted team-wide.",
             "**Reflection:** the objection dissolved when the guarantee became structural instead of a promise to be careful."
           ]
         },
         {
-          "t": "Story 5 — The e-KYC threshold (trade-offs)",
+          "t": "Story 5 - The e-KYC threshold (trade-offs)",
           "tier": "core",
           "resume": true,
           "one": "A decision with no correct answer, only a trade-off you had to own: fraud caught versus real doctors locked out.",
@@ -132,30 +132,30 @@
           "points": [
             "**Answers:** \"a difficult trade-off\", \"a decision with no right answer\", \"how do you handle ambiguity\", \"a time you disagreed on requirements\".",
             "**S:** Fraudulent accounts, and an EPCS regulatory requirement for identity proofing.",
-            "**T:** I built the platform across six flows — and had to choose the face-match threshold.",
-            "**A:** Framed it as false accept versus false reject. A false accept is a fraudulent account with prescribing capability; a false reject is a real physician blocked at signup. With EPCS in scope the asymmetry favoured strictness — but past a point you reject legitimate users for lighting and camera quality. So I set it high and built a manual review queue for the band just below, converting false rejects into a slower path rather than a lost user.",
+            "**T:** I built the platform across six flows - and had to choose the face-match threshold.",
+            "**A:** Framed it as false accept versus false reject. A false accept is a fraudulent account with prescribing capability; a false reject is a real physician blocked at signup. With EPCS in scope the asymmetry favoured strictness - but past a point you reject legitimate users for lighting and camera quality. So I set it high and built a manual review queue for the band just below, converting false rejects into a slower path rather than a lost user.",
             "**R:** 67% reduction in fraudulent accounts, 60,000+ users onboarded.",
             "**Reflection:** the review queue is what made the strict threshold defensible. Without it, the same number would have meant locking out real doctors."
           ],
-          "trap": "Know your measurement methodology for the 67% — denominator, window, and the honest caveat that some of the drop is deterrence rather than detection."
+          "trap": "Know your measurement methodology for the 67% - denominator, window, and the honest caveat that some of the drop is deterrence rather than detection."
         },
         {
-          "t": "Story 6 — A failure you own",
+          "t": "Story 6 - A failure you own",
           "tier": "core",
-          "one": "You will be asked. Have a real one with genuine cost, real ownership, and a systemic fix — not a humblebrag.",
+          "one": "You will be asked. Have a real one with genuine cost, real ownership, and a systemic fix - not a humblebrag.",
           "analogy": "A scar, not a beauty mark. Interviewers can tell the difference immediately.",
           "points": [
             "**Answers:** \"tell me about a failure\", \"a time you were wrong\", \"your biggest mistake\", \"a time you received difficult feedback\".",
-            "**Choose one with real consequence** — an outage, a wrong technical call, a rollout that hurt users, a deadline you missed.",
+            "**Choose one with real consequence** - an outage, a wrong technical call, a rollout that hurt users, a deadline you missed.",
             "**Own it in first person.** \"I misjudged\", not \"the requirements were unclear\". Blaming circumstances is the failure mode of this question.",
             "**The fix must be systemic**, not \"I'll be more careful\". A test, a guardrail, a review step, a monitor.",
-            "**Show the learning was durable** — point at something you have done differently since.",
+            "**Show the learning was durable** - point at something you have done differently since.",
             "**Never use a fake weakness.** \"I work too hard\" reads as evasion and costs you the Googleyness score directly."
           ],
-          "say": "The honest version is that I under-tested a path I assumed was covered. What I changed wasn't 'be more careful' — I added the check to CI so the same class of mistake fails the build rather than reaching production."
+          "say": "The honest version is that I under-tested a path I assumed was covered. What I changed wasn't 'be more careful' - I added the check to CI so the same class of mistake fails the build rather than reaching production."
         },
         {
-          "t": "Story 7 — Cross-team & cross-timezone",
+          "t": "Story 7 - Cross-team & cross-timezone",
           "tier": "core",
           "one": "India–US collaboration is directly on your résumé and directly relevant to Google India, where most teams work across timezones.",
           "analogy": "Playing in an orchestra where half the section is on a five-hour delay. The score has to be written down.",
@@ -168,7 +168,7 @@
           ]
         },
         {
-          "t": "Story 8 — Why Google, why now",
+          "t": "Story 8 - Why Google, why now",
           "tier": "core",
           "one": "Asked in nearly every loop and in the recruiter screen. A generic answer is a wasted opportunity; a specific one is memorable.",
           "analogy": "A proposal, not a job application. Say something true about them, not something flattering about anyone.",
@@ -179,7 +179,7 @@
             "**\"Why now\" has a real answer:** four years of depth in one product and one domain, and you want the next problem to be different in kind, not just in size.",
             "**Avoid the clichés:** 'impact at scale' and 'solving hard problems' without a specific referent are noise."
           ],
-          "say": "I've spent four years going deep on one product — AI systems inside a regulated EHR, where the constraint has always been compliance rather than scale. I want the next hard problem to be one where the scale itself is the constraint, and I want to be somewhere the engineering bar is set by people ahead of me rather than by me."
+          "say": "I've spent four years going deep on one product - AI systems inside a regulated EHR, where the constraint has always been compliance rather than scale. I want the next hard problem to be one where the scale itself is the constraint, and I want to be somewhere the engineering bar is set by people ahead of me rather than by me."
         }
       ]
     },
@@ -200,7 +200,7 @@
             "**\"Made a decision with incomplete data\"** → judgement. Use the per-token switch.",
             "**\"Something failed\"** → ownership and learning. Use your real failure, systemically fixed.",
             "**\"Handled a difficult teammate\"** → collaboration. Focus on what you did, never on their faults.",
-            "**\"Had to learn something quickly\"** → learning agility. The agentic rebuild works — Assistants API deprecating, and you rebuilt on your own runtime."
+            "**\"Had to learn something quickly\"** → learning agility. The agentic rebuild works - Assistants API deprecating, and you rebuilt on your own runtime."
           ]
         },
         {
@@ -209,13 +209,13 @@
           "one": "Google explicitly screens for it. The signal is being able to say \"I was wrong and here is what changed my mind\" without it costing you anything.",
           "analogy": "A scientist who updates on evidence, versus a lawyer who defends the position they started with.",
           "points": [
-            "**Have a specific example of changing your mind** based on someone else's argument — ideally someone more junior than you.",
+            "**Have a specific example of changing your mind** based on someone else's argument - ideally someone more junior than you.",
             "**Acknowledge the limits of your own numbers.** Volunteering that $10M is projected, not booked, is intellectual humility demonstrated rather than claimed.",
             "**When you do not know something, say so cleanly** and then say how you would find out. Bluffing is the single fastest way to lose a technical round.",
             "**Do not over-hedge either.** Constant qualification reads as low confidence. Be decisive where you know, honest where you do not.",
             "**\"I don't know, but here's how I'd approach finding out\"** is a genuinely strong answer, not a fallback."
           ],
-          "say": "I don't know that off the top of my head. Here's how I'd find out, and here's what I'd expect the answer to look like — [then reason out loud]."
+          "say": "I don't know that off the top of my head. Here's how I'd find out, and here's what I'd expect the answer to look like - [then reason out loud]."
         },
         {
           "t": "Questions to ask them",
@@ -225,7 +225,7 @@
           "points": [
             "**For engineers:** \"What's the thing about this codebase that surprises new engineers?\" \"What does the on-call rotation actually look like?\" \"What's a decision the team made that you'd now make differently?\"",
             "**For the hiring manager:** \"What does a great first six months look like?\" \"What's the biggest technical risk the team is carrying right now?\"",
-            "**Avoid anything a search would answer** — team size, tech stack basics, whether Google is a good place to work.",
+            "**Avoid anything a search would answer** - team size, tech stack basics, whether Google is a good place to work.",
             "**Avoid compensation and levelling here.** Those belong with the recruiter, not in a technical round.",
             "**Listen to the answer and follow up.** A real conversation is the point; a checklist recited is not."
           ]
@@ -235,7 +235,7 @@
     {
       "id": "plan",
       "name": "The Plan: Today to Offer",
-      "desc": "Concrete, dated, and built around the constraint you cannot move — Google's pipeline runs three and a half to five months from referral, and team match is the unpredictable tail.",
+      "desc": "Concrete, dated, and built around the constraint you cannot move - Google's pipeline runs three and a half to five months from referral, and team match is the unpredictable tail.",
       "concepts": [
         {
           "t": "The timeline, worked backwards",
@@ -244,11 +244,11 @@
           "one": "For an offer in Jan–Feb 2027, the referral has to land by roughly mid-October 2026. Today is 22 August 2026, so you have about eight weeks to be interview-ready before the clock starts.",
           "analogy": "A flight with a fixed departure. The only variable is how prepared you are when the gate opens, and the gate does not wait.",
           "points": [
-            "**Now → mid-Oct 2026 (8 weeks):** get interview-ready *and* run the referral outreach in parallel. Do not sequence these — the referral takes weeks of its own.",
+            "**Now → mid-Oct 2026 (8 weeks):** get interview-ready *and* run the referral outreach in parallel. Do not sequence these - the referral takes weeks of its own.",
             "**Mid-Oct → Nov:** referral lands, recruiter screen, technical screen. Peak coding sharpness needs to be here.",
             "**Nov → Dec:** onsite loop. Four to five rounds, usually within a two-week window.",
             "**Dec → Feb 2027:** hiring committee, then team match. Team match is the unpredictable tail and the reason Jan–Feb is realistic and December is not.",
-            "**The pipeline is the constraint, not your preparation.** Every week you delay outreach moves the offer date by a week — preparation can happen in parallel, referrals cannot be compressed."
+            "**The pipeline is the constraint, not your preparation.** Every week you delay outreach moves the offer date by a week - preparation can happen in parallel, referrals cannot be compressed."
           ],
           "trap": "Waiting until you feel ready before starting the referral outreach. The outreach takes 4–6 weeks on its own, and you can be preparing throughout. Starting it late is the single most common way this timeline slips a quarter."
         },
@@ -264,10 +264,10 @@
             "**The message is short and specific:** shared employer, one line on what you do now, one concrete reason for the team or area, and a clear small ask.",
             "**Ask for a conversation, not a referral, in the first message.** A referral request from a stranger is easy to decline; fifteen minutes about their team is not.",
             "**Make it trivially easy to refer you:** attach the résumé, name the job IDs, and give them two sentences they can paste into the referral form.",
-            "**Follow up once, after 7–10 days.** Then move on — no third message.",
+            "**Follow up once, after 7–10 days.** Then move on - no third message.",
             "**Referral is not a shortcut past the bar.** It gets your résumé read by a human. The loop is unchanged."
           ],
-          "say": "Hi — I saw you were at Zoho before Google. I'm still on the CharmHealth side, now on the AI layer in billing. I'm looking at [specific team/area] and would really value fifteen minutes on what the work is actually like there. Happy to work around your calendar."
+          "say": "Hi - I saw you were at Zoho before Google. I'm still on the CharmHealth side, now on the AI layer in billing. I'm looking at [specific team/area] and would really value fifteen minutes on what the work is actually like there. Happy to work around your calendar."
         },
         {
           "t": "The eight-week preparation split",
@@ -294,7 +294,7 @@
             "**Specifically:** Copilot requests per day through the agentic runtime, real before/after percentiles for the rebuild, e-KYC verifications per day at peak, and the billing ledger's write rate.",
             "**Then rewrite two bullets** with the pattern: what changed + by how much + at what load + which percentile.",
             "**Never invent one.** A real outcome without scale beats an invented QPS, and a fabricated number collapses under a single follow-up.",
-            "**Where you genuinely cannot get it, have a bounded honest answer ready** — the load shape, tenant count, and clinic-hours diurnal pattern still show you think in terms of load.",
+            "**Where you genuinely cannot get it, have a bounded honest answer ready** - the load shape, tenant count, and clinic-hours diurnal pattern still show you think in terms of load.",
             "**This is also an interview answer, not just a résumé edit.** \"What scale does your service run at?\" is a question you must not fumble."
           ],
           "trap": "This is the single highest-value hour of work available to you right now, and it is easy to keep postponing because it requires pulling real dashboards rather than writing. Do it this week."
@@ -305,11 +305,11 @@
           "one": "Beyond preparation: what would actually change how a hiring committee reads you, in the time available.",
           "analogy": "Polishing versus adding a room. Some of this is presentation; one of them is genuinely new evidence.",
           "points": [
-            "**Public evidence of the AI depth.** Your strongest differentiator — an in-house agentic runtime, prompt versioning, evals — is entirely invisible outside your company. Two or three substantial technical write-ups on latency in agentic systems or evaluating RAG in a regulated domain would make it verifiable. This is the highest-leverage addition and it also sharpens how you explain the work.",
-            "**A verifiable open-source or side artefact.** Even a small, well-engineered tool with tests, CI and a real README is evidence a committee can inspect. Quality over ambition — one polished thing beats five abandoned ones.",
+            "**Public evidence of the AI depth.** Your strongest differentiator - an in-house agentic runtime, prompt versioning, evals - is entirely invisible outside your company. Two or three substantial technical write-ups on latency in agentic systems or evaluating RAG in a regulated domain would make it verifiable. This is the highest-leverage addition and it also sharpens how you explain the work.",
+            "**A verifiable open-source or side artefact.** Even a small, well-engineered tool with tests, CI and a real README is evidence a committee can inspect. Quality over ambition - one polished thing beats five abandoned ones.",
             "**Competitive programming currency.** Your accomplishments are strong but dated to 2021–22. A current LeetCode contest rating is both preparation and a signal, and it costs you nothing extra because you are practising anyway.",
             "**What not to bother with:** more certifications. They carry close to zero weight at Google and consume time that coding practice would use better.",
-            "**One more honest note:** four years at one product in one domain is your main levelling risk. Counter it by leading with breadth of *problem types* — identity, billing, ML systems, developer tooling, security — rather than breadth of employer."
+            "**One more honest note:** four years at one product in one domain is your main levelling risk. Counter it by leading with breadth of *problem types* - identity, billing, ML systems, developer tooling, security - rather than breadth of employer."
           ]
         },
         {
@@ -323,9 +323,9 @@
             "**Set up properly:** stable connection, backup device, water, paper for diagrams, the coding environment tested in advance.",
             "**First five minutes of each round:** slow down deliberately. Clarify, restate, and give the brute force. The instinct under adrenaline is to rush, and rushing is what loses rounds.",
             "**Between rounds, reset.** A bad round is one score of four or five. Candidates who carry a poor round into the next one lose two instead of one.",
-            "**Use the drill mode in this guide** the morning of — questions only, answers hidden. It is the fastest way to find what has gone soft."
+            "**Use the drill mode in this guide** the morning of - questions only, answers hidden. It is the fastest way to find what has gone soft."
           ],
-          "say": "Let me make sure I understand the problem before I start — [restate it]. And let me check a couple of constraints: how large can the input get, and can there be duplicates?"
+          "say": "Let me make sure I understand the problem before I start - [restate it]. And let me check a couple of constraints: how large can the input get, and can there be duplicates?"
         }
       ]
     }

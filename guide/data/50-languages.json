@@ -1,7 +1,7 @@
 {
   "id": "lang",
   "name": "Languages & Frameworks",
-  "desc": "Every word in your skills section, and the question each one invites. If you print it, an interviewer may pick it — so know the one hard thing about each.",
+  "desc": "Every word in your skills section, and the question each one invites. If you print it, an interviewer may pick it - so know the one hard thing about each.",
   "color": "#F5B84E",
   "modules": [
     {
@@ -17,9 +17,9 @@
           "one": "One lock lets only one thread execute Python bytecode at a time. Threads are useless for CPU-bound parallelism and excellent for I/O-bound concurrency.",
           "analogy": "A kitchen with one chef's knife. Four cooks help enormously while things are simmering; they cannot chop faster than one person.",
           "points": [
-            "**Released during I/O** — file reads, network calls, `time.sleep`. This is why threads genuinely help an API client or a web server.",
+            "**Released during I/O** - file reads, network calls, `time.sleep`. This is why threads genuinely help an API client or a web server.",
             "**Held during pure-Python computation**, so four threads doing arithmetic run no faster than one, and often slower from lock contention.",
-            "**CPU-bound → `multiprocessing`** (separate interpreters, real parallelism, IPC cost) or a native extension that releases the GIL — NumPy, and your Numba and Cython work.",
+            "**CPU-bound → `multiprocessing`** (separate interpreters, real parallelism, IPC cost) or a native extension that releases the GIL - NumPy, and your Numba and Cython work.",
             "**I/O-bound → `asyncio` or threads.** asyncio scales to far more concurrent connections because a coroutine is far cheaper than an OS thread.",
             "**Python 3.13+ has an experimental free-threaded build** removing the GIL. Worth knowing it exists; not yet the default."
           ],
@@ -32,8 +32,8 @@
             {
               "q": "You have a service that calls three APIs and then does heavy parsing. How do you speed it up?",
               "a": [
-                "Split it by bottleneck, because the two halves need opposite answers. The three API calls are I/O-bound and independent, so they should run concurrently — `asyncio.gather` or a thread pool, and that alone takes three sequential round trips down to one.",
-                "The parsing is CPU-bound, so threads will not help at all thanks to the GIL. Options there are a process pool if it parallelises cleanly, or pushing the hot loop into something that releases the GIL — NumPy, or Numba if it is numeric. I would profile before assuming the parsing is even the problem; usually the network dominates and the second half is not worth touching."
+                "Split it by bottleneck, because the two halves need opposite answers. The three API calls are I/O-bound and independent, so they should run concurrently - `asyncio.gather` or a thread pool, and that alone takes three sequential round trips down to one.",
+                "The parsing is CPU-bound, so threads will not help at all thanks to the GIL. Options there are a process pool if it parallelises cleanly, or pushing the hot loop into something that releases the GIL - NumPy, or Numba if it is numeric. I would profile before assuming the parsing is even the problem; usually the network dominates and the second half is not worth touching."
               ]
             }
           ],
@@ -45,7 +45,7 @@
           "one": "`list` is a dynamic array, `dict` and `set` are hash tables, `deque` is a doubly-linked block list. Choosing wrong turns an O(n) algorithm into O(n²).",
           "analogy": "A numbered shelf, a card index, and a double-ended queue at a counter. Inserting at the front of the shelf means shifting every book.",
           "points": [
-            "**list:** O(1) index and append, **O(n) insert or pop at position 0** — the classic accidental quadratic in interview code.",
+            "**list:** O(1) index and append, **O(n) insert or pop at position 0** - the classic accidental quadratic in interview code.",
             "**dict / set:** O(1) average lookup, insert, delete. Since 3.7 dicts preserve insertion order as a language guarantee.",
             "**deque:** O(1) append and pop at *both* ends. The correct choice for a BFS queue or a sliding window.",
             "**heapq:** a min-heap on a list. O(log n) push and pop. For a max-heap, negate the values.",
@@ -65,10 +65,10 @@
           "analogy": "A tap rather than a filled bath. You take what you need when you need it, and an infinite stream costs nothing to define.",
           "points": [
             "**Constant memory** over arbitrarily large sequences. Reading a 50 GB file line by line is the canonical use.",
-            "**Lazy evaluation** — nothing computes until you iterate. Chain generators and the data flows through one item at a time.",
+            "**Lazy evaluation** - nothing computes until you iterate. Chain generators and the data flows through one item at a time.",
             "**Single-pass.** Once consumed, it is exhausted. This surprises people who try to iterate twice.",
             "**Generator expressions** `(x*2 for x in xs)` are the lazy form of a list comprehension. Use them inside `sum()` and `any()`.",
-            "**`yield from`** delegates to a sub-generator — how you compose them without a manual loop."
+            "**`yield from`** delegates to a sub-generator - how you compose them without a manual loop."
           ],
           "code": {
             "lang": "python",
@@ -83,9 +83,9 @@
           "analogy": "A decorator is a coat over the same person. A context manager is a door that always locks behind you, even if you leave in a hurry.",
           "points": [
             "A decorator is just `f = decorator(f)`. Everything else is syntax.",
-            "**Always use `functools.wraps`** or you destroy the wrapped function's name, docstring and signature — which breaks introspection and framework routing.",
+            "**Always use `functools.wraps`** or you destroy the wrapped function's name, docstring and signature - which breaks introspection and framework routing.",
             "**Context managers** implement `__enter__` and `__exit__`; `@contextlib.contextmanager` turns a generator into one with `yield` as the boundary.",
-            "**`__exit__` runs on exception too** — that is the whole point. Returning `True` from it suppresses the exception, which you almost never want.",
+            "**`__exit__` runs on exception too** - that is the whole point. Returning `True` from it suppresses the exception, which you almost never want.",
             "Real uses: timing, retry, auth checks, caching, database transactions, temporary state, and acquiring locks."
           ],
           "code": {
@@ -99,11 +99,11 @@
           "tier": "core",
           "resume": true,
           "one": "Single-threaded cooperative concurrency. `await` yields control back to the loop so other coroutines run while you wait on I/O.",
-          "analogy": "One waiter serving twenty tables. They never stand still watching a kitchen — they take the next order while the food cooks.",
+          "analogy": "One waiter serving twenty tables. They never stand still watching a kitchen - they take the next order while the food cooks.",
           "points": [
-            "**Cooperative, not pre-emptive.** A coroutine only yields at an `await`. One blocking call freezes the entire loop — including every other request.",
+            "**Cooperative, not pre-emptive.** A coroutine only yields at an `await`. One blocking call freezes the entire loop - including every other request.",
             "**Never call blocking code in an async function.** `requests.get`, `time.sleep`, or a synchronous database driver will stall everything. Use `asyncio.to_thread` if you must.",
-            "**`asyncio.gather`** runs coroutines concurrently — this is the mechanism behind parallel tool calls in your agentic runtime.",
+            "**`asyncio.gather`** runs coroutines concurrently - this is the mechanism behind parallel tool calls in your agentic runtime.",
             "**`asyncio.wait_for`** applies a timeout. Every external call needs one.",
             "**async is not faster** for a single request. It raises the number of *concurrent* requests one process can hold, which is a different win."
           ],
@@ -116,7 +116,7 @@
             {
               "q": "Your async service has good throughput until one endpoint is hit, then everything slows. What is likely?",
               "a": [
-                "Something blocking in the event loop on that endpoint — a synchronous database driver, a `requests` call, a CPU-heavy parse, or a `time.sleep`. Because asyncio is cooperative and single-threaded, that one call stalls every other in-flight request on the process, which is why the symptom is global rather than local to the endpoint.",
+                "Something blocking in the event loop on that endpoint - a synchronous database driver, a `requests` call, a CPU-heavy parse, or a `time.sleep`. Because asyncio is cooperative and single-threaded, that one call stalls every other in-flight request on the process, which is why the symptom is global rather than local to the endpoint.",
                 "I would confirm it by measuring event-loop lag, and asyncio's debug mode will log coroutines that occupy the loop too long. The fix is either an async-native client or pushing the blocking work to a thread with `asyncio.to_thread` so the loop stays free."
               ]
             }
@@ -125,13 +125,13 @@
         {
           "t": "Mutable default arguments",
           "tier": "core",
-          "one": "Default arguments are evaluated once, at function definition. A mutable default is shared by every call — the most famous Python gotcha and a common interview filter.",
+          "one": "Default arguments are evaluated once, at function definition. A mutable default is shared by every call - the most famous Python gotcha and a common interview filter.",
           "analogy": "A shared notepad stapled inside the desk. Every visitor writes on the same page, and each one is surprised by the previous entries.",
           "points": [
             "The default object is created once and lives on `func.__defaults__` for the life of the function.",
             "**Always use `None` as the sentinel** and create the mutable inside the body.",
             "The same trap applies to class attributes: a mutable class attribute is shared by all instances.",
-            "**Dataclasses** catch it — a mutable default raises an error and forces `field(default_factory=list)`.",
+            "**Dataclasses** catch it - a mutable default raises an error and forces `field(default_factory=list)`.",
             "It is occasionally used deliberately for caching, but doing so intentionally is rare and confusing."
           ],
           "code": {
@@ -144,9 +144,9 @@
           "t": "Memory: reference counting & GC",
           "tier": "deep",
           "one": "CPython frees objects the moment their reference count hits zero. A separate generational collector exists solely to break reference cycles.",
-          "analogy": "A library where a book is reshelved as soon as the last borrower returns it — plus an occasional sweep for books two readers have lent each other in a loop.",
+          "analogy": "A library where a book is reshelved as soon as the last borrower returns it - plus an occasional sweep for books two readers have lent each other in a loop.",
           "points": [
-            "**Reference counting is immediate and deterministic** — this is why `with` blocks and `__del__` behave predictably in CPython.",
+            "**Reference counting is immediate and deterministic** - this is why `with` blocks and `__del__` behave predictably in CPython.",
             "**Cycles need the collector:** `a.b = b; b.a = a` never reaches zero. The generational GC finds and frees these.",
             "**Three generations:** new objects are collected often, survivors less so. Based on the observation that most objects die young.",
             "**`gc.disable()`** is a real optimisation for short-lived batch processes with no cycles.",
@@ -158,7 +158,7 @@
     {
       "id": "java",
       "name": "Java & the JVM",
-      "desc": "You shipped production Java — e-KYC, the barcode reader, Spring services. Expect JVM internals, HashMap, and concurrency.",
+      "desc": "You shipped production Java - e-KYC, the barcode reader, Spring services. Expect JVM internals, HashMap, and concurrency.",
       "bullet": "Backend: Spring Boot, Java Servlets, JSP, Tomcat. Testing: JUnit.",
       "concepts": [
         {
@@ -168,9 +168,9 @@
           "one": "Heap holds objects, stack holds frames and locals. The collector reclaims unreachable heap objects, and its pauses are what shows up as tail latency.",
           "analogy": "A workshop floor that gets tidied periodically. The tidying is fast, but everyone stops working while it happens.",
           "points": [
-            "**Young generation** (Eden + survivors) for new objects — minor GC is frequent and cheap because most objects die young. **Old generation** for survivors — major GC is rarer and expensive.",
+            "**Young generation** (Eden + survivors) for new objects - minor GC is frequent and cheap because most objects die young. **Old generation** for survivors - major GC is rarer and expensive.",
             "**G1GC** is the modern default: region-based, targets a pause-time goal. **ZGC/Shenandoah** are low-pause collectors for large heaps.",
-            "**Stop-the-world pauses** are the operational concern — a major GC pause is a direct p99 latency spike.",
+            "**Stop-the-world pauses** are the operational concern - a major GC pause is a direct p99 latency spike.",
             "**`OutOfMemoryError`** usually means a leak (an unbounded cache, a static collection, unclosed resources) rather than genuinely insufficient memory.",
             "**Heap sizing:** too small causes constant GC, too large causes long pauses. Measure allocation rate and pause time; do not guess."
           ],
@@ -178,8 +178,8 @@
             {
               "q": "A Java service has p99 latency spikes every few minutes. Where do you look?",
               "a": [
-                "GC pauses first, because that periodicity is the signature. Turn on GC logging and correlate pause timestamps against the latency spikes — if a major collection lines up with each spike, that is the answer.",
-                "Then the question is why. Usually it is allocation rate: something is creating far more garbage than necessary, so the old generation fills and major collections come around often. Fixing the allocation is better than tuning the collector. If allocation is genuinely necessary, switching to a low-pause collector like ZGC or reducing heap size to shorten pauses are the levers. And I would rule out the non-GC causes with the same signature — a cache expiry cycle, a scheduled job, or connection-pool churn."
+                "GC pauses first, because that periodicity is the signature. Turn on GC logging and correlate pause timestamps against the latency spikes - if a major collection lines up with each spike, that is the answer.",
+                "Then the question is why. Usually it is allocation rate: something is creating far more garbage than necessary, so the old generation fills and major collections come around often. Fixing the allocation is better than tuning the collector. If allocation is genuinely necessary, switching to a low-pause collector like ZGC or reducing heap size to shorten pauses are the levers. And I would rule out the non-GC causes with the same signature - a cache expiry cycle, a scheduled job, or connection-pool churn."
               ]
             }
           ]
@@ -191,15 +191,15 @@
           "analogy": "A wall of pigeonholes. Two letters for the same hole stack up; if one hole gets very deep, it is reorganised into a sorted index.",
           "points": [
             "**O(1) average, O(log n) worst case** since Java 8's treeification. Before that, a collision attack could make it O(n).",
-            "**Load factor 0.75:** at 75% full it resizes to double capacity and rehashes everything — an O(n) operation you can avoid by sizing the map up front.",
-            "**equals/hashCode contract:** equal objects must have equal hash codes. Break it and lookups silently fail — the object is in the map and cannot be found.",
+            "**Load factor 0.75:** at 75% full it resizes to double capacity and rehashes everything - an O(n) operation you can avoid by sizing the map up front.",
+            "**equals/hashCode contract:** equal objects must have equal hash codes. Break it and lookups silently fail - the object is in the map and cannot be found.",
             "**Never mutate a key** after insertion. Its hash changes, its bucket does not, and it becomes unreachable.",
             "**HashMap is not thread-safe.** Concurrent writes could infinite-loop pre-Java-8. Use `ConcurrentHashMap`, which locks per bin rather than the whole map."
           ],
           "code": {
             "lang": "java",
             "cap": "The contract, and what breaks without it",
-            "src": "public final class ClaimKey {\n    private final String tenantId;\n    private final String claimId;\n\n    @Override public boolean equals(Object o) {\n        if (this == o) return true;\n        if (!(o instanceof ClaimKey k)) return false;\n        return tenantId.equals(k.tenantId) && claimId.equals(k.claimId);\n    }\n\n    // MUST be consistent with equals. Override one, override both —\n    // otherwise two equal keys hash to different buckets and the map\n    // silently fails to find an entry that is definitely in it.\n    @Override public int hashCode() {\n        return Objects.hash(tenantId, claimId);\n    }\n}\n\n// Fields are final: mutating a key after insertion changes its hash\n// but not its bucket, making the entry permanently unreachable."
+            "src": "public final class ClaimKey {\n    private final String tenantId;\n    private final String claimId;\n\n    @Override public boolean equals(Object o) {\n        if (this == o) return true;\n        if (!(o instanceof ClaimKey k)) return false;\n        return tenantId.equals(k.tenantId) && claimId.equals(k.claimId);\n    }\n\n    // MUST be consistent with equals. Override one, override both -\n    // otherwise two equal keys hash to different buckets and the map\n    // silently fails to find an entry that is definitely in it.\n    @Override public int hashCode() {\n        return Objects.hash(tenantId, claimId);\n    }\n}\n\n// Fields are final: mutating a key after insertion changes its hash\n// but not its bucket, making the entry permanently unreachable."
           }
         },
         {
@@ -208,24 +208,24 @@
           "one": "`synchronized` gives mutual exclusion and visibility. `volatile` gives visibility only. Executors let you manage threads as a pool rather than by hand.",
           "analogy": "A lock on the door versus a window everyone can see through. One stops two people entering; the other only ensures everyone sees the same room.",
           "points": [
-            "**`volatile`** guarantees reads see the latest write and prevents reordering. It does **not** make `count++` atomic — that is read-modify-write, three operations.",
+            "**`volatile`** guarantees reads see the latest write and prevents reordering. It does **not** make `count++` atomic - that is read-modify-write, three operations.",
             "**`synchronized`** provides both mutual exclusion and a happens-before relationship. Coarse-grained; prefer `java.util.concurrent` primitives.",
             "**`AtomicInteger`/`AtomicLong`** use compare-and-swap for lock-free atomic updates. Faster than synchronized under contention.",
-            "**`ExecutorService`** over raw threads — bounded pools, a queue you control, and graceful shutdown. An unbounded pool is a memory leak.",
+            "**`ExecutorService`** over raw threads - bounded pools, a queue you control, and graceful shutdown. An unbounded pool is a memory leak.",
             "**Deadlock** needs four conditions; break any one. In practice: acquire locks in a consistent global order and use timeouts.",
-            "**Virtual threads (Java 21+)** make thread-per-request viable again for I/O-bound work — the JVM's answer to async/await."
+            "**Virtual threads (Java 21+)** make thread-per-request viable again for I/O-bound work - the JVM's answer to async/await."
           ],
           "code": {
             "lang": "java",
             "cap": "Why volatile is not enough for a counter",
-            "src": "// BROKEN: volatile guarantees visibility, not atomicity.\n// count++ is read, add, write — three steps, interleavable.\nprivate volatile int count;\npublic void inc() { count++; }        // lost updates under concurrency\n\n// CORRECT: compare-and-swap, lock-free and atomic.\nprivate final AtomicInteger count = new AtomicInteger();\npublic void inc() { count.incrementAndGet(); }\n\n// Bounded pool: an unbounded queue is a slow-motion OOM.\nExecutorService pool = new ThreadPoolExecutor(\n    8, 32, 60L, TimeUnit.SECONDS,\n    new ArrayBlockingQueue<>(1000),                  // bounded: backpressure\n    new ThreadPoolExecutor.CallerRunsPolicy());      // shed by slowing caller"
+            "src": "// BROKEN: volatile guarantees visibility, not atomicity.\n// count++ is read, add, write - three steps, interleavable.\nprivate volatile int count;\npublic void inc() { count++; }        // lost updates under concurrency\n\n// CORRECT: compare-and-swap, lock-free and atomic.\nprivate final AtomicInteger count = new AtomicInteger();\npublic void inc() { count.incrementAndGet(); }\n\n// Bounded pool: an unbounded queue is a slow-motion OOM.\nExecutorService pool = new ThreadPoolExecutor(\n    8, 32, 60L, TimeUnit.SECONDS,\n    new ArrayBlockingQueue<>(1000),                  // bounded: backpressure\n    new ThreadPoolExecutor.CallerRunsPolicy());      // shed by slowing caller"
           },
           "qa": [
             {
               "q": "When is volatile sufficient and when is it not?",
               "a": [
-                "Sufficient when the operation is a single read or a single write and you only need visibility — a boolean shutdown flag is the textbook case. One thread writes `true`, others need to see it promptly, and there is no compound operation.",
-                "Not sufficient for anything read-modify-write, which is where people get caught. `count++` is three operations, so two threads can both read the same value and both write the same increment — a lost update, and volatile does nothing about it. That needs an `AtomicInteger` with compare-and-swap, or a lock."
+                "Sufficient when the operation is a single read or a single write and you only need visibility - a boolean shutdown flag is the textbook case. One thread writes `true`, others need to see it promptly, and there is no compound operation.",
+                "Not sufficient for anything read-modify-write, which is where people get caught. `count++` is three operations, so two threads can both read the same value and both write the same increment - a lost update, and volatile does nothing about it. That needs an `AtomicInteger` with compare-and-swap, or a lock."
               ]
             }
           ]
@@ -237,9 +237,9 @@
           "analogy": "A conveyor with filters and stampers. Nothing moves until someone at the end starts collecting.",
           "points": [
             "**Lazy until terminal:** `filter`/`map` build the pipeline; `collect`/`forEach`/`reduce` execute it.",
-            "**Single use.** A consumed stream cannot be reused — reuse throws `IllegalStateException`.",
+            "**Single use.** A consumed stream cannot be reused - reuse throws `IllegalStateException`.",
             "**`Optional`** for the maybe-absent result. Do not call `.get()` without checking; use `orElse`, `orElseThrow` or `map`.",
-            "**`parallelStream()` is rarely the right answer** — it uses the common ForkJoinPool, so one slow parallel stream can starve every other one in the JVM.",
+            "**`parallelStream()` is rarely the right answer** - it uses the common ForkJoinPool, so one slow parallel stream can starve every other one in the JVM.",
             "**Readability is the real benefit.** A stream that is harder to read than the loop it replaced is a worse solution."
           ]
         }
@@ -259,13 +259,13 @@
           "points": [
             "**Call stack → microtasks → macrotasks.** Microtasks (promise callbacks, `queueMicrotask`) run before the next macrotask, always.",
             "**Macrotasks:** `setTimeout`, `setInterval`, I/O callbacks, UI events.",
-            "**`setTimeout(fn, 0)` is not immediate** — it queues a macrotask, so every pending promise callback runs first.",
+            "**`setTimeout(fn, 0)` is not immediate** - it queues a macrotask, so every pending promise callback runs first.",
             "**An infinite microtask chain starves the macrotask queue** entirely and freezes the page or the server.",
-            "**In Node**, `process.nextTick` runs before other microtasks — its own priority level, and a common source of confusion."
+            "**In Node**, `process.nextTick` runs before other microtasks - its own priority level, and a common source of confusion."
           ],
           "code": {
             "lang": "js",
-            "cap": "Predict the output — the standard interview question",
+            "cap": "Predict the output - the standard interview question",
             "src": "console.log('1');\n\nsetTimeout(() => console.log('2'), 0);        // macrotask\n\nPromise.resolve().then(() => console.log('3')); // microtask\n\nconsole.log('4');\n\n// Output: 1, 4, 3, 2\n// Synchronous code first (1, 4). Then the microtask queue drains\n// completely (3). Only then does the next macrotask run (2).\n// setTimeout(fn, 0) means \"soon\", never \"now\"."
           }
         },
@@ -273,31 +273,31 @@
           "t": "Closures",
           "tier": "core",
           "one": "A function keeps a live reference to the scope it was defined in, even after that scope has returned. It is how private state and most callbacks work.",
-          "analogy": "An employee who keeps their office key after the office closes — and the room is still there, still with their things in it.",
+          "analogy": "An employee who keeps their office key after the office closes - and the room is still there, still with their things in it.",
           "points": [
             "The captured variable is a **live reference**, not a copy. This is the source of the classic `var` in a loop bug.",
-            "**`let` is block-scoped**, so each loop iteration gets a fresh binding — which is why `let` fixes that bug and `var` does not.",
+            "**`let` is block-scoped**, so each loop iteration gets a fresh binding - which is why `let` fixes that bug and `var` does not.",
             "Closures are how you get **private state** without classes, and how callbacks and event handlers keep context.",
             "**Memory implication:** a closure keeps its entire enclosing scope alive. A closure over a large object in a long-lived handler is a leak.",
-            "Every React hook depends on closures — a stale closure over old state is the single most common `useEffect` bug."
+            "Every React hook depends on closures - a stale closure over old state is the single most common `useEffect` bug."
           ],
           "code": {
             "lang": "js",
             "cap": "The loop bug, and why let fixes it",
-            "src": "// BROKEN: var is function-scoped. All three closures share ONE i,\n// which is 3 by the time the timers fire.\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);   // 3, 3, 3\n}\n\n// FIXED: let is block-scoped — a fresh binding each iteration.\nfor (let i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);   // 0, 1, 2\n}\n\n// Private state via closure — no class needed.\nfunction counter() {\n  let n = 0;                             // unreachable from outside\n  return { inc: () => ++n, get: () => n };\n}"
+            "src": "// BROKEN: var is function-scoped. All three closures share ONE i,\n// which is 3 by the time the timers fire.\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);   // 3, 3, 3\n}\n\n// FIXED: let is block-scoped - a fresh binding each iteration.\nfor (let i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);   // 0, 1, 2\n}\n\n// Private state via closure - no class needed.\nfunction counter() {\n  let n = 0;                             // unreachable from outside\n  return { inc: () => ++n, get: () => n };\n}"
           }
         },
         {
           "t": "Promises & async/await",
           "tier": "core",
-          "one": "A Promise is a placeholder for a future value. `async/await` is syntax over the same machinery — the function returns a Promise and `await` pauses without blocking the thread.",
+          "one": "A Promise is a placeholder for a future value. `async/await` is syntax over the same machinery - the function returns a Promise and `await` pauses without blocking the thread.",
           "analogy": "A collection ticket. You are free to do other things; you present the ticket when the item is ready.",
           "points": [
             "**Three states:** pending, fulfilled, rejected. Settled once and immutably.",
-            "**`Promise.all`** fails fast on the first rejection. **`Promise.allSettled`** waits for all and reports each outcome — usually what you want for independent calls.",
+            "**`Promise.all`** fails fast on the first rejection. **`Promise.allSettled`** waits for all and reports each outcome - usually what you want for independent calls.",
             "**Sequential awaits in a loop are a performance bug** when the calls are independent. Start them all, then await.",
             "**Always handle rejection.** An unhandled promise rejection crashes a Node process by default in modern versions.",
-            "**`await` inside a `try/catch`** is how you handle async errors — the reason async/await is more readable than `.then().catch()` chains."
+            "**`await` inside a `try/catch`** is how you handle async errors - the reason async/await is more readable than `.then().catch()` chains."
           ],
           "code": {
             "lang": "js",
@@ -308,19 +308,19 @@
         {
           "t": "TypeScript: types, interfaces & structural typing",
           "tier": "core",
-          "one": "Static types erased at compile time. TypeScript is structurally typed — compatibility is decided by shape, not by declared inheritance.",
+          "one": "Static types erased at compile time. TypeScript is structurally typed - compatibility is decided by shape, not by declared inheritance.",
           "analogy": "A duck test with a checklist. If it has all the listed features it qualifies, regardless of its family tree.",
           "points": [
             "**`interface` vs `type`:** interfaces can be reopened and merged (good for public APIs); type aliases handle unions, intersections and mapped types.",
             "**Structural typing:** any object with the required properties is assignable. No `implements` needed.",
-            "**Types are erased at runtime.** They cannot validate an API response — use Zod or io-ts for runtime validation at the boundary.",
+            "**Types are erased at runtime.** They cannot validate an API response - use Zod or io-ts for runtime validation at the boundary.",
             "**`any` defeats the whole system.** Prefer `unknown` and narrow it, which forces you to actually check.",
             "**Discriminated unions** are the most valuable pattern: a literal tag field lets the compiler exhaustively narrow, catching unhandled cases at compile time."
           ],
           "code": {
             "lang": "ts",
-            "cap": "Discriminated union — the compiler catches the missing case",
-            "src": "type Result =\n  | { status: 'ok';       data: Claim }\n  | { status: 'notFound' }\n  | { status: 'error';    message: string };\n\nfunction render(r: Result): string {\n  switch (r.status) {\n    case 'ok':       return r.data.id;      // narrowed: .data exists\n    case 'notFound': return 'No such claim';\n    case 'error':    return r.message;      // narrowed: .message exists\n    default:\n      // Add a 4th variant and this line fails to compile — the\n      // exhaustiveness check that makes unions worth using.\n      const _exhaustive: never = r;\n      return _exhaustive;\n  }\n}"
+            "cap": "Discriminated union - the compiler catches the missing case",
+            "src": "type Result =\n  | { status: 'ok';       data: Claim }\n  | { status: 'notFound' }\n  | { status: 'error';    message: string };\n\nfunction render(r: Result): string {\n  switch (r.status) {\n    case 'ok':       return r.data.id;      // narrowed: .data exists\n    case 'notFound': return 'No such claim';\n    case 'error':    return r.message;      // narrowed: .message exists\n    default:\n      // Add a 4th variant and this line fails to compile - the\n      // exhaustiveness check that makes unions worth using.\n      const _exhaustive: never = r;\n      return _exhaustive;\n  }\n}"
           }
         }
       ]
@@ -336,12 +336,12 @@
           "tier": "core",
           "resume": true,
           "one": "The container creates your objects and injects their dependencies rather than each class constructing its own. That inversion is what makes the code testable.",
-          "analogy": "A staffing agency rather than each department hiring independently. You declare the role you need; someone else supplies a person — including a stand-in during a rehearsal.",
+          "analogy": "A staffing agency rather than each department hiring independently. You declare the role you need; someone else supplies a person - including a stand-in during a rehearsal.",
           "points": [
             "**Constructor injection over field injection.** It makes dependencies explicit, allows `final` fields, and works without the container in tests.",
-            "**Bean scopes:** `singleton` is the default (one per context) — so a singleton bean must be stateless or thread-safe. `prototype` and `request` exist for the rest.",
+            "**Bean scopes:** `singleton` is the default (one per context) - so a singleton bean must be stateless or thread-safe. `prototype` and `request` exist for the rest.",
             "**`@Transactional`** wraps a method in a database transaction via a proxy. Two classic traps: it does nothing on **self-invocation** within the same class, and by default it only rolls back on unchecked exceptions.",
-            "**AOP** implements cross-cutting concerns — transactions, security, caching — via proxies. This is how `@PreAuthorize` on your support endpoints works.",
+            "**AOP** implements cross-cutting concerns - transactions, security, caching - via proxies. This is how `@PreAuthorize` on your support endpoints works.",
             "**Filter vs Interceptor:** filters are servlet-level and see raw requests (good for auth and CORS); interceptors are Spring-level and know the handler."
           ],
           "code": {
@@ -353,7 +353,7 @@
             {
               "q": "Why is constructor injection preferred over field injection?",
               "a": [
-                "Because it makes dependencies honest. A constructor signature tells you exactly what the class needs, so a class with eight constructor parameters is visibly doing too much — field injection hides that.",
+                "Because it makes dependencies honest. A constructor signature tells you exactly what the class needs, so a class with eight constructor parameters is visibly doing too much - field injection hides that.",
                 "Practically it also lets fields be `final`, which rules out accidental reassignment, and it means the object can never exist in a half-constructed state. And it makes testing trivial: you construct the class with test doubles and no Spring context at all, whereas field injection forces you into reflection or a container just to write a unit test."
               ]
             }
@@ -366,9 +366,9 @@
           "one": "An async Python framework built on ASGI, with Pydantic doing validation and OpenAPI documentation generated from your type hints.",
           "analogy": "A form that validates itself and prints its own instruction manual from the same definition.",
           "points": [
-            "**ASGI vs WSGI:** WSGI is synchronous, one request per worker at a time. ASGI supports async, WebSockets and long-lived connections — which is why streaming responses work.",
+            "**ASGI vs WSGI:** WSGI is synchronous, one request per worker at a time. ASGI supports async, WebSockets and long-lived connections - which is why streaming responses work.",
             "**Pydantic models are the contract:** validation, serialisation, and the OpenAPI schema all come from one type declaration.",
-            "**Dependency injection via `Depends`** — clean for auth, database sessions and per-request context.",
+            "**Dependency injection via `Depends`** - clean for auth, database sessions and per-request context.",
             "**`StreamingResponse`** is how you do SSE, which is exactly the mechanism behind your token streaming.",
             "**The performance trap:** a blocking call inside an `async def` endpoint stalls the whole event loop. Use `def` (FastAPI runs it in a threadpool) or an async driver."
           ]
@@ -379,16 +379,16 @@
           "one": "Batteries-included: ORM, admin, auth and migrations out of the box. The ORM is the part that will be asked about, specifically the N+1 problem.",
           "analogy": "A flat-pack house with the plumbing pre-installed. Fast to raise; you must still know where the pipes run.",
           "points": [
-            "**MVT** (model, view, template) — Django's naming for MVC.",
-            "**QuerySets are lazy** — no SQL runs until you iterate, slice or call `len()`. That laziness is what makes N+1 easy to cause accidentally.",
+            "**MVT** (model, view, template) - Django's naming for MVC.",
+            "**QuerySets are lazy** - no SQL runs until you iterate, slice or call `len()`. That laziness is what makes N+1 easy to cause accidentally.",
             "**N+1 problem:** one query for a list, then one per item for a related object. Fix with `select_related` (SQL join, for foreign keys) or `prefetch_related` (second query, for many-to-many).",
-            "**Migrations** are generated from model changes and version-controlled. Review them — the autogenerated one is not always the safe one on a large table.",
+            "**Migrations** are generated from model changes and version-controlled. Review them - the autogenerated one is not always the safe one on a large table.",
             "**Middleware** is the request/response pipeline: auth, sessions, CSRF, and your own cross-cutting logic."
           ],
           "code": {
             "lang": "python",
             "cap": "N+1: 101 queries versus 1",
-            "src": "# N+1: 1 query for claims, then 1 per claim for its patient.\nfor claim in Claim.objects.all()[:100]:\n    print(claim.patient.name)          # 100 extra queries\n\n# select_related: a SQL JOIN. One query. For FK / one-to-one.\nfor claim in Claim.objects.select_related(\"patient\")[:100]:\n    print(claim.patient.name)          # 1 query total\n\n# prefetch_related: a second query + Python-side join. For M2M / reverse FK.\nfor claim in Claim.objects.prefetch_related(\"line_items\")[:100]:\n    for item in claim.line_items.all():   # 2 queries total, not 101\n        ...\n\n# Only fetch the columns you need — matters on wide clinical tables.\nClaim.objects.only(\"id\", \"status\").filter(tenant_id=t)"
+            "src": "# N+1: 1 query for claims, then 1 per claim for its patient.\nfor claim in Claim.objects.all()[:100]:\n    print(claim.patient.name)          # 100 extra queries\n\n# select_related: a SQL JOIN. One query. For FK / one-to-one.\nfor claim in Claim.objects.select_related(\"patient\")[:100]:\n    print(claim.patient.name)          # 1 query total\n\n# prefetch_related: a second query + Python-side join. For M2M / reverse FK.\nfor claim in Claim.objects.prefetch_related(\"line_items\")[:100]:\n    for item in claim.line_items.all():   # 2 queries total, not 101\n        ...\n\n# Only fetch the columns you need - matters on wide clinical tables.\nClaim.objects.only(\"id\", \"status\").filter(tenant_id=t)"
           }
         },
         {
@@ -398,7 +398,7 @@
           "analogy": "One very fast waiter plus a small back-office team for the tasks that genuinely need hands.",
           "points": [
             "**Single-threaded for your code**, so CPU-bound work blocks every request. Offload to a worker thread or a separate service.",
-            "**Middleware is an ordered chain** — each gets `(req, res, next)` and must call `next()` or the request hangs forever.",
+            "**Middleware is an ordered chain** - each gets `(req, res, next)` and must call `next()` or the request hangs forever.",
             "**Error-handling middleware** has four parameters `(err, req, res, next)`. That signature is how Express recognises it.",
             "**`cluster` or PM2** forks one process per core, since one Node process uses one core.",
             "**Streams** are the idiomatic way to handle large payloads without buffering them into memory."
@@ -412,8 +412,8 @@
           "analogy": "The building and its staff. Tomcat is the building with the front desk; each servlet is a clerk assigned to a counter.",
           "points": [
             "**Servlet lifecycle:** `init()` once, `service()` per request (dispatching to `doGet`/`doPost`), `destroy()` at shutdown.",
-            "**Thread-per-request:** the container assigns a pooled thread per request. So **servlets must be stateless** — an instance field is shared across concurrent requests.",
-            "**Connector thread pool** (`maxThreads`) is the concurrency limit. Exhausting it queues requests — a classic Tomcat outage.",
+            "**Thread-per-request:** the container assigns a pooled thread per request. So **servlets must be stateless** - an instance field is shared across concurrent requests.",
+            "**Connector thread pool** (`maxThreads`) is the concurrency limit. Exhausting it queues requests - a classic Tomcat outage.",
             "**Session state** lives server-side keyed by `JSESSIONID`, which is why sticky sessions were needed before shared session stores.",
             "**JSP** compiles to a servlet on first request. Slow first hit; fine afterwards.",
             "Be honest and specific: this is the legacy surface you maintained and extended, not something you would choose today."
@@ -424,7 +424,7 @@
     {
       "id": "frontend",
       "name": "Frontend",
-      "desc": "Listed on your résumé, so fair game — but expect a lower bar. Know React's model properly and be honest about the depth of the rest.",
+      "desc": "Listed on your résumé, so fair game - but expect a lower bar. Know React's model properly and be honest about the depth of the rest.",
       "concepts": [
         {
           "t": "React: rendering, reconciliation & keys",
@@ -433,16 +433,16 @@
           "analogy": "Submitting a revised document and letting an editor mark only the changed lines, instead of reprinting the whole thing.",
           "points": [
             "**Re-render ≠ DOM update.** A component function re-running is cheap; only the diff touches the DOM.",
-            "**Keys must be stable and unique among siblings.** Using an array index as a key causes wrong state to stick to the wrong row when the list reorders — the classic React bug.",
+            "**Keys must be stable and unique among siblings.** Using an array index as a key causes wrong state to stick to the wrong row when the list reorders - the classic React bug.",
             "**State updates are asynchronous and batched.** Reading state immediately after `setState` gives the old value; use the functional form when the new value depends on the old.",
             "**`useEffect` dependencies:** a missing dependency creates a stale closure over old state. Empty array means run once on mount.",
             "**`useMemo`/`useCallback` are optimisations with a cost.** Applying them everywhere makes things slower, not faster. Measure first.",
-            "**Controlled inputs** — value from state, onChange updates it — is the standard form pattern."
+            "**Controlled inputs** - value from state, onChange updates it - is the standard form pattern."
           ],
           "code": {
             "lang": "jsx",
             "cap": "The two most common React bugs",
-            "src": "// BUG 1: index as key. Delete row 0 and every row's state shifts\n// onto the wrong item, because React matches by position.\n{rows.map((r, i) => <Row key={i} {...r} />)}\n{rows.map(r => <Row key={r.id} {...r} />)}      // stable identity\n\n// BUG 2: stale closure. count is captured from the render where the\n// effect ran, so this always increments from 0.\nuseEffect(() => {\n  const t = setInterval(() => setCount(count + 1), 1000);\n  return () => clearInterval(t);\n}, []);                                         // count not in deps\n\n// FIX: functional update — no dependency on the captured value.\nuseEffect(() => {\n  const t = setInterval(() => setCount(c => c + 1), 1000);\n  return () => clearInterval(t);\n}, []);"
+            "src": "// BUG 1: index as key. Delete row 0 and every row's state shifts\n// onto the wrong item, because React matches by position.\n{rows.map((r, i) => <Row key={i} {...r} />)}\n{rows.map(r => <Row key={r.id} {...r} />)}      // stable identity\n\n// BUG 2: stale closure. count is captured from the render where the\n// effect ran, so this always increments from 0.\nuseEffect(() => {\n  const t = setInterval(() => setCount(count + 1), 1000);\n  return () => clearInterval(t);\n}, []);                                         // count not in deps\n\n// FIX: functional update - no dependency on the captured value.\nuseEffect(() => {\n  const t = setInterval(() => setCount(c => c + 1), 1000);\n  return () => clearInterval(t);\n}, []);"
           }
         },
         {
@@ -452,8 +452,8 @@
           "one": "The rest of your frontend list. Know the one distinguishing idea behind each and do not overclaim depth.",
           "analogy": "Tools in a drawer you have used. You can name what each is for without claiming to be a carpenter.",
           "points": [
-            "**Vue:** reactivity via proxies — mutating state automatically updates the DOM. `computed` is cached and derived; `watch` is for side effects. Single-file components combine template, script and style.",
-            "**jQuery:** pre-framework DOM manipulation and AJAX. Imperative — you mutate the DOM directly rather than describing state. Legacy, but everywhere in older codebases.",
+            "**Vue:** reactivity via proxies - mutating state automatically updates the DOM. `computed` is cached and derived; `watch` is for side effects. Single-file components combine template, script and style.",
+            "**jQuery:** pre-framework DOM manipulation and AJAX. Imperative - you mutate the DOM directly rather than describing state. Legacy, but everywhere in older codebases.",
             "**Handlebars:** logic-less server-side templating. Deliberately restricted so logic stays in the controller.",
             "**Bootstrap:** a CSS component and grid framework. 12-column responsive grid, utility classes, prebuilt components.",
             "**The honest framing:** these are what the CharmHealth frontend uses. You work in them; React is where you would build something new."
@@ -464,7 +464,7 @@
     {
       "id": "tooling",
       "name": "Testing & Specialist Tooling",
-      "desc": "The tail of your skills list — Numba, Cython, OpenCV, ZXing, Regex. Each is one question deep, and each has a good answer.",
+      "desc": "The tail of your skills list - Numba, Cython, OpenCV, ZXing, Regex. Each is one question deep, and each has a good answer.",
       "bullet": "Testing: JUnit, PyTest, Selenium, Postman. Tooling: Numba (LLVM JIT), Cython, OpenCV, ZXing, Regex",
       "concepts": [
         {
@@ -474,10 +474,10 @@
           "analogy": "Checking the car still drives, not that the mechanic used a particular spanner.",
           "points": [
             "**Stub** returns canned data. **Mock** additionally asserts it was called. **Fake** is a working lightweight implementation (an in-memory repository).",
-            "**Mock at the boundary** — the HTTP client, the clock, the third-party SDK. Mocking your own internals couples the test to the structure.",
+            "**Mock at the boundary** - the HTTP client, the clock, the third-party SDK. Mocking your own internals couples the test to the structure.",
             "**PyTest fixtures** for setup with scopes (function, module, session). `parametrize` to run one test over many inputs.",
             "**JUnit 5:** `@BeforeEach`, `@ParameterizedTest`, and AssertJ for readable assertions.",
-            "**Selenium** for end-to-end browser tests — slow and flaky, so keep a handful on critical journeys only.",
+            "**Selenium** for end-to-end browser tests - slow and flaky, so keep a handful on critical journeys only.",
             "**Postman** for manual API exploration and collection-based smoke tests in CI."
           ]
         },
@@ -488,15 +488,15 @@
           "one": "Two ways to make Python numeric code fast. Numba JIT-compiles functions to machine code via LLVM at runtime; Cython compiles annotated Python to C ahead of time.",
           "analogy": "Numba is a simultaneous interpreter who gets fluent after the first sentence. Cython is having the speech professionally translated in advance.",
           "points": [
-            "**Numba:** add `@njit` to a numeric function and it compiles on first call. Best for NumPy-heavy loops. Falls back to slow object mode if it cannot infer types — `nopython=True` makes that failure loud.",
+            "**Numba:** add `@njit` to a numeric function and it compiles on first call. Best for NumPy-heavy loops. Falls back to slow object mode if it cannot infer types - `nopython=True` makes that failure loud.",
             "**Cython:** a superset of Python with C type declarations, compiled to a C extension. More control, more build complexity, works for non-numeric code too.",
-            "**Both release the GIL** (`nogil` in Cython, `parallel=True` in Numba) — which is how you get true multi-core CPU parallelism in Python.",
+            "**Both release the GIL** (`nogil` in Cython, `parallel=True` in Numba) - which is how you get true multi-core CPU parallelism in Python.",
             "**The real speedup comes from typed loops.** Vectorised NumPy is already C; Numba wins where you have a loop NumPy cannot express.",
             "**Profile first.** Reaching for a JIT before knowing where the time goes is how people optimise 3% of the runtime."
           ],
           "code": {
             "lang": "python",
-            "cap": "The loop NumPy cannot vectorise — where a JIT earns its place",
+            "cap": "The loop NumPy cannot vectorise - where a JIT earns its place",
             "src": "from numba import njit\n\n@njit(cache=True)          # nopython by default; cache the compile\ndef max_drawdown(prices):\n    peak = prices[0]\n    worst = 0.0\n    for p in prices:       # sequential dependency: NumPy can't vectorise\n        if p > peak:\n            peak = p\n        dd = (peak - p) / peak\n        if dd > worst:\n            worst = dd\n    return worst\n\n# First call compiles (~100ms), subsequent calls run at C speed.\n# Pure Python: ~2s on 10M points. njit: ~15ms."
           }
         },
@@ -504,13 +504,13 @@
           "t": "Regex: greedy, lazy & catastrophic backtracking",
           "tier": "core",
           "resume": true,
-          "one": "Quantifiers are greedy by default — they take as much as possible then give back. Nested quantifiers on overlapping patterns can make matching exponential.",
+          "one": "Quantifiers are greedy by default - they take as much as possible then give back. Nested quantifiers on overlapping patterns can make matching exponential.",
           "analogy": "Someone who grabs the whole buffet then returns items one at a time until the plate fits. With two of them negotiating, it can take forever.",
           "points": [
-            "**Greedy `.*` vs lazy `.*?`** — greedy matches to the end of the line then backtracks; lazy matches as little as possible then expands.",
+            "**Greedy `.*` vs lazy `.*?`** - greedy matches to the end of the line then backtracks; lazy matches as little as possible then expands.",
             "**Catastrophic backtracking (ReDoS):** patterns like `(a+)+$` on a non-matching string try exponentially many splits. A user-supplied regex or input is a denial-of-service vector.",
             "**Prevention:** avoid nested quantifiers over overlapping character classes, anchor patterns, prefer specific classes to `.`, and set a timeout where the engine supports it.",
-            "**Use non-capturing groups `(?:...)`** when you do not need the capture — cheaper and clearer.",
+            "**Use non-capturing groups `(?:...)`** when you do not need the capture - cheaper and clearer.",
             "**Compile once** at module level rather than inside a loop.",
             "**Know when to stop:** parsing HTML or nested structures with regex is the wrong tool. Say so."
           ],
@@ -529,7 +529,7 @@
           "points": [
             "**OpenCV** for preprocessing: greyscale, adaptive thresholding, deskew, denoise, perspective correction. Most decode failures are capture-quality failures, so this is where the wins are.",
             "**ZXing** ('zebra crossing') decodes many symbologies. You give it a `BinaryBitmap`; hints let you restrict to `PDF_417` and enable `TRY_HARDER`.",
-            "**`TRY_HARDER`** trades speed for a better chance on poor images — worth it for a one-off scan, not for a video stream.",
+            "**`TRY_HARDER`** trades speed for a better chance on poor images - worth it for a one-off scan, not for a video stream.",
             "**Real-world failures:** hologram glare, card curvature, low light, and motion blur. Guiding the capture beats improving the decoder.",
             "**Decode and parse are separate problems.** ZXing gives you a string; the AAMVA parsing is yours, and that is where the version drift lives."
           ]

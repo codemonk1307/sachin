@@ -16,11 +16,11 @@
           "one": "A process owns an address space; threads within it share that space. Sharing makes threads cheap to create and switch between, and makes them dangerous.",
           "analogy": "Separate offices versus desks in one room. Passing a note between desks is instant; it is also how two people end up editing the same page.",
           "points": [
-            "**Process:** own memory, file descriptors, PID. Isolated — a crash kills only that process. IPC (pipes, sockets, shared memory) needed to communicate.",
+            "**Process:** own memory, file descriptors, PID. Isolated - a crash kills only that process. IPC (pipes, sockets, shared memory) needed to communicate.",
             "**Thread:** shares heap, code and file descriptors with its siblings; has its own stack, registers and program counter.",
             "**Context switch cost:** thread switches are cheaper than process switches because the page tables and TLB do not change.",
             "**Shared state is the whole difficulty.** Race conditions, deadlocks and torn reads all follow from shared mutable memory.",
-            "**Coroutines / green threads** are cheaper still — scheduled in user space, no kernel involvement. This is asyncio and Java's virtual threads."
+            "**Coroutines / green threads** are cheaper still - scheduled in user space, no kernel involvement. This is asyncio and Java's virtual threads."
           ]
         },
         {
@@ -30,12 +30,12 @@
           "one": "A race condition is when the result depends on timing. A mutex allows exactly one holder; a semaphore allows N. The critical section is what you are protecting.",
           "analogy": "One toilet with one key versus a car park with N spaces. The mutex is ownership; the semaphore is counting.",
           "points": [
-            "**Critical section:** the code that must not run concurrently. Keep it as small as possible — long critical sections destroy throughput.",
-            "**Mutex:** binary, and has an owner — only the locker may unlock. **Semaphore:** a counter, no ownership, usable as a signal between threads.",
+            "**Critical section:** the code that must not run concurrently. Keep it as small as possible - long critical sections destroy throughput.",
+            "**Mutex:** binary, and has an owner - only the locker may unlock. **Semaphore:** a counter, no ownership, usable as a signal between threads.",
             "**Read-modify-write is the classic race.** `count++`, or check-balance-then-deduct. This is exactly the billing concurrency problem.",
-            "**Deadlock's four conditions:** mutual exclusion, hold-and-wait, no pre-emption, circular wait. Break one — usually by imposing a global lock order.",
+            "**Deadlock's four conditions:** mutual exclusion, hold-and-wait, no pre-emption, circular wait. Break one - usually by imposing a global lock order.",
             "**Livelock:** threads keep responding to each other and make no progress. **Starvation:** a thread never gets the lock.",
-            "**Prefer lock-free primitives** where possible — atomic compare-and-swap, or pushing the atomicity into the database or Redis, which is what you did."
+            "**Prefer lock-free primitives** where possible - atomic compare-and-swap, or pushing the atomicity into the database or Redis, which is what you did."
           ],
           "code": {
             "lang": "python",
@@ -47,7 +47,7 @@
               "q": "How do you prevent deadlock?",
               "a": [
                 "Break one of the four necessary conditions, and in practice the tractable one is circular wait: impose a global ordering on lock acquisition so every thread takes locks in the same sequence. If nobody can hold A and wait for B while someone holds B and waits for A, a cycle is impossible.",
-                "The other practical levers are lock timeouts — `tryLock` with a deadline so you back off and retry rather than hang — and reducing lock scope so the window is tiny. And where I can, avoiding locks entirely: an atomic compare-and-swap, or pushing the atomicity down to the database or Redis, which is what I did for credit deduction."
+                "The other practical levers are lock timeouts - `tryLock` with a deadline so you back off and retry rather than hang - and reducing lock scope so the window is tiny. And where I can, avoiding locks entirely: an atomic compare-and-swap, or pushing the atomicity down to the database or Redis, which is what I did for credit deduction."
               ]
             }
           ]
@@ -59,22 +59,22 @@
           "analogy": "Everyone believes they have the whole warehouse. A clerk maps each requested aisle to wherever the goods actually are, fetching from off-site when needed.",
           "points": [
             "**Page fault:** the page is not resident, so the kernel loads it from disk. A minor fault is cheap; a major fault hits disk and is thousands of times slower.",
-            "**TLB** caches recent translations. A TLB miss costs a page-table walk — this is why memory locality matters for performance.",
+            "**TLB** caches recent translations. A TLB miss costs a page-table walk - this is why memory locality matters for performance.",
             "**Thrashing:** the working set exceeds RAM, so the system spends its time paging rather than computing. Throughput collapses.",
-            "**Swap makes a memory problem into a latency catastrophe.** Many production systems disable swap for this reason — Kubernetes historically required it off.",
+            "**Swap makes a memory problem into a latency catastrophe.** Many production systems disable swap for this reason - Kubernetes historically required it off.",
             "**Copy-on-write:** `fork()` shares pages until one side writes. This is why forking a large process is cheap, and why Redis snapshots work the way they do."
           ]
         },
         {
           "t": "Scheduling & context switching",
           "tier": "deep",
-          "one": "The scheduler decides which runnable thread gets a core next. A context switch saves one thread's state and restores another's — cheap individually, expensive in bulk.",
+          "one": "The scheduler decides which runnable thread gets a core next. A context switch saves one thread's state and restores another's - cheap individually, expensive in bulk.",
           "analogy": "A receptionist juggling callers. Each swap costs a moment of remembering where you were; do it constantly and you get nothing done.",
           "points": [
-            "**Pre-emptive** — the kernel interrupts on a timer. Contrast with **cooperative**, where a task yields voluntarily (asyncio, and why one blocking call freezes the loop).",
+            "**Pre-emptive** - the kernel interrupts on a timer. Contrast with **cooperative**, where a task yields voluntarily (asyncio, and why one blocking call freezes the loop).",
             "**Linux CFS** aims for fair CPU share weighted by nice value. Real-time classes exist for latency-critical work.",
             "**Context switch cost** is roughly a microsecond of direct cost, plus a much larger indirect cost from cache and TLB pollution.",
-            "**Load average** counts runnable *plus* uninterruptible-sleep tasks on Linux — so high load with low CPU usually means I/O wait.",
+            "**Load average** counts runnable *plus* uninterruptible-sleep tasks on Linux - so high load with low CPU usually means I/O wait.",
             "**More threads is not more throughput.** Past the core count for CPU-bound work, you add switching overhead and contention and go slower."
           ]
         }
@@ -95,7 +95,7 @@
             "**TCP gives:** ordering, retransmission, flow control (receiver window) and congestion control (slow start, backoff).",
             "**UDP gives:** low latency and no head-of-line blocking. Used for DNS, video, gaming, and as the base for QUIC.",
             "**Head-of-line blocking:** one lost TCP segment stalls everything behind it, even data that already arrived. This is the flaw HTTP/3 and QUIC exist to fix.",
-            "**Connection reuse matters enormously.** Keep-alive and connection pools avoid paying the handshake per request — a common, large, easy win."
+            "**Connection reuse matters enormously.** Keep-alive and connection pools avoid paying the handshake per request - a common, large, easy win."
           ]
         },
         {
@@ -105,10 +105,10 @@
           "analogy": "Exchanging sealed introductions once, then switching to a shared codebook because it is far quicker to use.",
           "points": [
             "**TLS 1.3 needs one round trip** (down from two in 1.2), and supports 0-RTT resumption for repeat connections.",
-            "**The certificate proves identity** — the server's public key signed by a CA your client trusts. This is what prevents man-in-the-middle.",
+            "**The certificate proves identity** - the server's public key signed by a CA your client trusts. This is what prevents man-in-the-middle.",
             "**Key exchange is ephemeral (ECDHE)**, giving forward secrecy: stealing the server's private key later does not decrypt past traffic.",
             "**Session resumption** avoids a full handshake on reconnect, which matters for mobile clients on flaky networks.",
-            "**mTLS** additionally authenticates the client with its own certificate — common between services in a mesh, and in healthcare integrations."
+            "**mTLS** additionally authenticates the client with its own certificate - common between services in a mesh, and in healthcare integrations."
           ]
         },
         {
@@ -117,10 +117,10 @@
           "one": "1.1 is one request at a time per connection. 2 multiplexes many streams over one TCP connection. 3 moves to QUIC over UDP to remove TCP head-of-line blocking.",
           "analogy": "One conversation per phone line; many conversations on one line; and finally many conversations that do not stall each other when one word is missed.",
           "points": [
-            "**HTTP/1.1:** keep-alive, but one outstanding request per connection — so browsers open six connections per host to fake parallelism.",
+            "**HTTP/1.1:** keep-alive, but one outstanding request per connection - so browsers open six connections per host to fake parallelism.",
             "**HTTP/2:** binary framing, stream multiplexing, header compression (HPACK), server push (largely abandoned). Still suffers **TCP-level** head-of-line blocking.",
             "**HTTP/3 / QUIC:** streams are independent at the transport layer, so one lost packet stalls only its own stream. Also faster connection setup.",
-            "**Practical impact:** with HTTP/2, asset concatenation and domain sharding became counter-productive — old advice that is now wrong.",
+            "**Practical impact:** with HTTP/2, asset concatenation and domain sharding became counter-productive - old advice that is now wrong.",
             "**Idempotency and safety:** GET/HEAD/OPTIONS are safe; GET/PUT/DELETE are idempotent; POST is neither. Intermediaries rely on this."
           ]
         },
@@ -130,12 +130,12 @@
           "one": "The classic. Answer it as layers, and let the interviewer pick which one to open up.",
           "analogy": "Posting a letter: find the address, plan the route, seal it, hand it over, wait for the reply, then read it.",
           "points": [
-            "**1. DNS resolution** — browser cache → OS cache → resolver → root → TLD → authoritative. Returns an IP, with a TTL.",
-            "**2. TCP connection** — three-way handshake to the IP on port 443 (or a reused pooled connection).",
-            "**3. TLS handshake** — certificate validation, key agreement, then encrypted.",
-            "**4. HTTP request** — method, path, headers, cookies. Likely hits a CDN edge first, then a load balancer, then your service.",
-            "**5. Server processing** — gateway auth and rate limiting, application logic, database and cache reads, response assembly.",
-            "**6. Response and render** — parse HTML, build the DOM, fetch subresources, run CSS and JS, paint. Critical rendering path.",
+            "**1. DNS resolution** - browser cache → OS cache → resolver → root → TLD → authoritative. Returns an IP, with a TTL.",
+            "**2. TCP connection** - three-way handshake to the IP on port 443 (or a reused pooled connection).",
+            "**3. TLS handshake** - certificate validation, key agreement, then encrypted.",
+            "**4. HTTP request** - method, path, headers, cookies. Likely hits a CDN edge first, then a load balancer, then your service.",
+            "**5. Server processing** - gateway auth and rate limiting, application logic, database and cache reads, response assembly.",
+            "**6. Response and render** - parse HTML, build the DOM, fetch subresources, run CSS and JS, paint. Critical rendering path.",
             "**Say the layers first, then offer to go deep on any one.** That structure is the signal being tested."
           ],
           "say": "I'd break it into DNS, transport, TLS, the request path through CDN and load balancer to the app, then server processing and browser rendering. Which layer would you like me to go into?"
@@ -143,13 +143,13 @@
         {
           "t": "REST, status codes & gRPC",
           "tier": "core",
-          "one": "REST is resource-oriented HTTP with meaningful verbs and status codes. gRPC is binary RPC over HTTP/2 with a schema — faster and stricter, and worse for public APIs.",
+          "one": "REST is resource-oriented HTTP with meaningful verbs and status codes. gRPC is binary RPC over HTTP/2 with a schema - faster and stricter, and worse for public APIs.",
           "analogy": "REST is a well-labelled public counter; gRPC is a direct intercom between two departments who agreed the phrasing in advance.",
           "points": [
             "**Status codes carry meaning:** 200 ok, 201 created, 204 no content, 400 bad request, 401 unauthenticated, **403 authenticated but forbidden**, 404, 409 conflict, 422 validation, 429 rate limited, 500, 503.",
-            "**401 vs 403 is a standard filter** — 401 means we do not know who you are, 403 means we do and you still may not.",
+            "**401 vs 403 is a standard filter** - 401 means we do not know who you are, 403 means we do and you still may not.",
             "**Idempotency by verb:** PUT and DELETE are idempotent by definition; POST is not, which is why it needs an idempotency key.",
-            "**Pagination:** cursor-based beats offset-based at scale — offset gets slower deeper into the results and skips rows when data shifts.",
+            "**Pagination:** cursor-based beats offset-based at scale - offset gets slower deeper into the results and skips rows when data shifts.",
             "**gRPC:** protobuf schema, code generation, streaming both ways, much smaller payloads. Great service-to-service, awkward from a browser.",
             "**Versioning:** put it in the path (`/v1/`) or a header. Whatever you choose, never break an existing contract in place."
           ],
@@ -158,7 +158,7 @@
               "q": "A client is unauthorised for a resource. 401, 403 or 404?",
               "a": [
                 "403 if they are authenticated and simply lack permission; 401 if they have not authenticated at all or the token is invalid.",
-                "But in a multi-tenant EHR I would often deliberately return 404 instead of 403 for cross-tenant access. A 403 confirms the resource exists, which leaks information — an attacker can enumerate valid claim IDs by watching for 403 versus 404. Returning 404 for anything outside your tenant scope means the response is identical whether or not the record exists."
+                "But in a multi-tenant EHR I would often deliberately return 404 instead of 403 for cross-tenant access. A 403 confirms the resource exists, which leaks information - an attacker can enumerate valid claim IDs by watching for 403 versus 404. Returning 404 for anything outside your tenant scope means the response is identical whether or not the record exists."
               ]
             }
           ]
@@ -169,9 +169,9 @@
           "one": "A browser-enforced rule that a page from one origin cannot read a response from another unless that server opts in with headers.",
           "analogy": "A doorman who lets you knock on any door but only lets you carry the reply home if that household put your name on a list.",
           "points": [
-            "**It is browser-enforced only.** CORS is not security for your API — a server-side client or curl ignores it entirely. Authorisation still has to be real.",
+            "**It is browser-enforced only.** CORS is not security for your API - a server-side client or curl ignores it entirely. Authorisation still has to be real.",
             "**Simple requests** go straight out. **Preflight** (`OPTIONS`) happens for non-simple methods, custom headers or JSON content types.",
-            "**`Access-Control-Allow-Origin`** must echo a specific origin — not `*` — when credentials are involved, and `Allow-Credentials: true` is required for cookies.",
+            "**`Access-Control-Allow-Origin`** must echo a specific origin - not `*` - when credentials are involved, and `Allow-Credentials: true` is required for cookies.",
             "**The error is always on the browser side**, which is why the server logs look clean and the developer is confused.",
             "**Same-origin means scheme, host and port all match.** `http` vs `https` is a different origin."
           ]
@@ -193,20 +193,20 @@
             "**Authenticate at the edge, authorise in the service.** The gateway can verify a token; only the domain knows whether this user may read this claim.",
             "**Deny by default.** A new endpoint should be inaccessible until a rule grants access, not open until someone remembers to restrict it.",
             "**Authorise on every request**, not once at login. A permission revoked mid-session must take effect.",
-            "**Object-level authorisation is the one people miss** — checking the role but not whether *this* user may see *this* record. It is the top item in the OWASP API list for a reason.",
+            "**Object-level authorisation is the one people miss** - checking the role but not whether *this* user may see *this* record. It is the top item in the OWASP API list for a reason.",
             "**Never trust the client.** Hiding a UI control is not a control; the endpoint must refuse."
           ]
         },
         {
           "t": "Sessions vs JWT",
           "tier": "core",
-          "one": "A session ID is a reference the server can look up and revoke. A JWT is a self-contained signed claim the server can verify without a lookup — and cannot easily un-issue.",
+          "one": "A session ID is a reference the server can look up and revoke. A JWT is a self-contained signed claim the server can verify without a lookup - and cannot easily un-issue.",
           "analogy": "A cloakroom ticket versus a signed letter of authority. The cloakroom can refuse a ticket instantly; the letter is valid until it expires.",
           "points": [
             "**Sessions:** server-side state, instantly revocable, requires a shared store (Redis) to scale horizontally.",
-            "**JWT:** stateless, verifiable by signature, no lookup. **Revocation is the hard problem** — you need a denylist, which reintroduces the state you were avoiding.",
+            "**JWT:** stateless, verifiable by signature, no lookup. **Revocation is the hard problem** - you need a denylist, which reintroduces the state you were avoiding.",
             "**Standard compromise:** short-lived access token (5–15 min) plus a long-lived, revocable refresh token stored server-side.",
-            "**Never put sensitive data in a JWT payload** — it is base64, not encrypted. Anyone holding it can read it.",
+            "**Never put sensitive data in a JWT payload** - it is base64, not encrypted. Anyone holding it can read it.",
             "**`alg: none` and algorithm confusion** are classic JWT vulnerabilities. Pin the expected algorithm; never let the token choose it.",
             "**In a healthcare app, revocability matters.** A compromised session for a clinician must be killable immediately, which pushes toward short expiry and server-side refresh."
           ],
@@ -214,8 +214,8 @@
             {
               "q": "A clinician's account is compromised. How fast can you cut them off?",
               "a": [
-                "That depends entirely on the session design, and it is the reason I would not use long-lived stateless JWTs alone in a clinical product. With pure JWTs the token stays valid until it expires — you cannot un-issue it without a denylist, which means you have reintroduced server-side state anyway.",
-                "The design I would want is short-lived access tokens, five to fifteen minutes, with a revocable refresh token held server-side. Revoking the refresh token caps exposure at the access-token lifetime, which is a bounded and defensible window. And for genuinely immediate cut-off — which EPCS-scoped accounts warrant — a denylist checked at the gateway, accepting the lookup cost for that population."
+                "That depends entirely on the session design, and it is the reason I would not use long-lived stateless JWTs alone in a clinical product. With pure JWTs the token stays valid until it expires - you cannot un-issue it without a denylist, which means you have reintroduced server-side state anyway.",
+                "The design I would want is short-lived access tokens, five to fifteen minutes, with a revocable refresh token held server-side. Revoking the refresh token caps exposure at the access-token lifetime, which is a bounded and defensible window. And for genuinely immediate cut-off - which EPCS-scoped accounts warrant - a denylist checked at the gateway, accepting the lookup cost for that population."
               ]
             }
           ]
@@ -227,15 +227,15 @@
           "analogy": "Three ways a forged instruction gets executed: smuggled into a command, into a page, or into a request the browser makes on your behalf.",
           "points": [
             "**SQL injection:** untrusted input concatenated into a query. **Fix: parameterised queries, always.** Escaping is not a fix; an ORM is not automatically a fix if you use raw string interpolation.",
-            "**XSS:** untrusted input rendered as HTML or JS. **Fix: context-aware output encoding** plus a Content-Security-Policy. React escapes by default — `dangerouslySetInnerHTML` opts out.",
+            "**XSS:** untrusted input rendered as HTML or JS. **Fix: context-aware output encoding** plus a Content-Security-Policy. React escapes by default - `dangerouslySetInnerHTML` opts out.",
             "**CSRF:** a third-party site causes the browser to send an authenticated request. **Fix: `SameSite=Lax` cookies plus an anti-CSRF token** on state-changing requests.",
-            "**Stored vs reflected XSS:** stored is worse — it persists and hits every viewer.",
-            "**Prompt injection is the modern member of this family** — untrusted text reaching an interpreter. Same shape, no escaping available, so the fix has to be at the tool boundary."
+            "**Stored vs reflected XSS:** stored is worse - it persists and hits every viewer.",
+            "**Prompt injection is the modern member of this family** - untrusted text reaching an interpreter. Same shape, no escaping available, so the fix has to be at the tool boundary."
           ],
           "code": {
             "lang": "python",
             "cap": "The only correct fix for injection",
-            "src": "# VULNERABLE — string interpolation into SQL\ncur.execute(f\"SELECT * FROM claims WHERE id = '{claim_id}'\")\n# claim_id = \"1' OR '1'='1\"  ->  returns every claim in the table\n\n# CORRECT — parameterised. The driver sends query and values separately,\n# so the value can never be parsed as SQL.\ncur.execute(\"SELECT * FROM claims WHERE id = %s AND tenant_id = %s\",\n            (claim_id, tenant_id))\n\n# Still vulnerable through an ORM if you interpolate raw SQL:\n# Claim.objects.raw(f\"SELECT * FROM claims WHERE id = {claim_id}\")  # NO\nClaim.objects.filter(id=claim_id, tenant_id=tenant_id)              # yes"
+            "src": "# VULNERABLE - string interpolation into SQL\ncur.execute(f\"SELECT * FROM claims WHERE id = '{claim_id}'\")\n# claim_id = \"1' OR '1'='1\"  ->  returns every claim in the table\n\n# CORRECT - parameterised. The driver sends query and values separately,\n# so the value can never be parsed as SQL.\ncur.execute(\"SELECT * FROM claims WHERE id = %s AND tenant_id = %s\",\n            (claim_id, tenant_id))\n\n# Still vulnerable through an ORM if you interpolate raw SQL:\n# Claim.objects.raw(f\"SELECT * FROM claims WHERE id = {claim_id}\")  # NO\nClaim.objects.filter(id=claim_id, tenant_id=tenant_id)              # yes"
           }
         },
         {
@@ -244,11 +244,11 @@
           "one": "Encoding is reversible and not security (base64). Encryption is reversible with a key. Hashing is one-way. Using the wrong one is a common and serious mistake.",
           "analogy": "Translating a letter, locking it in a safe, or burning it and keeping the ash pattern. Only the last one cannot be undone.",
           "points": [
-            "**Passwords are hashed, never encrypted** — with a slow, salted, memory-hard function: bcrypt, scrypt or Argon2. Never MD5, SHA-1 or plain SHA-256.",
+            "**Passwords are hashed, never encrypted** - with a slow, salted, memory-hard function: bcrypt, scrypt or Argon2. Never MD5, SHA-1 or plain SHA-256.",
             "**Salt** is per-password and prevents rainbow tables. **Work factor** makes brute force expensive and should be raised as hardware improves.",
-            "**Encryption for data you must read back** — PHI at rest, API keys. AES-256-GCM gives confidentiality and integrity together.",
+            "**Encryption for data you must read back** - PHI at rest, API keys. AES-256-GCM gives confidentiality and integrity together.",
             "**Envelope encryption:** a KMS master key wraps a per-tenant data key. This is the BYOK pattern you implemented.",
-            "**Base64 is encoding, not encryption.** A JWT payload and a Kubernetes Secret are both merely base64 — treat them as plaintext.",
+            "**Base64 is encoding, not encryption.** A JWT payload and a Kubernetes Secret are both merely base64 - treat them as plaintext.",
             "**Never invent cryptography.** Use a vetted library, and say so in the interview."
           ]
         },
@@ -260,10 +260,10 @@
           "analogy": "Keys collected from a keybox on arrival, not taped under the doormat where the previous tenant also knew to look.",
           "points": [
             "**Use a real store:** AWS Secrets Manager, Vault, or cloud-native workload identity. Injected at runtime, never baked into the artefact.",
-            "**Prefer short-lived credentials** — an IAM role or workload identity gives rotating tokens, removing the long-lived key entirely.",
+            "**Prefer short-lived credentials** - an IAM role or workload identity gives rotating tokens, removing the long-lived key entirely.",
             "**Rotation must be routine**, not an incident response. If rotating is scary, that itself is the finding.",
             "**Scan for secrets in CI and pre-commit.** People will commit keys; the question is whether you find out in minutes or months.",
-            "**Docker image layers are immutable and shipped** — a secret added and then deleted is still in the image history.",
+            "**Docker image layers are immutable and shipped** - a secret added and then deleted is still in the image history.",
             "**On leak: rotate first, then clean history.** Cleaning without rotating achieves nothing."
           ]
         },
@@ -276,11 +276,11 @@
             "**Assets:** PHI, credentials, model keys, audit logs. Name what actually matters rather than everything equally.",
             "**Actors:** external attacker, malicious insider, a compromised third party, and an honest user making a mistake.",
             "**STRIDE** as a checklist: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege.",
-            "**Trust boundaries** are where the interesting bugs live — between browser and server, between service and third party, between agent and tool.",
+            "**Trust boundaries** are where the interesting bugs live - between browser and server, between service and third party, between agent and tool.",
             "**Mitigate structurally, not procedurally.** 'We are careful' is not a control; 'the projection cannot contain PHI' is.",
             "This framing is exactly how you would present the support-endpoint design in an interview."
           ],
-          "say": "The question I asked was what could travel down this new path that should not. PHI was the asset, a compromised support account was the actor, and the mitigation had to be structural — an explicit projection rather than entity serialisation — because 'we'll be careful with the fields' is not a control."
+          "say": "The question I asked was what could travel down this new path that should not. PHI was the asset, a compromised support account was the actor, and the mitigation had to be structural - an explicit projection rather than entity serialisation - because 'we'll be careful with the fields' is not a control."
         }
       ]
     }

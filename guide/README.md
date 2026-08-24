@@ -1,4 +1,4 @@
-# War Room — content pipeline
+# War Room - content pipeline
 
 `war-room.html` at the repo root is **generated**. Do not edit it by hand; your
 changes will be overwritten on the next build.
@@ -15,13 +15,13 @@ python guide/build.py
 ```
 
 It prints a summary (tracks, modules, concepts, snippets, questions) and fails
-loudly on malformed data — missing required keys, duplicate ids, a bad `tier`,
+loudly on malformed data - missing required keys, duplicate ids, a bad `tier`,
 or a module with no concepts.
 
 ## Adding content
 
 One JSON file per track, in `guide/data/`. Files load in **filename order**, and
-that is the order tracks appear on the home page — hence the numeric prefixes
+that is the order tracks appear on the home page - hence the numeric prefixes
 (`10-`, `20-`, …). To insert a track between two existing ones, use `35-`.
 
 ```jsonc
@@ -46,7 +46,7 @@ that is the order tracks appear on the home page — hence the numeric prefixes
 
 Only `t` and `one` are required. Every other field is optional and simply
 does not render when absent, so a stub is two lines and a full card is one
-pattern — the layout is identical either way.
+pattern - the layout is identical either way.
 
 ```jsonc
 {
@@ -84,7 +84,7 @@ Everything else is escaped, so `<`, `>` and `&` are safe to type literally.
 
 ## Syntax highlighting
 
-Done at **build time** in Python (`highlight()` in `build.py`) — no client-side
+Done at **build time** in Python (`highlight()` in `build.py`) - no client-side
 library, nothing to fail at runtime, and it still reads correctly with
 JavaScript disabled. It is a shallow regex tokenizer covering comments,
 strings, numbers, keywords, types and call sites. Enough to make a template
@@ -97,12 +97,12 @@ All of it lives in `css/war-room.css`. Two rules that keep the page from
 breaking, and which any new CSS must respect:
 
 1. **Every colour is a token**, defined for both themes. Never hard-code a hex
-   value in a component rule — add it to `:root` and to `[data-theme="light"]`.
+   value in a component rule - add it to `:root` and to `[data-theme="light"]`.
 2. **Every flex/grid child gets `min-width: 0`.** Without it a long unbroken
    token (a URL, an identifier) pushes its container wider than the viewport
    and the whole page scrolls sideways.
 
-Anything that can be wide — code, tables — scrolls inside its own
+Anything that can be wide - code, tables - scrolls inside its own
 `overflow-x: auto` box. The page body never scrolls horizontally.
 
 ## Theme
@@ -137,9 +137,9 @@ opening the file directly) matters because the stylesheet is a separate file.
 
 ## Progress storage
 
-- `warroom:conf` — `{conceptId: 1|2}`, the three-state confidence rating
+- `warroom:conf` - `{conceptId: 1|2}`, the three-state confidence rating
   (absent = unrated, 1 = shaky, 2 = solid)
-- `warroom:size` — `"lg"` when the larger reading size is on
+- `warroom:size` - `"lg"` when the larger reading size is on
 
 Concept ids are `c-<trackId>-<moduleId>-<index>`. **Reordering concepts within
 a module shifts the ids and therefore loses those ratings.** Append rather than
