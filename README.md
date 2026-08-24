@@ -4,6 +4,8 @@ A single-page portfolio plus two generated study apps, served as static files.
 No framework, no bundler, no build step for the site itself. Open `index.html`
 and it runs.
 
+Live: <https://codemonk1307.github.io/sachin/>
+
 ## What is in here
 
 | file | what it is | hand-written? |
