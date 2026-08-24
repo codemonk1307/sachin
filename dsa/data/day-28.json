@@ -1,0 +1,170 @@
+{
+  "day": 28,
+  "title": "Retrieval: Week Four",
+  "kind": "retrieval",
+  "focus": "Last retrieval day of the cycle. Every template from Days 22 to 27, blind, then the thirty problems.",
+  "cards": [
+    {
+      "id": "r4-arrays",
+      "lane": "arrays",
+      "kind": "drill",
+      "title": "Arrays and Strings: blind recall",
+      "trigger": "Three of this week's six are 'prove it is linear' problems. That proof is the graded part.",
+      "recall": "Paper: the budget window, the run-start guard, the place-at-own-index swap, the carry-both-extremes update, the 3Sum duplicate skips, and the merge-and-count line. Then say the amortised argument for the three that need one.",
+      "drill": [
+        { "lc": 424, "name": "Longest Repeating Character Replacement", "slug": "longest-repeating-character-replacement", "diff": "medium", "cue": "size - max_count <= k" },
+        { "lc": 128, "name": "Longest Consecutive Sequence", "slug": "longest-consecutive-sequence", "diff": "medium", "cue": "skip non-starts" },
+        { "lc": 54, "name": "Spiral Matrix", "slug": "spiral-matrix", "diff": "medium", "cue": "guard the last two" },
+        { "lc": 41, "name": "First Missing Positive", "slug": "first-missing-positive", "diff": "hard", "cue": "answer is in 1..n+1" },
+        { "lc": 15, "name": "3Sum", "slug": "3sum", "diff": "medium", "cue": "two skip levels" },
+        { "lc": 493, "name": "Reverse Pairs", "slug": "reverse-pairs", "diff": "hard", "cue": "count during merge" }
+      ],
+      "template": [
+        "# The three amortised-linear arguments you must be able to say:",
+        "#   longest consecutive : each run is walked once, from its unique start",
+        "#   first missing pos   : each swap places one value permanently",
+        "#   monotonic stack     : each index pushed once, popped once",
+        "",
+        "# and the two duplicate-skip idioms, which are NOT the same:",
+        "if i > start and a[i] == a[i-1]: continue     # sibling skip, before choosing",
+        "while lo < hi and a[lo] == a[lo-1]: lo += 1   # after recording a match"
+      ],
+      "keyInsights": [
+        "Any time an inner loop is inside an outer loop and the answer is still linear, they will ask you to prove it. Have the sentence ready",
+        "Duplicate handling has two distinct idioms. Mixing them produces missing or repeated results",
+        "Merge sort is worth keeping sharp purely because counting during the merge unlocks a whole family"
+      ],
+      "trap": "Claiming O(n) for longest consecutive without the start guard. The code without the guard is O(n^2) and looks identical at a glance."
+    },
+    {
+      "id": "r4-structures",
+      "lane": "structures",
+      "kind": "drill",
+      "title": "Structures and Design: blind recall",
+      "trigger": "Four design questions this week. All four are 'compose two structures so both operations are O(1)'.",
+      "recall": "From memory: the nested iterator's hasNext contract, the k-group three-pointer reconnection, LFU's three maps and min_freq rule, the freq-stack group insert, the BST iterator spine, and the calculator's parenthesis frame.",
+      "drill": [
+        { "lc": 341, "name": "Flatten Nested List Iterator", "slug": "flatten-nested-list-iterator", "diff": "medium", "cue": "work in hasNext" },
+        { "lc": 25, "name": "Reverse Nodes in k-Group", "slug": "reverse-nodes-in-k-group", "diff": "hard", "cue": "seed prev with group_next" },
+        { "lc": 460, "name": "LFU Cache", "slug": "lfu-cache", "diff": "hard", "cue": "new key resets min_freq" },
+        { "lc": 895, "name": "Maximum Frequency Stack", "slug": "maximum-frequency-stack", "diff": "hard", "cue": "stay in lower groups" },
+        { "lc": 173, "name": "Binary Search Tree Iterator", "slug": "binary-search-tree-iterator", "diff": "medium", "cue": "push the left spine" },
+        { "lc": 224, "name": "Basic Calculator", "slug": "basic-calculator", "diff": "hard", "cue": "push total and sign" }
+      ],
+      "template": [
+        "# The composition pattern behind LRU, LFU and FreqStack:",
+        "#   one map for O(1) LOOKUP",
+        "#   one ordered structure for O(1) ORDERING",
+        "#   one scalar tracking the current extreme, which only ever moves by one",
+        "",
+        "# The bounded-scalar argument, stated once and reused three times:",
+        "#   min_freq / max_freq changes by exactly 1 per operation,",
+        "#   so it never needs a scan."
+      ],
+      "keyInsights": [
+        "Three design questions share one skeleton. Learning the skeleton is cheaper than learning three solutions",
+        "The bounded-scalar argument is what turns an O(n) scan into O(1). It is the reusable idea in this whole lane",
+        "Iterator design is graded on the contract between hasNext and next, not on the traversal"
+      ],
+      "trap": "Building LFU without resetting min_freq to 1 on insert. Every test with an eviction after a new key fails, and it is one line."
+    },
+    {
+      "id": "r4-trees",
+      "lane": "trees",
+      "kind": "drill",
+      "title": "Trees: blind recall",
+      "trigger": "The array techniques came to the trees this week. Prefix sums, greedy, and level linking without a queue.",
+      "recall": "From memory: the ancestor-carrying DFS, the BST straddle walk, the dummy-head level linker, the path collector with its copy and pop, the three-state camera greedy, and the tree prefix-sum with its undo.",
+      "drill": [
+        { "lc": 1448, "name": "Count Good Nodes", "slug": "count-good-nodes-in-binary-tree", "diff": "medium", "cue": "carry the max down" },
+        { "lc": 235, "name": "LCA of a BST", "slug": "lowest-common-ancestor-of-a-binary-search-tree", "diff": "medium", "cue": "straddle point" },
+        { "lc": 116, "name": "Populating Next Right Pointers", "slug": "populating-next-right-pointers-in-each-node", "diff": "medium", "cue": "dummy per level" },
+        { "lc": 113, "name": "Path Sum II", "slug": "path-sum-ii", "diff": "medium", "cue": "copy and pop" },
+        { "lc": 968, "name": "Binary Tree Cameras", "slug": "binary-tree-cameras", "diff": "hard", "cue": "three states" },
+        { "lc": 437, "name": "Path Sum III", "slug": "path-sum-iii", "diff": "medium", "cue": "undo the prefix" }
+      ],
+      "template": [
+        "# Five tree shapes now, complete:",
+        "#   1. push DOWN            preorder with carried state",
+        "#   2. pull UP              postorder returning an answer",
+        "#   3. pull UP + RECORD     the answer bends at a node",
+        "#   4. as an undirected GRAPH   parent map, then BFS",
+        "#   5. path ACCUMULATOR     running state + undo on the way out",
+        "",
+        "# Shape 5 is shape 1 with a mutable accumulator, and the undo is what",
+        "# keeps sibling subtrees from seeing each other."
+      ],
+      "keyInsights": [
+        "Five shapes cover every tree question in this program. Naming the shape first is faster than pattern-matching the problem",
+        "The undo line appears in path sum III, in backtracking, and in N-Queens. It is one habit, three problems",
+        "Greedy on a tree is always postorder, because you can only commit once you know what the children need"
+      ],
+      "trap": "Putting the `path.pop()` inside the else branch of the leaf check. The recorded paths are correct and every path after the first is wrong."
+    },
+    {
+      "id": "r4-dp",
+      "lane": "dp",
+      "kind": "drill",
+      "title": "DP: blind recall",
+      "trigger": "Counting or optimising. Add or max. One word in the prompt picks the operator.",
+      "recall": "For all six: name the shape, say the state sentence, write the recurrence. Then say, for each, whether it counts or optimises, and which operator that implies.",
+      "drill": [
+        { "lc": 221, "name": "Maximal Square", "slug": "maximal-square", "diff": "medium", "cue": "min of three, plus one" },
+        { "lc": 518, "name": "Coin Change II", "slug": "coin-change-ii", "diff": "medium", "cue": "coin outer" },
+        { "lc": 10, "name": "Regular Expression Matching", "slug": "regular-expression-matching", "diff": "hard", "cue": "star takes j-2" },
+        { "lc": 152, "name": "Maximum Product Subarray", "slug": "maximum-product-subarray", "diff": "medium", "cue": "swap on negative" },
+        { "lc": 115, "name": "Distinct Subsequences", "slug": "distinct-subsequences", "diff": "hard", "cue": "add, do not max" },
+        { "lc": 120, "name": "Triangle", "slug": "triangle", "diff": "medium", "cue": "fill upward" }
+      ],
+      "template": [
+        "# The operator rule:",
+        "#   'how many ways'   -> dp[..] += ...        (alternatives ADD)",
+        "#   'best / longest'  -> dp[..] = max(...)    (alternatives COMPETE)",
+        "#   'is it possible'  -> dp[..] = a or b      (alternatives OR)",
+        "",
+        "# The loop-order rules, all four, one line each:",
+        "for c in range(cap, w-1, -1):   # 0/1 knapsack",
+        "for c in range(w, cap+1):       # unbounded knapsack",
+        "for coin in coins: ...          # combinations",
+        "for amount in ...: ...          # permutations"
+      ],
+      "keyInsights": [
+        "Counting versus optimising is a one-word read of the prompt and it decides the operator. Get it wrong and nothing else matters",
+        "Four loop-order rules cover the entire knapsack family. They are worth more drilling than any single problem",
+        "Direction of fill is a design decision. Choose whichever removes the boundary cases"
+      ],
+      "trap": "Using max in a counting problem. It returns a plausible number and it is not the answer. Read the question word before writing the recurrence."
+    },
+    {
+      "id": "r4-graphs",
+      "lane": "graphs",
+      "kind": "drill",
+      "title": "Graphs: blind recall",
+      "trigger": "Two of this week's problems are solved by inverting the question. That is the transferable idea.",
+      "recall": "From memory: Kahn producing an order plus the heap variant, the DSU over string keys, the alien-dictionary first-difference rule, the uphill climb from the border, eight-direction BFS with enqueue-marking, and the border-anchored flood.",
+      "drill": [
+        { "lc": 210, "name": "Course Schedule II", "slug": "course-schedule-ii", "diff": "medium", "cue": "heap for lexical" },
+        { "lc": 721, "name": "Accounts Merge", "slug": "accounts-merge", "diff": "medium", "cue": "emails are nodes" },
+        { "lc": 269, "name": "Alien Dictionary", "slug": "alien-dictionary", "diff": "hard", "cue": "first difference only" },
+        { "lc": 417, "name": "Pacific Atlantic Water Flow", "slug": "pacific-atlantic-water-flow", "diff": "medium", "cue": "climb from the ocean" },
+        { "lc": 1091, "name": "Shortest Path in Binary Matrix", "slug": "shortest-path-in-binary-matrix", "diff": "medium", "cue": "mark on enqueue" },
+        { "lc": 130, "name": "Surrounded Regions", "slug": "surrounded-regions", "diff": "medium", "cue": "find survivors" }
+      ],
+      "template": [
+        "# Two inversions worth keeping:",
+        "#   'which cells reach X'      -> search FROM X, inverting the move rule",
+        "#   'which regions are closed' -> find the OPEN ones, everything else is closed",
+        "",
+        "# And the modelling question that precedes every graph problem:",
+        "#   what is a node? what is an edge? is it directed? are weights involved?",
+        "# Four answers, and the algorithm follows."
+      ],
+      "keyInsights": [
+        "Inverting the search direction turns quadratic into linear on two of this week's problems. Look for it whenever the question is 'which things can reach'",
+        "Modelling is the graded step in accounts merge and alien dictionary. The algorithm afterwards is one you already know",
+        "Marking on enqueue rather than dequeue is the one BFS habit that silently ruins complexity"
+      ],
+      "trap": "Building an alien-dictionary edge for every position where the words differ. Only the first difference carries information, and the rest are fabricated constraints."
+    }
+  ]
+}

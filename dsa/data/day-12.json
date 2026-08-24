@@ -1,0 +1,221 @@
+{
+  "day": 12,
+  "title": "Nesting and Counting",
+  "kind": "core",
+  "focus": "Recursive structure in flat input, ordered traversal with an early exit, and the DP that counts rather than optimises.",
+  "cards": [
+    {
+      "id": "palindrome-expand",
+      "lane": "arrays",
+      "title": "Longest Palindromic Substring",
+      "patterns": ["Two centres per index", "Grow while symmetric", "Track start and length, not the string"],
+      "trigger": "Find the longest symmetric run inside a string.",
+      "recall": "Write it from memory, both centre types. Then answer: why track `(start, length)` instead of slicing the substring each time you improve?",
+      "useWhen": [
+        "Longest palindromic substring",
+        "Count palindromic substrings",
+        "Palindrome partitioning, with a precomputed table",
+        "Shortest palindrome by prefix reversal",
+        "Any question about maximal symmetric runs"
+      ],
+      "template": [
+        "def longest_palindrome(s):",
+        "    if not s: return ''",
+        "    start = end = 0",
+        "",
+        "    def expand(l, r):",
+        "        while l >= 0 and r < len(s) and s[l] == s[r]:",
+        "            l -= 1; r += 1",
+        "        return l + 1, r - 1        # step back inside the last valid window",
+        "",
+        "    for i in range(len(s)):",
+        "        for l, r in (expand(i, i), expand(i, i + 1)):   # odd then even",
+        "            if r - l > end - start:",
+        "                start, end = l, r",
+        "",
+        "    return s[start:end + 1]        # slice ONCE, at the end"
+      ],
+      "complexity": { "time": "O(n^2)", "space": "O(1)" },
+      "problem": { "lc": 5, "name": "Longest Palindromic Substring", "slug": "longest-palindromic-substring", "diff": "medium" },
+      "keyInsights": [
+        "The `l + 1, r - 1` return is where off-by-one errors live. The loop exits one step past the valid window",
+        "Slicing inside the loop makes it O(n^3) on adversarial input. Carry indices and slice once",
+        "Every index needs two expansions, odd-centred and even-centred. Forgetting the even case fails on 'abba'"
+      ],
+      "trap": "'Longest palindromic SUBSEQUENCE.' Completely different problem: interval DP, dp[i][j], O(n^2) time and space. Do not let the similar name pull you into the wrong solution."
+    },
+    {
+      "id": "stack-decode-nested",
+      "lane": "structures",
+      "title": "Nested Decoding with a Stack",
+      "patterns": ["Push the outer frame", "Reset accumulators on open", "Rebuild on close"],
+      "trigger": "Flat input with recursive structure: brackets, nesting, or a grammar you must evaluate.",
+      "recall": "Write the decode-string solver from memory. Then answer: exactly what gets pushed when you hit an opening bracket, and why is pushing only the number not enough?",
+      "useWhen": [
+        "Decode nested repeat strings",
+        "Basic calculator with parentheses and unary minus",
+        "Flatten a nested list or nested iterator",
+        "Evaluate a nested boolean or arithmetic expression",
+        "Simplify a Unix path, a degenerate case of the same idea"
+      ],
+      "template": [
+        "def decode(s):",
+        "    stack = []                    # frames: (previous string, repeat count)",
+        "    cur, num = '', 0",
+        "    for ch in s:",
+        "        if ch.isdigit():",
+        "            num = num * 10 + int(ch)      # multi-digit counts",
+        "        elif ch == '[':",
+        "            stack.append((cur, num))      # park the OUTER context",
+        "            cur, num = '', 0              # start a fresh inner context",
+        "        elif ch == ']':",
+        "            prev, k = stack.pop()",
+        "            cur = prev + cur * k          # fold the inner result into the outer",
+        "        else:",
+        "            cur += ch",
+        "    return cur",
+        "",
+        "# Calculator shape: push (result_so_far, sign) on '(' and fold on ')'",
+        "# Path simplify: split on '/', push a name, pop on '..', ignore '.' and ''"
+      ],
+      "complexity": { "time": "O(output length)", "space": "O(depth)" },
+      "problem": { "lc": 394, "name": "Decode String", "slug": "decode-string", "diff": "medium" },
+      "keyInsights": [
+        "You must push both the accumulated outer string and the count. Pushing only the count loses everything before the bracket",
+        "`num = num * 10 + int(ch)` is how you handle counts above nine. Single-digit assumptions fail the hidden tests",
+        "Every one of these is 'recursion done with an explicit stack'. If the recursive version is clearer, write that instead and say why"
+      ],
+      "trap": "'Now support nested negative numbers and spaces.' The tokeniser becomes the hard part, not the stack. Separate tokenising from evaluating before you write a line."
+    },
+    {
+      "id": "bst-kth-smallest",
+      "lane": "trees",
+      "title": "Ordered Traversal with Early Exit",
+      "patterns": ["Iterative inorder", "Decrement k and stop", "Augment with subtree sizes"],
+      "trigger": "You need the kth element in sorted order from a BST, and k is much smaller than n.",
+      "recall": "Write the iterative inorder from memory, including the exact push-left-then-pop structure. Then answer the design follow-up: if kth-smallest is called constantly and the tree is modified, what do you change?",
+      "useWhen": [
+        "Kth smallest or kth largest in a BST",
+        "Validate a BST by checking inorder is increasing",
+        "Convert a BST to a sorted list or a doubly linked list",
+        "Find the inorder successor of a node",
+        "Range sum in a BST, prune branches outside the range"
+      ],
+      "template": [
+        "def kth_smallest(root, k):",
+        "    stack, node = [], root",
+        "    while stack or node:",
+        "        while node:                # go as far left as possible",
+        "            stack.append(node)",
+        "            node = node.left",
+        "        node = stack.pop()         # smallest unvisited",
+        "        k -= 1",
+        "        if k == 0: return node.val",
+        "        node = node.right          # then the right subtree",
+        "    return -1",
+        "",
+        "# Kth LARGEST: same loop, mirrored (right first, then left)",
+        "",
+        "# If queries are frequent AND the tree mutates: store subtree size per node.",
+        "# Then kth becomes an O(h) descent:",
+        "#   left_size = size(node.left)",
+        "#   k <= left_size          -> go left",
+        "#   k == left_size + 1      -> this node",
+        "#   otherwise               -> go right with k -= left_size + 1"
+      ],
+      "complexity": { "time": "O(h + k)", "space": "O(h)" },
+      "problem": { "lc": 230, "name": "Kth Smallest Element in a BST", "slug": "kth-smallest-element-in-a-bst", "diff": "medium" },
+      "keyInsights": [
+        "O(h + k), not O(n). Saying the tighter bound shows you understand that the early exit is the point",
+        "The size-augmented version is the expected answer to the frequent-queries follow-up, and it is O(h) per query",
+        "The inner while-push-left plus outer pop is the canonical iterative inorder. Learn it once, use it everywhere"
+      ],
+      "trap": "'Do it recursively with O(1) space.' Morris traversal threads the tree temporarily. Name it, say it mutates during traversal, and offer the stack version as the safe one."
+    },
+    {
+      "id": "dp-decode-ways",
+      "lane": "dp",
+      "title": "Counting DP with Validity",
+      "patterns": ["dp[i] = dp[i-1] + dp[i-2]", "Guarded by a validity test", "Zero is the trap"],
+      "trigger": "Count the ways to parse or tile a sequence, where each step has one or two valid moves.",
+      "recall": "Write decode ways from memory. Then answer the case that breaks everyone: what happens at a '0', and what happens at '06'?",
+      "useWhen": [
+        "Decode a digit string into letters",
+        "Count tilings of a 1 by n board with pieces of size 1 and 2",
+        "Count valid parse trees or expression groupings",
+        "Staircase problems with forbidden steps",
+        "Any Fibonacci-shaped count with a per-step legality check"
+      ],
+      "template": [
+        "# dp[i] = number of ways to decode s[:i]",
+        "def num_decodings(s):",
+        "    if not s or s[0] == '0': return 0",
+        "    prev2, prev1 = 1, 1          # dp[0] = 1 (empty), dp[1] = 1",
+        "    for i in range(1, len(s)):",
+        "        cur = 0",
+        "        if s[i] != '0':                       # single-digit move, 1..9",
+        "            cur += prev1",
+        "        two = int(s[i - 1:i + 1])",
+        "        if 10 <= two <= 26:                   # two-digit move, 10..26",
+        "            cur += prev2",
+        "        if cur == 0: return 0                 # dead end, e.g. '30'",
+        "        prev2, prev1 = prev1, cur",
+        "    return prev1"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 91, "name": "Decode Ways", "slug": "decode-ways", "diff": "medium" },
+      "keyInsights": [
+        "'0' can never stand alone, and can only be consumed as part of 10 or 20. Every failing test is a zero",
+        "The leading `10 <=` matters: '06' is not 6, it is invalid. String-to-int silently hides that unless you range check",
+        "dp[0] = 1 means 'one way to decode nothing'. That is the base case that makes the two-digit branch work at i = 1"
+      ],
+      "trap": "'Now the string can contain a wildcard star matching 1 through 9.' The branch count explodes into cases and you need modular arithmetic. Structure the cases before coding."
+    },
+    {
+      "id": "eulerian-path",
+      "lane": "graphs",
+      "title": "Eulerian Path",
+      "patterns": ["Use every edge exactly once", "Hierholzer's post-order append", "Reverse at the end"],
+      "trigger": "Traverse every edge exactly once, typically phrased as an itinerary or a sequence reconstruction.",
+      "recall": "Write Hierholzer from memory. Then answer the part that makes it non-obvious: why is the route appended AFTER the recursion and then reversed?",
+      "useWhen": [
+        "Reconstruct an itinerary from a set of tickets",
+        "Cracking the safe, de Bruijn sequences",
+        "Valid arrangement of pairs, domino chains",
+        "Any 'use every edge once' phrasing",
+        "Genome assembly style sequence stitching"
+      ],
+      "template": [
+        "from collections import defaultdict",
+        "import heapq",
+        "",
+        "def find_itinerary(tickets):",
+        "    adj = defaultdict(list)",
+        "    for a, b in tickets:",
+        "        heapq.heappush(adj[a], b)          # smallest lexical option first",
+        "",
+        "    route = []",
+        "    def visit(u):",
+        "        while adj[u]:",
+        "            visit(heapq.heappop(adj[u]))   # consume the edge as you take it",
+        "        route.append(u)                    # append AFTER, on the way out",
+        "",
+        "    visit('JFK')",
+        "    return route[::-1]",
+        "",
+        "# Existence conditions, directed graph:",
+        "#   Euler CIRCUIT: every vertex has in-degree == out-degree, and is connected",
+        "#   Euler PATH:    exactly one vertex with out - in == 1 (the start),",
+        "#                  exactly one with in - out == 1 (the end)"
+      ],
+      "complexity": { "time": "O(E log E)", "space": "O(E)" },
+      "problem": { "lc": 332, "name": "Reconstruct Itinerary", "slug": "reconstruct-itinerary", "diff": "hard" },
+      "keyInsights": [
+        "Post-order append means a dead end lands at the front of the reversed route, which is exactly where it belongs",
+        "A naive greedy walk gets stuck in a dead end and cannot backtrack correctly. Hierholzer is the fix, not an optimisation",
+        "Deleting the edge as you take it is what makes 'exactly once' hold. Marking visited nodes would be wrong, edges are the resource"
+      ],
+      "trap": "'Is this different from a Hamiltonian path?' Yes, and enormously: every edge once is polynomial, every vertex once is NP-complete. Know that contrast cold."
+    }
+  ]
+}

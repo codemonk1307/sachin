@@ -1,0 +1,233 @@
+{
+  "day": 1,
+  "title": "Foundations",
+  "kind": "core",
+  "focus": "The five moves everything else is built on. If these are not automatic, nothing later will be.",
+  "cards": [
+    {
+      "id": "two-pointers",
+      "lane": "arrays",
+      "title": "Two Pointers",
+      "patterns": ["Opposite ends", "Fast / slow", "Read / write"],
+      "trigger": "Sorted input and you need a pair, or an in-place rearrangement where a write index can trail a read index.",
+      "recall": "Write the opposite-ends loop from memory. Then answer out loud: why is it safe to move `left` inward when the sum is too small, and what breaks if the array is not sorted?",
+      "useWhen": [
+        "Sorted array, find a pair or triplet hitting a target",
+        "Remove or dedupe in place with O(1) extra space",
+        "Palindrome check from both ends",
+        "Cycle detection in a linked list (Floyd's)",
+        "Container / area problems where both walls matter"
+      ],
+      "template": [
+        "# Opposite ends: needs sorted input",
+        "left, right = 0, len(arr) - 1",
+        "while left < right:",
+        "    s = arr[left] + arr[right]",
+        "    if s == target: return (left, right)",
+        "    elif s < target:  left += 1     # only larger values can help",
+        "    else:             right -= 1    # only smaller values can help",
+        "",
+        "# Read / write: compact in place, keep relative order",
+        "write = 0",
+        "for read in range(len(arr)):",
+        "    if keep(arr[read]):",
+        "        arr[write] = arr[read]",
+        "        write += 1",
+        "return write   # new logical length"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 125, "name": "Valid Palindrome", "slug": "valid-palindrome", "diff": "easy" },
+      "keyInsights": [
+        "Each pointer only ever moves one direction, so the loop is linear even though it looks nested",
+        "The sorted invariant is what makes discarding a whole side safe, that is the entire proof",
+        "Read/write is the same idea with both pointers moving forward at different speeds"
+      ],
+      "trap": "The follow-up is 'what if there are duplicates and you must return unique triplets'. The answer is skip-while-equal after each accepted move, not a set at the end."
+    },
+    {
+      "id": "stack-lifo",
+      "lane": "structures",
+      "title": "Stack (LIFO)",
+      "patterns": ["Matching pairs", "Deferred resolution", "Undo history"],
+      "trigger": "The thing you opened most recently is the thing you must close first.",
+      "recall": "Write the bracket matcher in six lines from memory. Then say why you compare against the expected opener on pop, and what the empty-at-end check actually proves.",
+      "useWhen": [
+        "Bracket, tag or quote matching",
+        "Expression evaluation, postfix and infix",
+        "Nested decoding, one level pushes state for the level above",
+        "Undo and back-button history",
+        "Anything where you must postpone a decision until more input arrives"
+      ],
+      "template": [
+        "PAIRS = {')': '(', ']': '[', '}': '{'}",
+        "",
+        "def valid(s):",
+        "    stack = []",
+        "    for ch in s:",
+        "        if ch in '([{':",
+        "            stack.append(ch)",
+        "        else:",
+        "            if not stack or stack.pop() != PAIRS[ch]:",
+        "                return False",
+        "    return not stack        # nothing left open",
+        "",
+        "# Nested state: push the frame, resolve on close",
+        "for ch in s:",
+        "    if ch == '[':",
+        "        stack.append((count, buf)); count, buf = 0, ''",
+        "    elif ch == ']':",
+        "        prev_count, prev_buf = stack.pop()",
+        "        buf = prev_buf + buf * prev_count"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(n)" },
+      "problem": { "lc": 20, "name": "Valid Parentheses", "slug": "valid-parentheses", "diff": "easy" },
+      "keyInsights": [
+        "Two failure modes, not one: wrong closer, and leftover openers. Both must be checked",
+        "Guard with `not stack` before `stack.pop()` or you crash on a string that starts with a closer",
+        "For nested decoding, push the whole outer frame, never try to patch it in place"
+      ],
+      "trap": "'Now do it with a counter instead of a stack.' You can for one bracket type and cannot for three. Saying exactly why, you need unbounded nesting depth per type, is the answer they want."
+    },
+    {
+      "id": "tree-dfs",
+      "lane": "trees",
+      "title": "Binary Tree DFS",
+      "patterns": ["Preorder: root, L, R", "Inorder: L, root, R", "Postorder: L, R, root"],
+      "trigger": "The answer for a node depends on answers from its children, or on the path taken to reach it.",
+      "recall": "Write the postorder depth function without looking. Then answer the question that splits every tree problem in two: does this push information down the tree, or pull it up?",
+      "useWhen": [
+        "Height, depth, diameter, any size-of-subtree measure (postorder)",
+        "Root-to-leaf paths and running sums (preorder, carry state down)",
+        "BST validation, inorder yields sorted order",
+        "Serialize and rebuild, preorder preserves shape",
+        "Anything answered by a single bottom-up sweep"
+      ],
+      "template": [
+        "# Postorder: pull answers UP from children",
+        "def depth(node):",
+        "    if not node: return 0",
+        "    return 1 + max(depth(node.left), depth(node.right))",
+        "",
+        "# Preorder: push state DOWN into children",
+        "def paths(node, running, out):",
+        "    if not node: return",
+        "    running = running + [node.val]",
+        "    if not node.left and not node.right:",
+        "        out.append(running)",
+        "    paths(node.left, running, out)",
+        "    paths(node.right, running, out)",
+        "",
+        "# Iterative preorder when recursion depth is a risk",
+        "stack = [root]",
+        "while stack:",
+        "    n = stack.pop()",
+        "    visit(n)",
+        "    if n.right: stack.append(n.right)   # right first, so left pops first",
+        "    if n.left:  stack.append(n.left)"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(h), h = height" },
+      "problem": { "lc": 104, "name": "Maximum Depth of Binary Tree", "slug": "maximum-depth-of-binary-tree", "diff": "easy" },
+      "keyInsights": [
+        "Every tree DFS question is 'down or up'. Answer that first and the code writes itself",
+        "Space is O(h), not O(n). Say height, then say it degrades to O(n) on a skewed tree",
+        "Iterative preorder pushes right before left, that reversal is the only trick in it"
+      ],
+      "trap": "'What if the tree is a million nodes in a single chain?' Python recurses about 1000 deep by default. The expected answer is the explicit stack, not raising the recursion limit."
+    },
+    {
+      "id": "dp-1d-linear",
+      "lane": "dp",
+      "title": "Linear DP",
+      "patterns": ["dp[i] from dp[i-1], dp[i-2]", "Rolling variables", "Bottom-up over index"],
+      "trigger": "The answer at position i depends on a fixed number of earlier positions, and on nothing later.",
+      "recall": "Before revealing: state the recurrence in words, say what `dp[i]` actually means as an English sentence, and give both base cases. Naming the state correctly is ninety percent of DP.",
+      "useWhen": [
+        "Count the ways to reach step or cell i",
+        "Best value ending at, or up to, index i",
+        "Take-or-skip decisions along a line",
+        "Any recursion with one integer argument and overlapping calls",
+        "Anything Fibonacci shaped"
+      ],
+      "template": [
+        "# 1. Define the state in one sentence, out loud:",
+        "#    dp[i] = number of distinct ways to reach step i",
+        "# 2. Recurrence:  dp[i] = dp[i-1] + dp[i-2]",
+        "# 3. Base cases:  dp[0] = 1, dp[1] = 1",
+        "",
+        "def climb(n):",
+        "    a, b = 1, 1                 # dp[i-2], dp[i-1]",
+        "    for _ in range(2, n + 1):",
+        "        a, b = b, a + b",
+        "    return b                    # O(1) space",
+        "",
+        "# Table form, when you need the whole history later",
+        "dp = [0] * (n + 1)",
+        "dp[0] = base",
+        "for i in range(1, n + 1):",
+        "    dp[i] = combine(dp[i - 1], dp[i - 2], arr[i])",
+        "return dp[n]"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1) rolling, O(n) table" },
+      "problem": { "lc": 70, "name": "Climbing Stairs", "slug": "climbing-stairs", "diff": "easy" },
+      "keyInsights": [
+        "Say the state definition out loud before writing a line. If you cannot say it, you do not have the recurrence",
+        "Every linear DP that looks back a fixed distance collapses to rolling variables",
+        "Top-down memo and bottom-up table are the same recurrence, pick whichever base case is easier to state"
+      ],
+      "trap": "'Now you can climb 1, 2 or 3 steps, and step k is broken.' Both are one-line edits if your state is right, and a full rewrite if it is not."
+    },
+    {
+      "id": "grid-flood",
+      "lane": "graphs",
+      "title": "Grid DFS / BFS",
+      "patterns": ["Flood fill", "Sink the island", "4-directional walk"],
+      "trigger": "A 2D grid where connected cells form a region, and you are counting or measuring those regions.",
+      "recall": "Write the island counter from memory, bounds check included. Then answer: why does mutating the grid beat a separate visited set here, and when would it not?",
+      "useWhen": [
+        "Count connected components in a grid",
+        "Largest or smallest region, perimeter, area",
+        "Reachability from a border, water flowing off a map",
+        "Fewest steps in an unweighted grid, which means BFS not DFS",
+        "Any implicit graph where neighbours are computed rather than stored"
+      ],
+      "template": [
+        "DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))",
+        "",
+        "def num_islands(grid):",
+        "    if not grid: return 0",
+        "    rows, cols = len(grid), len(grid[0])",
+        "",
+        "    def sink(r, c):",
+        "        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != '1':",
+        "            return",
+        "        grid[r][c] = '0'                  # mark visited by mutating",
+        "        for dr, dc in DIRS:",
+        "            sink(r + dr, c + dc)",
+        "",
+        "    count = 0",
+        "    for r in range(rows):",
+        "        for c in range(cols):",
+        "            if grid[r][c] == '1':",
+        "                count += 1",
+        "                sink(r, c)",
+        "    return count",
+        "",
+        "# BFS variant: reach for this the moment the prompt says 'shortest' or 'minutes'",
+        "q = deque(starts); seen = set(starts); steps = 0",
+        "while q:",
+        "    for _ in range(len(q)):           # drain one whole level per step",
+        "        r, c = q.popleft()",
+        "        ...",
+        "    steps += 1"
+      ],
+      "complexity": { "time": "O(rows * cols)", "space": "O(rows * cols) worst case" },
+      "problem": { "lc": 200, "name": "Number of Islands", "slug": "number-of-islands", "diff": "medium" },
+      "keyInsights": [
+        "Bounds check first, value check second, and both inside the recursive call rather than before it",
+        "DFS answers 'how many' and 'how big'. BFS answers 'how far'. Choosing wrong costs you the problem",
+        "Mutating the grid is O(1) extra space but destroys the input, always say that trade out loud"
+      ],
+      "trap": "'The grid is a million by a million.' Recursive DFS blows the stack. Convert to an explicit stack or to BFS, and say it before they ask."
+    }
+  ]
+}

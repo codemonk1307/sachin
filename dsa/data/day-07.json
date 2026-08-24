@@ -1,0 +1,168 @@
+{
+  "day": 7,
+  "title": "Retrieval: Week One",
+  "kind": "retrieval",
+  "focus": "No new material. Blank page, six templates per lane, then the timed redo. Retrieval is where the memory actually forms.",
+  "cards": [
+    {
+      "id": "r1-arrays",
+      "lane": "arrays",
+      "kind": "drill",
+      "title": "Arrays and Strings: blind recall",
+      "trigger": "Six triggers, one page. If you cannot name the trigger you will not recall the template under pressure.",
+      "recall": "Paper, not keyboard. Write all six templates from Days 1 to 6 in this lane: two pointers, hashmap complement, binary search boundary, prefix sum with map, Kadane, interval merge. Then open and diff yours against these.",
+      "drill": [
+        { "lc": 125, "name": "Valid Palindrome", "slug": "valid-palindrome", "diff": "easy", "cue": "opposite ends" },
+        { "lc": 1, "name": "Two Sum", "slug": "two-sum", "diff": "easy", "cue": "complement map" },
+        { "lc": 704, "name": "Binary Search", "slug": "binary-search", "diff": "easy", "cue": "boundary invariant" },
+        { "lc": 560, "name": "Subarray Sum Equals K", "slug": "subarray-sum-equals-k", "diff": "medium", "cue": "prefix + map, seed {0:1}" },
+        { "lc": 53, "name": "Maximum Subarray", "slug": "maximum-subarray", "diff": "medium", "cue": "extend or restart" },
+        { "lc": 56, "name": "Merge Intervals", "slug": "merge-intervals", "diff": "medium", "cue": "sort by start" }
+      ],
+      "template": [
+        "# The six openings. If any of these is not instant, that is your homework.",
+        "left, right = 0, len(a) - 1                 # two pointers",
+        "seen = {}                                   # complement map",
+        "lo, hi = 0, len(a)                          # boundary binary search",
+        "seen = defaultdict(int); seen[0] = 1        # prefix sum count",
+        "cur = best = a[0]                           # kadane",
+        "intervals.sort(key=lambda iv: iv[0])        # interval merge"
+      ],
+      "keyInsights": [
+        "Choosing the pattern is the graded step. Once chosen, the code is typing",
+        "Two pointers needs sorted. Prefix-map does not. That distinction decides half of these",
+        "If a template came out wrong, redo the original day tomorrow, not next month"
+      ],
+      "trap": "The seductive failure today is re-reading and feeling fluent. Recognition is not recall. If your pen did not move, you learned nothing this hour."
+    },
+    {
+      "id": "r1-structures",
+      "lane": "structures",
+      "kind": "drill",
+      "title": "Structures and Design: blind recall",
+      "trigger": "Which container, and why not the other one.",
+      "recall": "From memory: bracket matcher, level-drain queue, size-k heap with the inversion, trie insert, monotonic deque with both evictions, monotonic stack. Say the complexity of each before you check.",
+      "drill": [
+        { "lc": 20, "name": "Valid Parentheses", "slug": "valid-parentheses", "diff": "easy", "cue": "push expected closer" },
+        { "lc": 622, "name": "Design Circular Queue", "slug": "design-circular-queue", "diff": "medium", "cue": "head + count" },
+        { "lc": 973, "name": "K Closest Points to Origin", "slug": "k-closest-points-to-origin", "diff": "medium", "cue": "max-heap of size k" },
+        { "lc": 208, "name": "Implement Trie", "slug": "implement-trie-prefix-tree", "diff": "medium", "cue": "is_word flag" },
+        { "lc": 239, "name": "Sliding Window Maximum", "slug": "sliding-window-maximum", "diff": "hard", "cue": "deque of indices" },
+        { "lc": 739, "name": "Daily Temperatures", "slug": "daily-temperatures", "diff": "medium", "cue": "pop resolves" }
+      ],
+      "template": [
+        "# The choosing table. Recite it before you look.",
+        "# most recent first .......... stack",
+        "# oldest first ............... deque, never list.pop(0)",
+        "# best repeatedly ............ heap; k smallest needs a MAX-heap",
+        "# prefix questions ........... trie",
+        "# max over a moving window ... monotonic deque, O(n)",
+        "# nearest greater ............ monotonic stack, indices"
+      ],
+      "keyInsights": [
+        "Heap gives you the best element, not sorted order. If you need order you wanted sorting",
+        "Monotonic deque beats a heap for windows because expiry is a position test, not a value test",
+        "Trie beats a hash set only when the query is about prefixes. Otherwise it is strictly worse"
+      ],
+      "trap": "Under time pressure people reach for a heap when a deque is linear. Cost yourself the log factor once here and you will not do it in the room."
+    },
+    {
+      "id": "r1-trees",
+      "lane": "trees",
+      "kind": "drill",
+      "title": "Trees: blind recall",
+      "trigger": "Down or up. Answer that first, every time.",
+      "recall": "From memory: postorder depth, level-drain BFS, range-bound BST validation, recursive LCA, the diameter global-versus-return split, the balance sentinel. For each, say down or up before you write it.",
+      "drill": [
+        { "lc": 104, "name": "Maximum Depth of Binary Tree", "slug": "maximum-depth-of-binary-tree", "diff": "easy", "cue": "postorder, up" },
+        { "lc": 102, "name": "Binary Tree Level Order Traversal", "slug": "binary-tree-level-order-traversal", "diff": "medium", "cue": "snapshot len(q)" },
+        { "lc": 98, "name": "Validate Binary Search Tree", "slug": "validate-binary-search-tree", "diff": "medium", "cue": "carry lo/hi down" },
+        { "lc": 236, "name": "Lowest Common Ancestor", "slug": "lowest-common-ancestor-of-a-binary-tree", "diff": "medium", "cue": "both sides non-null" },
+        { "lc": 543, "name": "Diameter of Binary Tree", "slug": "diameter-of-binary-tree", "diff": "easy", "cue": "record bend, return arm" },
+        { "lc": 110, "name": "Balanced Binary Tree", "slug": "balanced-binary-tree", "diff": "easy", "cue": "-1 sentinel" }
+      ],
+      "template": [
+        "def down(node, state):        # preorder: parent hands context to child",
+        "    if not node: return",
+        "    state = extend(state, node)",
+        "    down(node.left, state); down(node.right, state)",
+        "",
+        "def up(node):                 # postorder: child hands an answer to parent",
+        "    if not node: return BASE",
+        "    return combine(up(node.left), up(node.right), node)",
+        "",
+        "# and the third shape: up(), but RECORD something the parent cannot use"
+      ],
+      "keyInsights": [
+        "Three shapes cover almost every tree question: push down, pull up, pull up while recording a global",
+        "Space is O(h) and degrades to O(n) on a skewed tree. Say both",
+        "BFS is only correct when the question is about levels or shortest hops. Otherwise DFS is simpler"
+      ],
+      "trap": "The LCA base case, returning the node when it equals p or q, is the line people forget under pressure. Write it twice today."
+    },
+    {
+      "id": "r1-dp",
+      "lane": "dp",
+      "kind": "drill",
+      "title": "DP: blind recall",
+      "trigger": "If you cannot say what dp[i] means in one English sentence, you do not have a solution yet.",
+      "recall": "For each of the six, write the state definition as a sentence FIRST, then the recurrence, then the base cases. Only then the code. Do not skip straight to code, that is the habit this day exists to break.",
+      "drill": [
+        { "lc": 70, "name": "Climbing Stairs", "slug": "climbing-stairs", "diff": "easy", "cue": "dp[i] = ways to reach i" },
+        { "lc": 62, "name": "Unique Paths", "slug": "unique-paths", "diff": "medium", "cue": "above + left" },
+        { "lc": 198, "name": "House Robber", "slug": "house-robber", "diff": "medium", "cue": "two states per index" },
+        { "lc": 1143, "name": "Longest Common Subsequence", "slug": "longest-common-subsequence", "diff": "medium", "cue": "diagonal on match" },
+        { "lc": 416, "name": "Partition Equal Subset Sum", "slug": "partition-equal-subset-sum", "diff": "medium", "cue": "capacity loop backwards" },
+        { "lc": 300, "name": "Longest Increasing Subsequence", "slug": "longest-increasing-subsequence", "diff": "medium", "cue": "tails + bisect" }
+      ],
+      "template": [
+        "# The four-line ritual. Every DP, every time, out loud.",
+        "# 1. STATE      dp[...] = <one English sentence>",
+        "# 2. RECURRENCE dp[...] = <combination of smaller states>",
+        "# 3. BASE       the smallest states, stated explicitly",
+        "# 4. ORDER      the loop order that makes dependencies already computed",
+        "",
+        "# and one memorised pair:",
+        "for c in range(cap, w - 1, -1):   # 0/1: each item once",
+        "for c in range(w, cap + 1):       # unbounded: unlimited copies"
+      ],
+      "keyInsights": [
+        "Wrong state definition is the root cause of almost every failed DP, not a wrong recurrence",
+        "Loop direction on the rolled knapsack is the single highest-value fact in this lane",
+        "LIS in O(n log n) is the one DP here that is not really DP. Know it as its own thing"
+      ],
+      "trap": "Writing the code before the sentence. Under interview pressure that produces a table you cannot debug, and you will not have time to restart."
+    },
+    {
+      "id": "r1-graphs",
+      "lane": "graphs",
+      "kind": "drill",
+      "title": "Graphs: blind recall",
+      "trigger": "Unweighted means BFS. Non-negative weights means Dijkstra. Negative or hop-limited means Bellman-Ford.",
+      "recall": "From memory: grid flood fill, the choose-explore-unchoose skeleton, DSU find and union with both optimisations, Dijkstra with the stale skip, Bellman-Ford with the snapshot, Floyd-Warshall with k outermost.",
+      "drill": [
+        { "lc": 200, "name": "Number of Islands", "slug": "number-of-islands", "diff": "medium", "cue": "sink the island" },
+        { "lc": 78, "name": "Subsets", "slug": "subsets", "diff": "medium", "cue": "path[:] snapshot" },
+        { "lc": 547, "name": "Number of Provinces", "slug": "number-of-provinces", "diff": "medium", "cue": "DSU count" },
+        { "lc": 743, "name": "Network Delay Time", "slug": "network-delay-time", "diff": "medium", "cue": "stale skip" },
+        { "lc": 787, "name": "Cheapest Flights Within K Stops", "slug": "cheapest-flights-within-k-stops", "diff": "medium", "cue": "snapshot per round" },
+        { "lc": 1334, "name": "Find the City", "slug": "find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance", "diff": "medium", "cue": "k outermost" }
+      ],
+      "template": [
+        "# The decision tree. Recite before you look.",
+        "# all edges weight 1 ............... BFS",
+        "# weights >= 0 ..................... Dijkstra + stale skip",
+        "# negative edges, or 'at most k' ... Bellman-Ford + snapshot",
+        "# all pairs, V small ............... Floyd-Warshall, k outermost",
+        "# connectivity only, edges stream .. DSU",
+        "# enumerate everything ............. backtracking, choose/explore/unchoose"
+      ],
+      "keyInsights": [
+        "Reading the weights before choosing the algorithm saves you from the most expensive mistake in this lane",
+        "DSU answers connectivity but never gives you a path. If they want the path, it is the wrong tool",
+        "Backtracking on a graph needs the visited mark removed on the way out. On a grid flood fill it usually does not"
+      ],
+      "trap": "Reaching for Dijkstra on an unweighted graph. It works, and it is a log factor slower, and a Google interviewer will ask you why you did that."
+    }
+  ]
+}

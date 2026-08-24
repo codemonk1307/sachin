@@ -1,0 +1,230 @@
+{
+  "day": 5,
+  "title": "Running Best",
+  "kind": "core",
+  "focus": "Keep one number as you sweep. Keep one stack as you sweep. Keep one capacity as you fill.",
+  "cards": [
+    {
+      "id": "kadane",
+      "lane": "arrays",
+      "title": "Kadane's Algorithm",
+      "patterns": ["Extend or restart", "Best ending here", "Track global separately"],
+      "trigger": "Maximum or minimum contiguous subarray, with negatives in play.",
+      "recall": "Write Kadane from memory. Then answer: what does `cur` mean at each step, why is it `max(x, cur + x)` and not `max(cur, cur + x)`, and how does the all-negative case still work?",
+      "useWhen": [
+        "Maximum subarray sum",
+        "Maximum product subarray, carry both max and min",
+        "Best single buy and sell, which is Kadane on the difference array",
+        "Circular maximum subarray, total minus the minimum subarray",
+        "Any 'best contiguous run' phrasing"
+      ],
+      "template": [
+        "def max_subarray(nums):",
+        "    cur = best = nums[0]",
+        "    for x in nums[1:]:",
+        "        cur = max(x, cur + x)      # restart at x, or extend the run",
+        "        best = max(best, cur)      # global answer is tracked separately",
+        "    return best",
+        "",
+        "# Product variant: a negative flips min into max, so carry both",
+        "hi = lo = best = nums[0]",
+        "for x in nums[1:]:",
+        "    if x < 0: hi, lo = lo, hi",
+        "    hi = max(x, hi * x)",
+        "    lo = min(x, lo * x)",
+        "    best = max(best, hi)",
+        "",
+        "# Circular: answer is max(kadane_max, total - kadane_min)",
+        "# unless every element is negative, in which case it is kadane_max"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 53, "name": "Maximum Subarray", "slug": "maximum-subarray", "diff": "medium" },
+      "keyInsights": [
+        "`cur` is the best subarray *ending exactly here*. That definition is why the restart branch is `x` alone",
+        "Initialising to 0 instead of `nums[0]` breaks the all-negative case, which is the standard hidden test",
+        "The circular version has one special case, all negatives, where total minus min is the empty subarray"
+      ],
+      "trap": "'Return the indices, not the sum.' Track the start whenever you restart, and commit it whenever you update the global best. Retrofit this and you will get it wrong."
+    },
+    {
+      "id": "monotonic-stack",
+      "lane": "structures",
+      "title": "Monotonic Stack",
+      "patterns": ["Next greater element", "Pop resolves the answer", "Indices on the stack"],
+      "trigger": "For each element, find the nearest element to one side that is bigger or smaller.",
+      "recall": "Write next-greater from memory. Then answer: when you pop an index, whose answer are you filling in, and why is total work linear despite the inner while loop?",
+      "useWhen": [
+        "Next or previous greater or smaller element",
+        "Daily temperatures, stock span",
+        "Largest rectangle in a histogram, and maximal rectangle in a matrix",
+        "Trapping rain water",
+        "Remove k digits to make the smallest number"
+      ],
+      "template": [
+        "# Next greater to the right. Stack holds indices with decreasing values.",
+        "def next_greater(nums):",
+        "    n = len(nums)",
+        "    out = [-1] * n",
+        "    stack = []",
+        "    for i, x in enumerate(nums):",
+        "        while stack and nums[stack[-1]] < x:",
+        "            out[stack.pop()] = x      # x is the answer for that popped index",
+        "        stack.append(i)",
+        "    return out",
+        "",
+        "# Histogram: sentinel 0 at the end flushes the stack",
+        "heights.append(0)",
+        "for i, h in enumerate(heights):",
+        "    while stack and heights[stack[-1]] > h:",
+        "        top = stack.pop()",
+        "        left = stack[-1] if stack else -1",
+        "        best = max(best, heights[top] * (i - left - 1))",
+        "    stack.append(i)"
+      ],
+      "complexity": { "time": "O(n) amortised", "space": "O(n)" },
+      "problem": { "lc": 739, "name": "Daily Temperatures", "slug": "daily-temperatures", "diff": "medium" },
+      "keyInsights": [
+        "You are not computing the answer for the current element, you are resolving answers for elements you parked earlier",
+        "Each index is pushed once and popped once, so the while loop is amortised O(1). Say it that way",
+        "The sentinel at the end is not a hack, it is what guarantees every parked index gets resolved"
+      ],
+      "trap": "'Make it circular.' Iterate the array twice with `i % n` and do not push on the second pass. If you push twice you corrupt the stack."
+    },
+    {
+      "id": "tree-diameter",
+      "lane": "trees",
+      "title": "Global vs Returned Value",
+      "patterns": ["Return one thing, record another", "Postorder with a side effect", "Clamp negatives to zero"],
+      "trigger": "The best answer might pass *through* a node without going up to its parent.",
+      "recall": "Write the diameter function from memory. Then answer the pattern's whole point: why must the value you return differ from the value you record, and what would break if they were the same?",
+      "useWhen": [
+        "Tree diameter, longest path between any two nodes",
+        "Maximum path sum where the path can bend at a node",
+        "Longest univalue or increasing path",
+        "Largest BST subtree",
+        "Any tree problem where the answer is not rooted at the root"
+      ],
+      "template": [
+        "# Diameter: the answer bends at some node, but the parent can only use one arm",
+        "def diameter(root):",
+        "    best = 0",
+        "",
+        "    def height(node):",
+        "        nonlocal best",
+        "        if not node: return 0",
+        "        l, r = height(node.left), height(node.right)",
+        "        best = max(best, l + r)          # RECORD: the bend, both arms",
+        "        return 1 + max(l, r)             # RETURN: one arm, for the parent",
+        "",
+        "    height(root)",
+        "    return best",
+        "",
+        "# Max path sum: same shape, plus clamp negative arms to zero",
+        "def gain(node):",
+        "    nonlocal best",
+        "    if not node: return 0",
+        "    l = max(gain(node.left), 0)          # a negative arm is worse than no arm",
+        "    r = max(gain(node.right), 0)",
+        "    best = max(best, node.val + l + r)",
+        "    return node.val + max(l, r)"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(h)" },
+      "problem": { "lc": 543, "name": "Diameter of Binary Tree", "slug": "diameter-of-binary-tree", "diff": "easy" },
+      "keyInsights": [
+        "A path through a node uses both children. A path continuing to the parent can use only one. That asymmetry is the entire pattern",
+        "Recognise it by the phrase 'between any two nodes' rather than 'from the root'",
+        "Clamping to zero is how you say 'I would rather take nothing than take a negative subtree'"
+      ],
+      "trap": "'Return the path itself.' You now need parent links or to thread the path through the recursion, and the elegant version does not extend for free."
+    },
+    {
+      "id": "dp-knapsack-01",
+      "lane": "dp",
+      "title": "0/1 Knapsack",
+      "patterns": ["Each item used at most once", "Iterate capacity backwards", "Boolean reachability variant"],
+      "trigger": "A fixed set of items, a capacity, and each item is either in or out.",
+      "recall": "Write the 1D rolled version from memory. Then answer the question that separates 0/1 from unbounded: why does the capacity loop run *backwards*, and what happens if it runs forwards?",
+      "useWhen": [
+        "Subset sum, partition into equal halves",
+        "Target sum with plus and minus signs, after a transform",
+        "Maximum value under a weight budget",
+        "Count subsets hitting an exact total",
+        "Last stone weight II, minimise the difference"
+      ],
+      "template": [
+        "# dp[c] = True if some subset of items seen so far sums to exactly c",
+        "def can_partition(nums):",
+        "    total = sum(nums)",
+        "    if total % 2: return False",
+        "    target = total // 2",
+        "",
+        "    dp = [False] * (target + 1)",
+        "    dp[0] = True                       # empty subset hits 0",
+        "    for x in nums:",
+        "        for c in range(target, x - 1, -1):   # BACKWARDS",
+        "            dp[c] = dp[c] or dp[c - x]",
+        "        if dp[target]: return True",
+        "    return dp[target]",
+        "",
+        "# Value version: dp[c] = best value achievable with capacity c",
+        "for w, v in items:",
+        "    for c in range(cap, w - 1, -1):",
+        "        dp[c] = max(dp[c], dp[c - w] + v)",
+        "",
+        "# Counting version: dp[c] += dp[c - x], same backwards loop"
+      ],
+      "complexity": { "time": "O(n * capacity)", "space": "O(capacity)" },
+      "problem": { "lc": 416, "name": "Partition Equal Subset Sum", "slug": "partition-equal-subset-sum", "diff": "medium" },
+      "keyInsights": [
+        "Backwards keeps `dp[c - x]` at its previous-item value, so item x is used at most once. Forwards is the unbounded knapsack",
+        "That single loop direction is the only structural difference between the two knapsack families. Memorise it as a pair",
+        "This is pseudo-polynomial. If the capacity is huge the table is huge, and saying that shows you understand the bound"
+      ],
+      "trap": "'Now each item has unlimited copies.' Flip the loop to forwards. If you cannot explain why in one sentence, you memorised code instead of the idea."
+    },
+    {
+      "id": "bellman-ford",
+      "lane": "graphs",
+      "title": "Bellman-Ford",
+      "patterns": ["Relax every edge V-1 times", "Snapshot for k-hop limits", "Negative cycle detection"],
+      "trigger": "Negative edge weights, or a hard limit on the number of hops.",
+      "recall": "Write the k-stops version from memory. Then answer: why do you relax from a *snapshot* of the previous round rather than in place, and what does relaxing in place actually compute?",
+      "useWhen": [
+        "Shortest path with negative edges",
+        "At most k edges or k stops",
+        "Detect a negative cycle, currency arbitrage",
+        "Small graphs where E log V beats nothing and simplicity wins",
+        "Any constraint on path *length in edges*"
+      ],
+      "template": [
+        "# Cheapest flight with at most k stops = at most k+1 edges",
+        "def cheapest(n, flights, src, dst, k):",
+        "    INF = float('inf')",
+        "    dist = [INF] * n",
+        "    dist[src] = 0",
+        "    for _ in range(k + 1):",
+        "        snap = dist[:]                 # freeze the previous round",
+        "        for u, v, w in flights:",
+        "            if snap[u] + w < dist[v]:  # read snap, write dist",
+        "                dist[v] = snap[u] + w",
+        "    return -1 if dist[dst] == INF else dist[dst]",
+        "",
+        "# Full Bellman-Ford: V-1 rounds, then one extra round to detect negatives",
+        "for _ in range(V - 1):",
+        "    for u, v, w in edges:",
+        "        dist[v] = min(dist[v], dist[u] + w)",
+        "for u, v, w in edges:",
+        "    if dist[u] + w < dist[v]:",
+        "        return 'negative cycle reachable'"
+      ],
+      "complexity": { "time": "O(V * E)", "space": "O(V)" },
+      "problem": { "lc": 787, "name": "Cheapest Flights Within K Stops", "slug": "cheapest-flights-within-k-stops", "diff": "medium" },
+      "keyInsights": [
+        "The snapshot enforces 'at most one more edge per round'. In place, one round can chain many edges and blow past k",
+        "After round i, dist holds the best path using at most i edges. That is the invariant and it is worth saying",
+        "One extra relaxing round that still improves something proves a reachable negative cycle"
+      ],
+      "trap": "'Why not Dijkstra with a stop count in the state?' You can, but the state is (node, stops) and you must not settle on node alone. Explaining that shows real understanding."
+    }
+  ]
+}

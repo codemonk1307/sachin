@@ -1,0 +1,162 @@
+{
+  "day": 29,
+  "title": "Mock: Phone Screen",
+  "kind": "mock",
+  "focus": "Four timed rounds under real constraints. No notes, no editor autocomplete, talk out loud the whole time.",
+  "cards": [
+    {
+      "id": "m1-warmup",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Round 0: Warm-up",
+      "timerSec": 1200,
+      "trigger": "Twenty minutes, two problems. If either takes more than ten minutes, that pattern is not yet automatic.",
+      "recall": "No notes. Before writing anything, say the pattern name and the complexity out loud, as if someone is listening. Then code. Then state the edge cases you handled.",
+      "drill": [
+        { "lc": 125, "name": "Valid Palindrome", "slug": "valid-palindrome", "diff": "easy", "cue": "target: 5 min" },
+        { "lc": 20, "name": "Valid Parentheses", "slug": "valid-parentheses", "diff": "easy", "cue": "target: 5 min" }
+      ],
+      "template": [
+        "# The four sentences you say before writing a line. Every round. Out loud.",
+        "#   1. 'Let me restate the problem to make sure I have it.'",
+        "#   2. 'The constraints are ..., so I am targeting ... complexity.'",
+        "#   3. 'This looks like a <pattern> problem because <trigger>.'",
+        "#   4. 'Before I code, the edge cases are: empty, single element, all duplicates.'",
+        "",
+        "# If you cannot say sentence 3, you are not ready to code. Keep thinking."
+      ],
+      "keyInsights": [
+        "Restating the problem catches a misreading before it costs you thirty minutes. It is not a formality",
+        "Naming the target complexity from the constraints signals seniority more than any single solution does",
+        "Warm-up rounds exist to get your hands moving. Do not skip them because the problems look easy"
+      ],
+      "trap": "Silence. A correct solution written silently scores worse than a slightly worse solution narrated well. The interviewer is scoring communication explicitly."
+    },
+    {
+      "id": "m1-round1",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Round 1: Standard Medium",
+      "timerSec": 1500,
+      "trigger": "Twenty-five minutes, one medium. This is the actual shape of a Google phone screen.",
+      "recall": "Pick ONE without looking at the others. Set a timer. Do not start coding until you have said the approach and the complexity out loud.",
+      "drill": [
+        { "lc": 3, "name": "Longest Substring Without Repeating Characters", "slug": "longest-substring-without-repeating-characters", "diff": "medium", "cue": "sliding window" },
+        { "lc": 560, "name": "Subarray Sum Equals K", "slug": "subarray-sum-equals-k", "diff": "medium", "cue": "prefix + map" },
+        { "lc": 200, "name": "Number of Islands", "slug": "number-of-islands", "diff": "medium", "cue": "flood fill" },
+        { "lc": 236, "name": "Lowest Common Ancestor", "slug": "lowest-common-ancestor-of-a-binary-tree", "diff": "medium", "cue": "both sides non-null" }
+      ],
+      "template": [
+        "# Time budget for a 25-minute medium:",
+        "#   0:00 - 0:03   restate, clarify, ask about constraints and edge cases",
+        "#   0:03 - 0:07   approach out loud, complexity, get a nod before coding",
+        "#   0:07 - 0:18   write it, narrating the non-obvious lines only",
+        "#   0:18 - 0:23   trace one small example by hand, out loud",
+        "#   0:23 - 0:25   state the complexity again, and one thing you would improve",
+        "",
+        "# If you are still silent at 0:07, you are behind. Say something, even",
+        "# if it is 'the brute force is O(n^2) and I am looking for better'."
+      ],
+      "keyInsights": [
+        "Getting a nod on the approach before coding is what stops you from writing twenty lines in the wrong direction",
+        "Tracing an example by hand catches off-by-ones that reading the code will not",
+        "Naming an improvement at the end, even a small one, closes the interview on a strong note"
+      ],
+      "trap": "Jumping straight to the optimal solution with no brute force stated. If the optimal is wrong you have nothing to fall back on, and you have shown no reasoning."
+    },
+    {
+      "id": "m1-round2",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Round 2: Medium with a Follow-Up",
+      "timerSec": 2100,
+      "trigger": "Thirty-five minutes. Solve it, then answer the follow-up. The follow-up is the actual test.",
+      "recall": "Solve the problem, then immediately answer its follow-up as if asked. Do not look up the follow-up. If you cannot generate one yourself, you do not understand the problem well enough.",
+      "drill": [
+        { "lc": 146, "name": "LRU Cache", "slug": "lru-cache", "diff": "medium", "cue": "follow-up: make it LFU" },
+        { "lc": 322, "name": "Coin Change", "slug": "coin-change", "diff": "medium", "cue": "follow-up: count the ways" },
+        { "lc": 207, "name": "Course Schedule", "slug": "course-schedule", "diff": "medium", "cue": "follow-up: return the order" },
+        { "lc": 300, "name": "Longest Increasing Subsequence", "slug": "longest-increasing-subsequence", "diff": "medium", "cue": "follow-up: reconstruct it" }
+      ],
+      "template": [
+        "# Generate your own follow-up. The five that come up most:",
+        "#   1. 'Now the input is a stream and does not fit in memory.'",
+        "#   2. 'Now return the actual thing, not just its size or count.'",
+        "#   3. 'Now do it in O(1) space.'",
+        "#   4. 'Now the constraint is relaxed: negatives, duplicates, unbounded values.'",
+        "#   5. 'Now there are a million queries instead of one.'",
+        "",
+        "# For each of your month's 150 problems, at least one of these applies."
+      ],
+      "keyInsights": [
+        "The follow-up is where L4 is separated from L3. A clean base solution with a fumbled follow-up reads as memorisation",
+        "Reconstructing the answer, rather than its size, usually forces a different data structure. Notice that before they ask",
+        "'A million queries' almost always means precompute, and 'a stream' almost always means you cannot sort"
+      ],
+      "trap": "Answering a follow-up by saying 'I would just modify the code'. Say specifically what changes and what it costs, or say you do not know. Vagueness scores worse than either."
+    },
+    {
+      "id": "m1-round3",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Round 3: Hard",
+      "timerSec": 2400,
+      "trigger": "Forty minutes, one hard. The goal is not necessarily to finish. The goal is to make visible progress out loud.",
+      "recall": "Pick one you did NOT solve smoothly this month. Forty minutes on a clock. If you stall, narrate the stall: say what you have, what you need, and what you would try next.",
+      "drill": [
+        { "lc": 42, "name": "Trapping Rain Water", "slug": "trapping-rain-water", "diff": "hard", "cue": "two pointers" },
+        { "lc": 76, "name": "Minimum Window Substring", "slug": "minimum-window-substring", "diff": "hard", "cue": "shrink while valid" },
+        { "lc": 84, "name": "Largest Rectangle in Histogram", "slug": "largest-rectangle-in-histogram", "diff": "hard", "cue": "monotonic stack" },
+        { "lc": 124, "name": "Binary Tree Maximum Path Sum", "slug": "binary-tree-maximum-path-sum", "diff": "hard", "cue": "record vs return" }
+      ],
+      "template": [
+        "# When you stall, say this rather than going quiet:",
+        "#   'Here is what I have: <the invariant or partial approach>.'",
+        "#   'Here is what I am missing: <the specific gap>.'",
+        "#   'Two things I would try: <A> and <B>. I will try <A> because <reason>.'",
+        "",
+        "# A narrated stall is a hiring signal. A silent stall is a no-hire.",
+        "",
+        "# And the fallback that is always available:",
+        "#   'Let me write the brute force first so we have something correct,",
+        "#    then optimise from there.'"
+      ],
+      "keyInsights": [
+        "Partial credit is real. An interviewer writes down what you demonstrated, not just whether it compiled",
+        "The brute-force fallback guarantees you leave with working code. Start it at the twenty-five minute mark if you are stuck",
+        "Hards are usually one insight away from a medium you know. Ask yourself which medium this resembles"
+      ],
+      "trap": "Spending forty minutes searching for the elegant solution and submitting nothing. Correct and slow beats elegant and absent, every time."
+    },
+    {
+      "id": "m1-debrief",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Debrief: Score Yourself",
+      "timerSec": 600,
+      "trigger": "Ten minutes. Grade the session honestly, and write down exactly one thing to fix.",
+      "recall": "Answer all six questions below in writing. Not in your head, in writing. Then pick the single weakest one and make it tomorrow's first task.",
+      "drill": [],
+      "template": [
+        "# Score each round 0 to 3. Be harsh.",
+        "#",
+        "#   1. Did I restate and clarify before coding?",
+        "#   2. Did I state the complexity BEFORE writing, not after?",
+        "#   3. Did I name the pattern, or did I stumble into it?",
+        "#   4. Did I go silent at any point for more than thirty seconds?",
+        "#   5. Did I trace an example by hand before declaring it done?",
+        "#   6. Could I answer the follow-up without looking anything up?",
+        "#",
+        "# Total out of 18. Below 12 means the gap is process, not knowledge.",
+        "#",
+        "# Then: the ONE fix for tomorrow. One. Not a list."
+      ],
+      "keyInsights": [
+        "Most rejections at L4 are process failures, not knowledge failures. Silence, no complexity analysis, no edge cases",
+        "Writing the score down is what makes the pattern visible across months. Keeping it in your head does not",
+        "One fix per session. A list of six fixes is a list of zero fixes"
+      ],
+      "trap": "Scoring yourself generously because you solved the problems. The problems are the easy part. Google is grading how you got there."
+    }
+  ]
+}

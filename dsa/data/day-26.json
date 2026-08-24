@@ -1,0 +1,229 @@
+{
+  "day": 26,
+  "title": "Triples, Cursors and Coverage",
+  "kind": "core",
+  "focus": "The interview classic you must never fumble, an iterator over a tree, and greedy on a tree.",
+  "cards": [
+    {
+      "id": "three-sum",
+      "lane": "arrays",
+      "title": "3Sum",
+      "patterns": ["Sort, then fix one and two-point the rest", "Skip duplicates at both levels", "Break early on a positive pivot"],
+      "trigger": "Find triples, or k-tuples, summing to a target, with unique results required.",
+      "recall": "Write it from memory with both duplicate skips. Then answer: the outer skip uses `i > 0`, the inner skips run after a match. Say precisely why the two are different.",
+      "useWhen": [
+        "3Sum, 3Sum closest, 3Sum smaller",
+        "4Sum, and the general kSum recursion",
+        "Two sum on a sorted array",
+        "Any 'find unique tuples' question",
+        "Where a hash-set approach would produce duplicates you then have to clean up"
+      ],
+      "template": [
+        "def three_sum(nums):",
+        "    nums.sort()",
+        "    out, n = [], len(nums)",
+        "    for i in range(n - 2):",
+        "        if nums[i] > 0: break                       # sorted: no triple can sum to 0",
+        "        if i > 0 and nums[i] == nums[i - 1]: continue   # skip duplicate pivots",
+        "",
+        "        lo, hi = i + 1, n - 1",
+        "        while lo < hi:",
+        "            s = nums[i] + nums[lo] + nums[hi]",
+        "            if s < 0:   lo += 1",
+        "            elif s > 0: hi -= 1",
+        "            else:",
+        "                out.append([nums[i], nums[lo], nums[hi]])",
+        "                lo += 1; hi -= 1",
+        "                while lo < hi and nums[lo] == nums[lo - 1]: lo += 1",
+        "                while lo < hi and nums[hi] == nums[hi + 1]: hi -= 1",
+        "    return out"
+      ],
+      "complexity": { "time": "O(n^2)", "space": "O(1) beyond output" },
+      "problem": { "lc": 15, "name": "3Sum", "slug": "3sum", "diff": "medium" },
+      "keyInsights": [
+        "`i > 0` compares against the previous PIVOT you actually used. The inner skips run only after recording a match, comparing against the value just consumed",
+        "Sorting is not optional. It powers the two-pointer move, the duplicate skips and the early break all at once",
+        "The early break on a positive pivot is a real speedup on large inputs and costs one line"
+      ],
+      "trap": "'Now do 4Sum.' Two nested pivots plus the two-pointer, O(n^3), with duplicate skips at every level. If your 3Sum skips are hazy, 4Sum is unwriteable."
+    },
+    {
+      "id": "bst-iterator",
+      "lane": "structures",
+      "title": "BST Iterator",
+      "patterns": ["Push the left spine", "Pop, then push the right child's spine", "O(h) space, amortised O(1) next"],
+      "trigger": "Iterate a BST in order, on demand, without flattening it first.",
+      "recall": "Write it from memory. Then answer the two claims in the complexity: why is space O(h) and not O(n), and why is `next` amortised O(1) despite the inner while loop?",
+      "useWhen": [
+        "BST iterator, with next and hasNext",
+        "Kth smallest with repeated queries",
+        "Merge two BSTs in sorted order, run two iterators",
+        "Closest k values in a BST, two iterators moving outward",
+        "Any lazy in-order consumption"
+      ],
+      "template": [
+        "class BSTIterator:",
+        "    def __init__(self, root):",
+        "        self.stack = []",
+        "        self._push_left(root)",
+        "",
+        "    def _push_left(self, node):",
+        "        while node:",
+        "            self.stack.append(node)",
+        "            node = node.left",
+        "",
+        "    def hasNext(self):",
+        "        return bool(self.stack)",
+        "",
+        "    def next(self):",
+        "        node = self.stack.pop()          # smallest unvisited",
+        "        self._push_left(node.right)      # its right subtree's spine comes next",
+        "        return node.val",
+        "",
+        "# Merging two BSTs in sorted order: two iterators, always advance the smaller.",
+        "# Same shape as merging two sorted lists."
+      ],
+      "complexity": { "time": "O(1) amortised next", "space": "O(h)" },
+      "problem": { "lc": 173, "name": "Binary Search Tree Iterator", "slug": "binary-search-tree-iterator", "diff": "medium" },
+      "keyInsights": [
+        "The stack holds one node per level of the left spine, so it is bounded by the height, not the node count",
+        "Every node is pushed exactly once and popped exactly once across the whole iteration, so n calls do O(n) total work",
+        "This is the iterative inorder from Day 12, paused between pops. Recognising that means you already knew it"
+      ],
+      "trap": "'Support prev() as well.' A single stack cannot go backwards. You need parent pointers or a doubly threaded structure, and saying so is better than improvising."
+    },
+    {
+      "id": "tree-greedy-cover",
+      "lane": "trees",
+      "title": "Greedy on a Tree",
+      "patterns": ["Three states returned upward", "Decide at the parent, not the node", "Postorder commitment"],
+      "trigger": "Place the fewest items on a tree so that every node is covered by itself or a neighbour.",
+      "recall": "Name the three states a node can return before revealing. Then answer: why is the decision to place a camera made by the PARENT rather than by the node itself?",
+      "useWhen": [
+        "Binary tree cameras, minimum nodes to cover a tree",
+        "Minimum vertex cover on a tree",
+        "Distribute coins in a binary tree",
+        "Any minimal-placement problem on a tree",
+        "Where a greedy leaf-upward argument beats a DP"
+      ],
+      "template": [
+        "# Three states returned from a subtree:",
+        "#   0 = this node NEEDS covering",
+        "#   1 = this node is covered, but has no camera",
+        "#   2 = this node HAS a camera",
+        "",
+        "def min_camera_cover(root):",
+        "    cameras = 0",
+        "",
+        "    def go(node):",
+        "        nonlocal cameras",
+        "        if not node: return 1              # None counts as covered",
+        "        l, r = go(node.left), go(node.right)",
+        "",
+        "        if l == 0 or r == 0:               # a child is uncovered -> must place here",
+        "            cameras += 1",
+        "            return 2",
+        "        if l == 2 or r == 2:               # a child has a camera -> we are covered",
+        "            return 1",
+        "        return 0                           # both children merely covered -> we need it",
+        "",
+        "    return cameras + (1 if go(root) == 0 else 0)   # root may still be uncovered"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(h)" },
+      "problem": { "lc": 968, "name": "Binary Tree Cameras", "slug": "binary-tree-cameras", "diff": "hard" },
+      "keyInsights": [
+        "Placing a camera at a leaf is always wasteful, since its parent covers strictly more. That is why cameras rise one level",
+        "The order of the three checks matters. Uncovered children must be handled before the covered case",
+        "The final root check is the only thing outside the recursion, and forgetting it undercounts by exactly one"
+      ],
+      "trap": "'Prove the greedy is optimal.' The exchange argument is: moving any leaf camera to its parent never covers less. Have it in one sentence."
+    },
+    {
+      "id": "dp-distinct-subsequences",
+      "lane": "dp",
+      "title": "Counting Subsequences",
+      "patterns": ["dp[i][j] counts, does not maximise", "Match adds two terms", "Mismatch inherits one"],
+      "trigger": "How many ways can one string appear as a subsequence of another.",
+      "recall": "State what `dp[i][j]` counts, then write both branches. Then answer: on a match, why do you ADD the two terms rather than take a max, and what does each term represent?",
+      "useWhen": [
+        "Distinct subsequences",
+        "Count palindromic subsequences",
+        "Number of ways to form a target from sources",
+        "Any counting variant of a two-string DP",
+        "Where the optimisation version is LCS and the counting version is this"
+      ],
+      "template": [
+        "# dp[i][j] = number of ways s[:i] contains t[:j] as a subsequence",
+        "def num_distinct(s, t):",
+        "    m, n = len(s), len(t)",
+        "    dp = [[0] * (n + 1) for _ in range(m + 1)]",
+        "    for i in range(m + 1):",
+        "        dp[i][0] = 1                       # one way to form the empty target",
+        "",
+        "    for i in range(1, m + 1):",
+        "        for j in range(1, n + 1):",
+        "            dp[i][j] = dp[i - 1][j]        # skip s[i-1] entirely",
+        "            if s[i - 1] == t[j - 1]:",
+        "                dp[i][j] += dp[i - 1][j - 1]   # OR use it to match t[j-1]",
+        "    return dp[m][n]",
+        "",
+        "# Rolled to 1D: iterate j BACKWARDS so dp[j-1] is still the previous row",
+        "for i in range(1, m + 1):",
+        "    for j in range(n, 0, -1):",
+        "        if s[i - 1] == t[j - 1]: dp[j] += dp[j - 1]"
+      ],
+      "complexity": { "time": "O(m * n)", "space": "O(n) rolled" },
+      "problem": { "lc": 115, "name": "Distinct Subsequences", "slug": "distinct-subsequences", "diff": "hard" },
+      "keyInsights": [
+        "Counting means the two options are alternatives, so you add. Optimising means you pick one, so you max. That one word changes the operator",
+        "`dp[i][0] = 1` says there is exactly one way to match nothing, which is what makes the recursion bottom out correctly",
+        "The backwards inner loop in the 1D form is the same reason as 0/1 knapsack: keep the previous row's value available"
+      ],
+      "trap": "'The answer can be enormous.' In other languages you need 64-bit or a modulus. Mention it, because the problem statement usually guarantees it fits and interviewers probe whether you noticed."
+    },
+    {
+      "id": "grid-bfs-diagonal",
+      "lane": "graphs",
+      "title": "Shortest Path in a Grid",
+      "patterns": ["Eight directions", "Mark visited on enqueue", "A-star only if asked"],
+      "trigger": "Fewest steps through a grid where the move set is larger than four directions.",
+      "recall": "Write it from memory. Then answer the bug that costs people this problem: why must you mark a cell visited when you ENQUEUE it, not when you dequeue it?",
+      "useWhen": [
+        "Shortest path in a binary matrix",
+        "Knight moves on a board",
+        "Minimum knight or king moves, any custom move set",
+        "Escape a maze in the fewest steps",
+        "Any unweighted shortest path over an implicit grid"
+      ],
+      "template": [
+        "from collections import deque",
+        "",
+        "DIRS8 = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]",
+        "",
+        "def shortest_path(grid):",
+        "    n = len(grid)",
+        "    if grid[0][0] or grid[n-1][n-1]: return -1",
+        "",
+        "    q = deque([(0, 0, 1)])              # row, col, path length so far",
+        "    grid[0][0] = 1                      # mark on ENQUEUE",
+        "    while q:",
+        "        r, c, d = q.popleft()",
+        "        if r == n - 1 and c == n - 1: return d",
+        "        for dr, dc in DIRS8:",
+        "            nr, nc = r + dr, c + dc",
+        "            if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 0:",
+        "                grid[nr][nc] = 1        # mark immediately, before it is processed",
+        "                q.append((nr, nc, d + 1))",
+        "    return -1"
+      ],
+      "complexity": { "time": "O(n^2)", "space": "O(n^2)" },
+      "problem": { "lc": 1091, "name": "Shortest Path in Binary Matrix", "slug": "shortest-path-in-binary-matrix", "diff": "medium" },
+      "keyInsights": [
+        "Marking on dequeue lets the same cell be enqueued many times before it is processed, which blows up the queue and can be exponential on dense grids",
+        "Carrying the distance in the tuple avoids a separate distance array and is the cleanest form for a single source",
+        "Eight directions instead of four changes nothing structurally, which is the point: the move set is data, not logic"
+      ],
+      "trap": "'Make it faster.' A-star with the Chebyshev distance heuristic is the intended answer. Name the heuristic; guessing at a heuristic that is not admissible is worse than not offering one."
+    }
+  ]
+}

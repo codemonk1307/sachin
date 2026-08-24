@@ -1,0 +1,225 @@
+{
+  "day": 4,
+  "title": "Ranges and Weights",
+  "kind": "core",
+  "focus": "Precompute the range. Keep the window honest. Let the cheapest edge go first.",
+  "cards": [
+    {
+      "id": "prefix-sum",
+      "lane": "arrays",
+      "title": "Prefix Sum",
+      "patterns": ["Range sum in O(1)", "Prefix + hashmap", "Difference array"],
+      "trigger": "Repeated range queries, or 'count subarrays summing to k' on an array that may contain negatives.",
+      "recall": "Write the prefix-plus-hashmap counter from memory. Then answer the question everyone gets wrong: why must the map start with `{0: 1}`?",
+      "useWhen": [
+        "Many range-sum queries on a static array",
+        "Count subarrays with an exact sum, including negatives",
+        "Subarray with equal counts of two symbols, map them to +1 and -1",
+        "Range updates offline, use the difference array",
+        "2D region sums, the same idea with inclusion and exclusion"
+      ],
+      "template": [
+        "# Static range sums",
+        "pre = [0] * (n + 1)",
+        "for i, x in enumerate(nums):",
+        "    pre[i + 1] = pre[i] + x",
+        "range_sum = pre[j + 1] - pre[i]        # inclusive [i, j]",
+        "",
+        "# Count subarrays summing to k. Works with negatives; sliding window does not.",
+        "from collections import defaultdict",
+        "def subarray_sum(nums, k):",
+        "    seen = defaultdict(int)",
+        "    seen[0] = 1                        # the empty prefix",
+        "    running = total = 0",
+        "    for x in nums:",
+        "        running += x",
+        "        total += seen[running - k]     # count first",
+        "        seen[running] += 1             # then record",
+        "    return total",
+        "",
+        "# Difference array: O(1) range add, one final sweep",
+        "diff[l] += v; diff[r + 1] -= v",
+        "# then prefix-sum diff to get the final array"
+      ],
+      "complexity": { "time": "O(n) build, O(1) per query", "space": "O(n)" },
+      "problem": { "lc": 560, "name": "Subarray Sum Equals K", "slug": "subarray-sum-equals-k", "diff": "medium" },
+      "keyInsights": [
+        "`{0: 1}` accounts for subarrays that start at index 0. Without it you miss every prefix that itself equals k",
+        "Count before you record, or an element of value 0 counts itself",
+        "The moment the array has negatives, sliding window is dead and prefix-plus-map is the only linear answer"
+      ],
+      "trap": "'Now do it for a 2D matrix.' Build row prefixes, then sweep every pair of columns and run the 1D algorithm. O(cols^2 * rows), and knowing that shape is the point."
+    },
+    {
+      "id": "monotonic-deque",
+      "lane": "structures",
+      "title": "Monotonic Deque",
+      "patterns": ["Decreasing deque for max", "Evict from the front", "Store indices, not values"],
+      "trigger": "Sliding window maximum or minimum, where the window moves and you must not rescan it.",
+      "recall": "Write the sliding window maximum from memory. Then answer: why do you store indices instead of values, and what are the two separate eviction rules?",
+      "useWhen": [
+        "Max or min of every window of size k",
+        "Shortest subarray with sum at least k, on prefix sums",
+        "Constrained DP where the transition is a max over a moving range",
+        "Jump games with a bounded jump length",
+        "Stock spans and temperature spans over a window"
+      ],
+      "template": [
+        "from collections import deque",
+        "",
+        "def max_window(nums, k):",
+        "    dq = deque()          # indices, values strictly decreasing",
+        "    out = []",
+        "    for i, x in enumerate(nums):",
+        "        # 1. evict from the BACK anything this value dominates",
+        "        while dq and nums[dq[-1]] <= x:",
+        "            dq.pop()",
+        "        dq.append(i)",
+        "        # 2. evict from the FRONT anything that fell out of the window",
+        "        if dq[0] <= i - k:",
+        "            dq.popleft()",
+        "        if i >= k - 1:",
+        "            out.append(nums[dq[0]])   # front is always the max",
+        "    return out"
+      ],
+      "complexity": { "time": "O(n) amortised", "space": "O(k)" },
+      "problem": { "lc": 239, "name": "Sliding Window Maximum", "slug": "sliding-window-maximum", "diff": "hard" },
+      "keyInsights": [
+        "Indices, because the front eviction is a position test and you cannot test a value for staleness",
+        "Two evictions with different reasons: back for dominance, front for expiry. Mixing them up is the usual bug",
+        "Amortised O(n) because every index is appended once and popped at most once. Say 'amortised' out loud"
+      ],
+      "trap": "'Why not a heap?' A heap gives O(n log k) and needs lazy deletion for stale entries. The deque is O(n). Being able to compare the two is the real answer."
+    },
+    {
+      "id": "tree-lca",
+      "lane": "trees",
+      "title": "Lowest Common Ancestor",
+      "patterns": ["Postorder bubble-up", "BST split point", "Parent map plus ancestor set"],
+      "trigger": "Two nodes, and you need the deepest node that has both in its subtree.",
+      "recall": "Write the recursive LCA from memory. Then answer the subtle part: when both recursive calls return non-null, why is the current node necessarily the answer?",
+      "useWhen": [
+        "Lowest common ancestor in a binary tree or a BST",
+        "Distance between two nodes, depth(a) + depth(b) - 2 * depth(lca)",
+        "Path between two nodes in a tree",
+        "Any 'deepest node covering both' phrasing",
+        "Repeated queries, which pushes you to binary lifting"
+      ],
+      "template": [
+        "# Binary tree, assumes both nodes exist",
+        "def lca(node, p, q):",
+        "    if not node or node is p or node is q:",
+        "        return node",
+        "    left  = lca(node.left,  p, q)",
+        "    right = lca(node.right, p, q)",
+        "    if left and right:",
+        "        return node          # p and q split here -> this is the LCA",
+        "    return left or right     # both are on one side, pass it up",
+        "",
+        "# BST: no recursion needed, just walk until the values straddle",
+        "while node:",
+        "    if p.val < node.val and q.val < node.val:   node = node.left",
+        "    elif p.val > node.val and q.val > node.val: node = node.right",
+        "    else: return node        # split point",
+        "",
+        "# Distance",
+        "dist = depth(p) + depth(q) - 2 * depth(lca(root, p, q))"
+      ],
+      "complexity": { "time": "O(n) tree, O(h) BST", "space": "O(h)" },
+      "problem": { "lc": 236, "name": "Lowest Common Ancestor of a Binary Tree", "slug": "lowest-common-ancestor-of-a-binary-tree", "diff": "medium" },
+      "keyInsights": [
+        "Both sides non-null means one target is left and the other is right, so nothing deeper can contain both",
+        "The base case returns the node itself, which is what makes an ancestor-of-itself case work",
+        "The BST version is O(h) and needs no recursion. If they say BST and you write the general version, you missed the point"
+      ],
+      "trap": "'The nodes might not exist in the tree.' The clean version returns a wrong answer. You need to count matches found and verify both, and they will ask."
+    },
+    {
+      "id": "dp-lcs",
+      "lane": "dp",
+      "title": "Two-Sequence DP",
+      "patterns": ["dp[i][j] over two strings", "Match: diagonal + 1", "Mismatch: max of the two skips"],
+      "trigger": "Two sequences compared against each other, and the answer is an alignment.",
+      "recall": "Say what `dp[i][j]` means over the two prefixes, then write both branches of the recurrence before revealing.",
+      "useWhen": [
+        "Longest common subsequence or substring",
+        "Edit distance and its weighted variants",
+        "Is one string a subsequence of another, counted",
+        "Diff and merge algorithms",
+        "Shortest common supersequence, which is m + n - lcs"
+      ],
+      "template": [
+        "# dp[i][j] = LCS of a[:i] and b[:j]",
+        "def lcs(a, b):",
+        "    m, n = len(a), len(b)",
+        "    dp = [[0] * (n + 1) for _ in range(m + 1)]",
+        "    for i in range(1, m + 1):",
+        "        for j in range(1, n + 1):",
+        "            if a[i - 1] == b[j - 1]:",
+        "                dp[i][j] = dp[i - 1][j - 1] + 1        # consume both",
+        "            else:",
+        "                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])",
+        "    return dp[m][n]",
+        "",
+        "# Rolled to two rows when you do not need to reconstruct",
+        "prev, cur = [0] * (n + 1), [0] * (n + 1)",
+        "# ... fill cur from prev, then prev, cur = cur, prev",
+        "",
+        "# Substring (contiguous) is a DIFFERENT recurrence:",
+        "# mismatch resets to 0, and the answer is the running max, not dp[m][n]"
+      ],
+      "complexity": { "time": "O(m * n)", "space": "O(min(m, n)) rolled" },
+      "problem": { "lc": 1143, "name": "Longest Common Subsequence", "slug": "longest-common-subsequence", "diff": "medium" },
+      "keyInsights": [
+        "1-indexed dp with a zero row and column removes every boundary special case. Always pad",
+        "Subsequence versus substring changes the mismatch branch from `max` to `0`, and moves where the answer lives",
+        "Rolling to two rows is free. Rolling to one row needs a saved diagonal, and that is where people break it"
+      ],
+      "trap": "'Reconstruct the actual subsequence, not just the length.' You need the full table and a backward walk. If you rolled to two rows you cannot, and you must say so."
+    },
+    {
+      "id": "dijkstra",
+      "lane": "graphs",
+      "title": "Dijkstra's Algorithm",
+      "patterns": ["Min-heap by distance", "Settle on pop", "Lazy stale-entry skip"],
+      "trigger": "Shortest path with non-negative weights. If weights are all equal, use BFS instead.",
+      "recall": "Write Dijkstra from memory including the stale-entry skip. Then answer: why is the first time you pop a node also the last time you need to look at it, and why does that argument collapse with a negative edge?",
+      "useWhen": [
+        "Single-source shortest path, weighted, non-negative",
+        "Network delay, minimum travel cost, cheapest route",
+        "Path of maximum probability, negate the log",
+        "Grid with per-cell entry cost",
+        "Minimax path, swim in rising water, by changing the relax rule"
+      ],
+      "template": [
+        "import heapq",
+        "from collections import defaultdict",
+        "",
+        "def dijkstra(graph, src, n):",
+        "    dist = {src: 0}",
+        "    pq = [(0, src)]",
+        "    while pq:",
+        "        d, u = heapq.heappop(pq)",
+        "        if d > dist.get(u, float('inf')):",
+        "            continue                      # stale entry, already settled better",
+        "        for v, w in graph[u]:",
+        "            nd = d + w",
+        "            if nd < dist.get(v, float('inf')):",
+        "                dist[v] = nd",
+        "                heapq.heappush(pq, (nd, v))",
+        "    return dist",
+        "",
+        "# Minimax variant: replace nd = d + w with nd = max(d, w)",
+        "# and the same skeleton solves 'minimise the largest edge on the path'"
+      ],
+      "complexity": { "time": "O(E log V)", "space": "O(V + E)" },
+      "problem": { "lc": 743, "name": "Network Delay Time", "slug": "network-delay-time", "diff": "medium" },
+      "keyInsights": [
+        "The stale skip replaces decrease-key. Without it you re-expand nodes and the complexity argument falls apart",
+        "First pop is final because every edge is non-negative, so no later path can be shorter. That sentence is the proof",
+        "Swap `+` for `max` and you get bottleneck paths. Same heap, same skeleton, different relax"
+      ],
+      "trap": "'One edge has weight -1.' Dijkstra silently returns a wrong answer rather than failing. Bellman-Ford is the fix, and recognising the failure is the test."
+    }
+  ]
+}

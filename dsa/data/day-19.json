@@ -1,0 +1,225 @@
+{
+  "day": 19,
+  "title": "Partition and Bend",
+  "kind": "core",
+  "focus": "Selection without full sorting, the hardest monotonic stack, and the DP that thinks backwards.",
+  "cards": [
+    {
+      "id": "quickselect",
+      "lane": "arrays",
+      "title": "Quickselect",
+      "patterns": ["Partition, then recurse on one side", "Random pivot", "Average linear"],
+      "trigger": "Kth largest or smallest, and you are allowed to mutate the array.",
+      "recall": "Write it from memory. Then answer the two complexity questions: why is the average O(n), why is the worst case O(n^2), and what makes the difference?",
+      "useWhen": [
+        "Kth largest or smallest element",
+        "Top k elements when you do not need them in order",
+        "Median of an unsorted array",
+        "Wiggle sort II, after finding the median",
+        "Any selection where a full sort is more than the question asks for"
+      ],
+      "template": [
+        "import random",
+        "",
+        "def kth_largest(nums, k):",
+        "    target = len(nums) - k          # index it would occupy when sorted ascending",
+        "    lo, hi = 0, len(nums) - 1",
+        "    while True:",
+        "        p = partition(nums, lo, hi)",
+        "        if   p == target: return nums[p]",
+        "        elif p < target:  lo = p + 1     # recurse RIGHT only",
+        "        else:             hi = p - 1     # recurse LEFT only",
+        "",
+        "def partition(a, lo, hi):",
+        "    r = random.randint(lo, hi)          # random pivot defeats sorted input",
+        "    a[r], a[hi] = a[hi], a[r]",
+        "    pivot, store = a[hi], lo",
+        "    for i in range(lo, hi):",
+        "        if a[i] < pivot:",
+        "            a[store], a[i] = a[i], a[store]",
+        "            store += 1",
+        "    a[store], a[hi] = a[hi], a[store]",
+        "    return store"
+      ],
+      "complexity": { "time": "O(n) average, O(n^2) worst", "space": "O(1) iterative" },
+      "problem": { "lc": 215, "name": "Kth Largest Element in an Array", "slug": "kth-largest-element-in-an-array", "diff": "medium" },
+      "keyInsights": [
+        "Only one side is recursed into, so the work is n + n/2 + n/4 and that sums to 2n. That is the linear argument",
+        "Without a random pivot, an already-sorted array gives you every partition of size one and quadratic time",
+        "It mutates the input and gives no ordering among the top k. If either matters, use a heap"
+      ],
+      "trap": "'Guarantee O(n) worst case.' That is median-of-medians. Name it, say it is linear but with a bad constant, and that randomised quickselect is what you would actually ship."
+    },
+    {
+      "id": "largest-rectangle",
+      "lane": "structures",
+      "title": "Largest Rectangle in Histogram",
+      "patterns": ["Increasing stack of indices", "Width from the new left neighbour", "Sentinel to flush"],
+      "trigger": "Maximal area or span bounded by a smaller element on each side.",
+      "recall": "Write it from memory. Then answer the line that carries everything: when you pop index `top`, what is the width of its rectangle, and why is `stack[-1]` the correct left bound after the pop?",
+      "useWhen": [
+        "Largest rectangle in a histogram",
+        "Maximal rectangle in a binary matrix, row by row",
+        "Sum of subarray minimums, or maximums",
+        "Trapping rain water, the stack formulation",
+        "Any 'extend until a smaller element blocks you' question"
+      ],
+      "template": [
+        "def largest_rectangle(heights):",
+        "    heights.append(0)                    # sentinel flushes the stack at the end",
+        "    stack, best = [], 0                  # stack holds indices, heights increasing",
+        "    for i, h in enumerate(heights):",
+        "        while stack and heights[stack[-1]] > h:",
+        "            top = stack.pop()",
+        "            left = stack[-1] if stack else -1   # nearest smaller to the LEFT",
+        "            width = i - left - 1               # i is nearest smaller to the RIGHT",
+        "            best = max(best, heights[top] * width)",
+        "        stack.append(i)",
+        "    heights.pop()",
+        "    return best",
+        "",
+        "# Maximal rectangle in a 0/1 matrix: build a running histogram per row,",
+        "# reset a column to 0 when the cell is 0, and call the above on each row."
+      ],
+      "complexity": { "time": "O(n)", "space": "O(n)" },
+      "problem": { "lc": 84, "name": "Largest Rectangle in Histogram", "slug": "largest-rectangle-in-histogram", "diff": "hard" },
+      "keyInsights": [
+        "After popping, `stack[-1]` is the nearest strictly smaller bar to the left, because everything between was already popped",
+        "The current index i is the nearest smaller bar to the right, which is exactly why the pop happens now",
+        "Maximal rectangle is this function called n times on a running histogram. Seeing that reduces a hard problem to a known one"
+      ],
+      "trap": "'Equal heights.' With `>` you pop later and still get the right maximum, because the taller-equal bar's own pop covers the full width. Be ready to argue that, it looks like a bug."
+    },
+    {
+      "id": "tree-as-graph",
+      "lane": "trees",
+      "title": "Tree as an Undirected Graph",
+      "patterns": ["Build parent pointers", "BFS outward from a node", "Track visited to avoid going back"],
+      "trigger": "Distance or reachability in a tree measured from an arbitrary node, not from the root.",
+      "recall": "Write all-nodes-distance-k from memory. Then answer: why does the tree need converting to an undirected graph at all, and what is the one extra thing BFS needs that it did not need on the rooted tree?",
+      "useWhen": [
+        "All nodes at distance k from a target",
+        "Amount of time for a whole binary tree to be infected",
+        "Closest leaf to a given node",
+        "Tree diameter via two BFS runs",
+        "Any tree question where the origin is not the root"
+      ],
+      "template": [
+        "from collections import deque, defaultdict",
+        "",
+        "def distance_k(root, target, k):",
+        "    parent = {}",
+        "    def link(node, par):",
+        "        if not node: return",
+        "        parent[node] = par",
+        "        link(node.left, node); link(node.right, node)",
+        "    link(root, None)",
+        "",
+        "    seen = {target}",
+        "    q = deque([target])",
+        "    dist = 0",
+        "    while q:",
+        "        if dist == k:",
+        "            return [n.val for n in q]",
+        "        for _ in range(len(q)):",
+        "            n = q.popleft()",
+        "            for nxt in (n.left, n.right, parent[n]):   # THREE neighbours now",
+        "                if nxt and nxt not in seen:",
+        "                    seen.add(nxt); q.append(nxt)",
+        "        dist += 1",
+        "    return []"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(n)" },
+      "problem": { "lc": 863, "name": "All Nodes Distance K in Binary Tree", "slug": "all-nodes-distance-k-in-binary-tree", "diff": "medium" },
+      "keyInsights": [
+        "A rooted tree only points downwards. Distance is symmetric, so you need the upward edge too",
+        "Once parents exist, every node has up to three neighbours and it is an ordinary undirected graph BFS",
+        "A visited set becomes mandatory. On a rooted traversal you never revisit; here you would bounce straight back to the parent"
+      ],
+      "trap": "'Do it without a parent map.' You can, with an annotated DFS that returns the distance to the target and handles the subtree split, and it is considerably harder to get right."
+    },
+    {
+      "id": "dp-burst-balloons",
+      "lane": "dp",
+      "title": "Last-Move Interval DP",
+      "patterns": ["Loop over the LAST action", "Padded boundaries", "Independent left and right"],
+      "trigger": "Actions interfere with each other, and choosing what happens first does not decompose.",
+      "recall": "Before revealing: the naive framing loops over which balloon to burst FIRST, and it does not work. Say why, and say what changes when you loop over which balloon bursts LAST.",
+      "useWhen": [
+        "Burst balloons",
+        "Matrix chain multiplication",
+        "Minimum cost to merge stones or cut a stick",
+        "Remove boxes and similar interference problems",
+        "Any interval DP where neighbours change as you act"
+      ],
+      "template": [
+        "# dp[i][j] = max coins from bursting everything strictly inside (i, j)",
+        "# Loop over k = the LAST balloon burst in that open interval.",
+        "# When k is last, i and j are still standing, so left and right are independent.",
+        "",
+        "def max_coins(nums):",
+        "    a = [1] + nums + [1]                # padded boundaries",
+        "    n = len(a)",
+        "    dp = [[0] * n for _ in range(n)]",
+        "",
+        "    for length in range(2, n):          # window width in the padded array",
+        "        for i in range(n - length):",
+        "            j = i + length",
+        "            for k in range(i + 1, j):   # k bursts LAST",
+        "                dp[i][j] = max(dp[i][j],",
+        "                               dp[i][k] + a[i] * a[k] * a[j] + dp[k][j])",
+        "    return dp[0][n - 1]"
+      ],
+      "complexity": { "time": "O(n^3)", "space": "O(n^2)" },
+      "problem": { "lc": 312, "name": "Burst Balloons", "slug": "burst-balloons", "diff": "hard" },
+      "keyInsights": [
+        "First-move framing fails because bursting changes who the neighbours are, so the two sides are not independent subproblems",
+        "Last-move framing keeps i and j alive throughout, which is exactly what restores independence",
+        "The padding with 1s removes every boundary special case, the same trick as the zero row in two-string DP"
+      ],
+      "trap": "'Why n^3?' n^2 intervals times n choices of last move. If you say n^2 you have not understood your own loops."
+    },
+    {
+      "id": "clone-graph",
+      "lane": "graphs",
+      "title": "Clone with a Map",
+      "patterns": ["Old node to new node map", "Create before recursing", "Handles cycles for free"],
+      "trigger": "Deep copy a structure that may contain cycles or shared references.",
+      "recall": "Write clone graph from memory. Then answer the ordering question: why must you put the new node into the map BEFORE recursing into its neighbours?",
+      "useWhen": [
+        "Clone an undirected graph",
+        "Copy a linked list with random pointers",
+        "Deep copy any object graph with cycles",
+        "Serialize and rebuild a DAG",
+        "Any structural copy where identity must be preserved"
+      ],
+      "template": [
+        "def clone_graph(node):",
+        "    if not node: return None",
+        "    made = {}                            # original node -> its copy",
+        "",
+        "    def copy(n):",
+        "        if n in made: return made[n]     # already cloned, cycle-safe",
+        "        clone = Node(n.val)",
+        "        made[n] = clone                  # register BEFORE recursing",
+        "        for nb in n.neighbors:",
+        "            clone.neighbors.append(copy(nb))",
+        "        return clone",
+        "",
+        "    return copy(node)",
+        "",
+        "# Random-pointer linked list, two passes, no recursion:",
+        "#   pass 1: create every copy and map old -> new",
+        "#   pass 2: new.next = made[old.next], new.random = made[old.random]"
+      ],
+      "complexity": { "time": "O(V + E)", "space": "O(V)" },
+      "problem": { "lc": 133, "name": "Clone Graph", "slug": "clone-graph", "diff": "medium" },
+      "keyInsights": [
+        "Registering before recursing is what stops a cycle from recursing forever. It is the whole correctness argument",
+        "The map does double duty: visited set and old-to-new translation table",
+        "The two-pass version for the random-pointer list avoids recursion entirely and is easier to defend on deep inputs"
+      ],
+      "trap": "'Do it with O(1) extra space for the random-pointer list.' Interleave copies into the original list, wire the random pointers, then unweave. Know that trick exists."
+    }
+  ]
+}

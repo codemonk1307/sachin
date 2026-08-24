@@ -1,0 +1,230 @@
+{
+  "day": 27,
+  "title": "Divide, Parse, Enclose",
+  "kind": "core",
+  "focus": "Last day of new material. Merge sort earning its keep, a parser you can defend, and the last flood fill.",
+  "cards": [
+    {
+      "id": "merge-sort-counting",
+      "lane": "arrays",
+      "title": "Merge Sort and Counting",
+      "patterns": ["Divide, solve, merge", "Count during the merge", "Stable by construction"],
+      "trigger": "Counting pairs across a whole array where a naive double loop is quadratic.",
+      "recall": "Write merge sort from memory, then add the counting line. Then answer: at the moment you take an element from the right half, what have you learned about the remaining left half?",
+      "useWhen": [
+        "Count inversions in an array",
+        "Reverse pairs, count of smaller numbers after self",
+        "Sort a linked list in O(n log n) with O(log n) space",
+        "Any pair-counting reducible to a merge step",
+        "Where you need a guaranteed n log n and stability"
+      ],
+      "template": [
+        "def sort_and_count(a):",
+        "    if len(a) <= 1: return a, 0",
+        "    mid = len(a) // 2",
+        "    left,  cl = sort_and_count(a[:mid])",
+        "    right, cr = sort_and_count(a[mid:])",
+        "",
+        "    merged, inv = [], cl + cr",
+        "    i = j = 0",
+        "    while i < len(left) and j < len(right):",
+        "        if left[i] <= right[j]:",
+        "            merged.append(left[i]); i += 1",
+        "        else:",
+        "            # left[i..] are ALL greater than right[j], so they all invert with it",
+        "            inv += len(left) - i",
+        "            merged.append(right[j]); j += 1",
+        "    merged += left[i:]",
+        "    merged += right[j:]",
+        "    return merged, inv",
+        "",
+        "# Linked list merge sort: split with fast/slow, sort halves, merge with a dummy."
+      ],
+      "complexity": { "time": "O(n log n)", "space": "O(n)" },
+      "problem": { "lc": 493, "name": "Reverse Pairs", "slug": "reverse-pairs", "diff": "hard" },
+      "keyInsights": [
+        "Both halves are already sorted at merge time, so one comparison settles a whole block of pairs at once",
+        "`<=` rather than `<` is what makes the sort stable, and stability matters when elements carry payloads",
+        "Reverse pairs needs a separate counting pass before the merge, because the condition is not the merge comparison"
+      ],
+      "trap": "'Why not a Fenwick tree?' You can, after coordinate compression, and it is the same complexity. Being able to give both, and say which you would ship, is the strong answer."
+    },
+    {
+      "id": "calculator-stack",
+      "lane": "structures",
+      "title": "Expression Parsing",
+      "patterns": ["Sign carried through parentheses", "Push result and sign on open", "Operator precedence with a stack"],
+      "trigger": "Evaluate an expression string with parentheses or precedence, without using eval.",
+      "recall": "Write the plus-minus-parentheses calculator from memory. Then answer the key modelling choice: what two values do you push onto the stack when you hit an open parenthesis?",
+      "useWhen": [
+        "Basic calculator, with and without multiplication",
+        "Evaluate reverse Polish notation",
+        "Decode string, simplify path, the same stack family",
+        "Any grammar shallow enough to parse without a real parser",
+        "Nested boolean or arithmetic evaluation"
+      ],
+      "template": [
+        "# Plus, minus, parentheses. Sign is carried, not stored as an operator.",
+        "def calculate(s):",
+        "    stack = []",
+        "    total, num, sign = 0, 0, 1",
+        "    for ch in s:",
+        "        if ch.isdigit():",
+        "            num = num * 10 + int(ch)",
+        "        elif ch in '+-':",
+        "            total += sign * num",
+        "            num, sign = 0, (1 if ch == '+' else -1)",
+        "        elif ch == '(':",
+        "            stack.append(total); stack.append(sign)   # park the outer context",
+        "            total, sign = 0, 1                        # fresh inner context",
+        "        elif ch == ')':",
+        "            total += sign * num; num = 0",
+        "            total *= stack.pop()                      # the sign before the '('",
+        "            total += stack.pop()                      # the total before the '('",
+        "    return total + sign * num",
+        "",
+        "# With * and /: keep a running stack of TERMS, and fold * and / immediately,",
+        "# then sum the stack at the end. Precedence handled by when you fold."
+      ],
+      "complexity": { "time": "O(n)", "space": "O(depth)" },
+      "problem": { "lc": 224, "name": "Basic Calculator", "slug": "basic-calculator", "diff": "hard" },
+      "keyInsights": [
+        "Pushing the total and the sign is exactly the same frame idea as decode string. One family, two dressings",
+        "Handling the trailing number after the loop is mandatory, because there is no operator to trigger the final flush",
+        "Precedence is decided by when you fold, not by a precedence table. Multiplication folds immediately, addition folds at the end"
+      ],
+      "trap": "'Add unary minus and spaces.' Spaces are a skip, unary minus needs the sign initialised per context. Both are small, and both break a solution that assumed clean input."
+    },
+    {
+      "id": "tree-prefix-paths",
+      "lane": "trees",
+      "title": "Prefix Sums on a Tree",
+      "patterns": ["Running sum down the path", "Counter map keyed by prefix", "Undo the map entry on the way out"],
+      "trigger": "Count downward paths with a given sum, where paths need not start at the root.",
+      "recall": "Write path sum III in O(n) from memory. Then answer: this is exactly the Day 4 array trick. What is the one extra line the tree version needs, and what breaks without it?",
+      "useWhen": [
+        "Path sum III, count paths with a target sum",
+        "Longest path with a divisible or bounded sum",
+        "Count paths with a given XOR value",
+        "Any array prefix technique lifted onto a tree",
+        "Where the naive per-node restart would be O(n^2)"
+      ],
+      "template": [
+        "from collections import defaultdict",
+        "",
+        "def path_sum(root, target):",
+        "    prefix = defaultdict(int)",
+        "    prefix[0] = 1                 # the empty prefix, same seed as the array version",
+        "    total = 0",
+        "",
+        "    def go(node, running):",
+        "        nonlocal total",
+        "        if not node: return",
+        "        running += node.val",
+        "        total += prefix[running - target]    # count first",
+        "        prefix[running] += 1                 # then record",
+        "",
+        "        go(node.left,  running)",
+        "        go(node.right, running)",
+        "",
+        "        prefix[running] -= 1                 # UNDO: leaving this path",
+        "",
+        "    go(root, 0)",
+        "    return total"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(h)" },
+      "problem": { "lc": 437, "name": "Path Sum III", "slug": "path-sum-iii", "diff": "medium" },
+      "keyInsights": [
+        "The undo is the only difference from the array version. Without it, a right subtree counts prefixes that exist only in the left subtree",
+        "`prefix[0] = 1` handles paths that begin at the root, exactly as in the array case",
+        "The naive version, restarting a DFS at every node, is O(n^2) or O(n log n) on a balanced tree. This is linear"
+      ],
+      "trap": "'The path can go up and back down.' Prefix sums along a root path do not cover that. It becomes a record-versus-return problem instead. Confirm the direction before coding."
+    },
+    {
+      "id": "dp-triangle",
+      "lane": "dp",
+      "title": "Bottom-Up Accumulation",
+      "patterns": ["Fill from the last row upward", "In-place, one row of state", "Neighbours are c and c+1"],
+      "trigger": "A layered structure where each cell chooses among a small set of successors in the next layer.",
+      "recall": "Write the triangle solution bottom-up from memory. Then answer: why is bottom-up cleaner than top-down here, in terms of how many boundary cases each has?",
+      "useWhen": [
+        "Triangle minimum path total",
+        "Minimum falling path sum",
+        "Any layered DAG shortest path with local moves",
+        "Dungeon game and other suffix-constrained grids",
+        "Where the goal is a single cell but the start is a whole row, or vice versa"
+      ],
+      "template": [
+        "# dp[c] = best total from row r, column c, down to the bottom",
+        "def minimum_total(triangle):",
+        "    dp = triangle[-1][:]                    # start with the bottom row",
+        "    for r in range(len(triangle) - 2, -1, -1):",
+        "        for c in range(r + 1):",
+        "            dp[c] = triangle[r][c] + min(dp[c], dp[c + 1])",
+        "    return dp[0]",
+        "",
+        "# Top-down needs boundary handling at c == 0 and c == r on every row.",
+        "# Bottom-up needs none, because dp[c] and dp[c+1] always exist.",
+        "",
+        "# Minimum falling path sum: same shape, but three neighbours,",
+        "# and the ends need a guard because the grid is rectangular.",
+        "dp[c] = grid[r][c] + min(dp[max(c-1, 0) : min(c+2, n)])"
+      ],
+      "complexity": { "time": "O(n^2)", "space": "O(n)" },
+      "problem": { "lc": 120, "name": "Triangle", "slug": "triangle", "diff": "medium" },
+      "keyInsights": [
+        "Bottom-up has zero boundary cases here, because row r has r+1 cells and row r+1 has r+2. That asymmetry is the whole reason to go upward",
+        "One array of state is enough, since each row reads only the row below",
+        "Choosing the direction of a DP is a design decision, not a preference. Pick whichever removes the special cases"
+      ],
+      "trap": "'Do it in O(1) extra space.' You can mutate the triangle in place. Say that it destroys the input, which is a real cost if the caller reuses it."
+    },
+    {
+      "id": "surrounded-regions",
+      "lane": "graphs",
+      "title": "Border-Anchored Flood Fill",
+      "patterns": ["Mark what touches the border", "Flip the unmarked", "Restore the marks"],
+      "trigger": "Everything not connected to the outside gets transformed.",
+      "recall": "Write surrounded regions from memory. Then answer the strategic question: why is it far simpler to find what SURVIVES than to find what is enclosed?",
+      "useWhen": [
+        "Surrounded regions, number of enclaves, closed islands",
+        "Count regions not touching the boundary",
+        "Escape-the-grid reachability",
+        "Any 'enclosed by' or 'cannot reach the outside' question",
+        "Where checking each region for enclosure separately would be quadratic"
+      ],
+      "template": [
+        "def solve(board):",
+        "    if not board: return",
+        "    rows, cols = len(board), len(board[0])",
+        "",
+        "    def mark_safe(r, c):",
+        "        if r < 0 or r >= rows or c < 0 or c >= cols or board[r][c] != 'O':",
+        "            return",
+        "        board[r][c] = 'S'                        # temporary marker",
+        "        mark_safe(r+1, c); mark_safe(r-1, c)",
+        "        mark_safe(r, c+1); mark_safe(r, c-1)",
+        "",
+        "    # 1. anything reachable from the border survives",
+        "    for r in range(rows):",
+        "        mark_safe(r, 0); mark_safe(r, cols - 1)",
+        "    for c in range(cols):",
+        "        mark_safe(0, c); mark_safe(rows - 1, c)",
+        "",
+        "    # 2. everything else was enclosed; restore the survivors",
+        "    for r in range(rows):",
+        "        for c in range(cols):",
+        "            board[r][c] = 'O' if board[r][c] == 'S' else 'X'"
+      ],
+      "complexity": { "time": "O(rows * cols)", "space": "O(rows * cols) recursion" },
+      "problem": { "lc": 130, "name": "Surrounded Regions", "slug": "surrounded-regions", "diff": "medium" },
+      "keyInsights": [
+        "Enclosure is a global property and hard to test locally. Border-reachability is local and easy, so invert the question",
+        "The temporary marker must be a third symbol. Reusing 'X' loses the information you are about to need",
+        "On a large grid the recursion depth is the whole grid. Convert to an explicit stack and say why"
+      ],
+      "trap": "'Closed island, where zeros are land.' Same technique, inverted values, and now the border cells you flood are land rather than water. Read which symbol is which."
+    }
+  ]
+}

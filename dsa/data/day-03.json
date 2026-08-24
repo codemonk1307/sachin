@@ -1,0 +1,229 @@
+{
+  "day": 3,
+  "title": "Halving and Ordering",
+  "kind": "core",
+  "focus": "Three ways to avoid looking at everything: discard half, keep only the best k, share the prefix.",
+  "cards": [
+    {
+      "id": "binary-search",
+      "lane": "arrays",
+      "title": "Binary Search",
+      "patterns": ["Exact match", "Leftmost / rightmost boundary", "Half-open invariant"],
+      "trigger": "A sorted array, or any monotonic predicate that flips from false to true exactly once.",
+      "recall": "Write the leftmost-boundary version from memory. Then say the loop invariant out loud: what is true about everything left of `lo` and everything right of `hi` at every iteration?",
+      "useWhen": [
+        "Find a value, or the insertion point, in sorted data",
+        "First or last index satisfying a condition",
+        "Search a rotated or 2D sorted array",
+        "Peak finding on a bitonic sequence",
+        "Anything where you can test 'is k feasible' in O(n)"
+      ],
+      "template": [
+        "# Exact match",
+        "def search(nums, target):",
+        "    lo, hi = 0, len(nums) - 1",
+        "    while lo <= hi:",
+        "        mid = lo + (hi - lo) // 2      # overflow-safe habit",
+        "        if nums[mid] == target: return mid",
+        "        elif nums[mid] < target: lo = mid + 1",
+        "        else: hi = mid - 1",
+        "    return -1",
+        "",
+        "# Leftmost index where pred(i) is True. Memorise THIS one.",
+        "def lower_bound(nums, target):",
+        "    lo, hi = 0, len(nums)             # note: hi = n, half-open",
+        "    while lo < hi:",
+        "        mid = (lo + hi) // 2",
+        "        if nums[mid] < target: lo = mid + 1",
+        "        else: hi = mid              # mid stays a candidate",
+        "    return lo                        # in [0, n], may be n"
+      ],
+      "complexity": { "time": "O(log n)", "space": "O(1)" },
+      "problem": { "lc": 704, "name": "Binary Search", "slug": "binary-search", "diff": "easy" },
+      "keyInsights": [
+        "Learn one boundary template cold. Exact match is a special case of it, never the reverse",
+        "`lo < hi` with `hi = mid` terminates. `lo <= hi` with `hi = mid` loops forever. That is the classic infinite loop",
+        "The answer of `lower_bound` can be n, meaning 'not present, insert at the end'. Check the bound before indexing"
+      ],
+      "trap": "'Now find the last index that is less than target.' If you memorised only the exact-match form you will fumble this. The boundary form is a one-character change."
+    },
+    {
+      "id": "heap",
+      "lane": "structures",
+      "title": "Heap / Priority Queue",
+      "patterns": ["Top k with a size-k heap", "Repeated extract-min", "Lazy deletion"],
+      "trigger": "You need the smallest or largest repeatedly, but you do not need the whole thing sorted.",
+      "recall": "Write the k-closest-points solution from memory. Then answer: to keep the k *smallest*, do you use a min-heap or a max-heap, and why is the intuitive answer wrong?",
+      "useWhen": [
+        "Top k or kth largest, streaming or static",
+        "Merge k sorted sequences",
+        "Dijkstra and any greedy that always takes the current best",
+        "Scheduling by deadline, cost or frequency",
+        "Running median with two heaps"
+      ],
+      "template": [
+        "import heapq",
+        "heapq.heappush(h, x)          # O(log n)",
+        "heapq.heappop(h)              # smallest, O(log n)",
+        "h[0]                          # peek, O(1)",
+        "heapq.heapify(arr)            # O(n), in place",
+        "heapq.nlargest(k, arr)        # O(n log k)",
+        "",
+        "# k smallest: keep a MAX-heap of size k, evict the worst",
+        "h = []",
+        "for x in stream:",
+        "    heapq.heappush(h, -x)     # negate: Python only has min-heaps",
+        "    if len(h) > k:",
+        "        heapq.heappop(h)      # drops the largest so far",
+        "return [-v for v in h]",
+        "",
+        "# Tuples break ties left to right; add a counter if items are not comparable",
+        "heapq.heappush(h, (cost, counter, node))"
+      ],
+      "complexity": { "time": "O(n log k) for top k", "space": "O(k)" },
+      "problem": { "lc": 973, "name": "K Closest Points to Origin", "slug": "k-closest-points-to-origin", "diff": "medium" },
+      "keyInsights": [
+        "To keep the k smallest you need a max-heap, because you must be able to evict the current worst. This inverts every time",
+        "Python has no max-heap. Negate the key, and remember to un-negate on the way out",
+        "`heapify` is O(n) but pushing n items one at a time is O(n log n). Build in bulk when you can"
+      ],
+      "trap": "'Do it in O(n) average.' That is Quickselect, not a heap. Know when they are fishing for the partition-based answer."
+    },
+    {
+      "id": "trie",
+      "lane": "trees",
+      "title": "Trie (Prefix Tree)",
+      "patterns": ["Character-indexed children", "End-of-word flag", "Shared prefix walk"],
+      "trigger": "Many strings, and the query is about prefixes rather than whole-string equality.",
+      "recall": "Write insert and search from memory. Then answer why `is_word` has to exist at all, given that the node already exists after inserting 'apple'.",
+      "useWhen": [
+        "Autocomplete and prefix counting",
+        "Word search on a board with a large dictionary",
+        "Longest common prefix across many strings",
+        "Replace words with their shortest root",
+        "Bitwise problems, a binary trie over 32 bits for max XOR"
+      ],
+      "template": [
+        "class Node:",
+        "    __slots__ = ('kids', 'is_word')",
+        "    def __init__(self):",
+        "        self.kids = {}          # char -> Node",
+        "        self.is_word = False",
+        "",
+        "class Trie:",
+        "    def __init__(self): self.root = Node()",
+        "",
+        "    def insert(self, word):",
+        "        node = self.root",
+        "        for ch in word:",
+        "            node = node.kids.setdefault(ch, Node())",
+        "        node.is_word = True",
+        "",
+        "    def _walk(self, s):",
+        "        node = self.root",
+        "        for ch in s:",
+        "            if ch not in node.kids: return None",
+        "            node = node.kids[ch]",
+        "        return node",
+        "",
+        "    def search(self, w):        return (n := self._walk(w)) is not None and n.is_word",
+        "    def starts_with(self, p):   return self._walk(p) is not None"
+      ],
+      "complexity": { "time": "O(L) per op, L = word length", "space": "O(total characters)" },
+      "problem": { "lc": 208, "name": "Implement Trie (Prefix Tree)", "slug": "implement-trie-prefix-tree", "diff": "medium" },
+      "keyInsights": [
+        "`is_word` distinguishes 'app' inserted from 'app' merely being a prefix of 'apple'. Without it search is wrong",
+        "Lookup is O(L) independent of how many words are stored. That is the entire selling point over a hash set",
+        "For board search, walk the trie and the grid together so a dead prefix prunes the whole subtree at once"
+      ],
+      "trap": "'Support a `.` wildcard matching any character.' Search becomes DFS over all children at that position. Say the branching cost, O(26^dots)."
+    },
+    {
+      "id": "dp-house-robber",
+      "lane": "dp",
+      "title": "Take or Skip DP",
+      "patterns": ["dp[i] = max(skip, take)", "Two rolling variables", "Circular variant runs twice"],
+      "trigger": "A sequence of choices where taking one item forbids a neighbouring item.",
+      "recall": "State what `dp[i]` means, then write the two-variable form. Then answer: for the circular version, why does running the linear solver twice work, and what are the two ranges?",
+      "useWhen": [
+        "Non-adjacent maximum sum",
+        "Scheduling where adjacent slots conflict",
+        "Delete-and-earn style problems after a frequency transform",
+        "Any binary decision per index with a local constraint",
+        "Tree version, rob or skip each node"
+      ],
+      "template": [
+        "# dp[i] = best total considering the first i houses",
+        "def rob(nums):",
+        "    take, skip = 0, 0        # take = best if we rob house i, skip = best if we do not",
+        "    for x in nums:",
+        "        take, skip = skip + x, max(skip, take)",
+        "    return max(take, skip)",
+        "",
+        "# Circular: house 0 and house n-1 are adjacent, so one of them is out",
+        "def rob_circle(nums):",
+        "    if len(nums) == 1: return nums[0]",
+        "    return max(rob(nums[:-1]), rob(nums[1:]))",
+        "",
+        "# Tree version: return a PAIR from every node",
+        "def dfs(node):",
+        "    if not node: return (0, 0)          # (rob_this, skip_this)",
+        "    l, r = dfs(node.left), dfs(node.right)",
+        "    return (node.val + l[1] + r[1], max(l) + max(r))"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 198, "name": "House Robber", "slug": "house-robber", "diff": "medium" },
+      "keyInsights": [
+        "Two states per index, not one. Carrying 'best if I took it' separately is what makes the constraint expressible",
+        "The circular trick works because at least one of the two endpoints must be excluded, so the two runs cover every case",
+        "The tree version returns a tuple. Any time a constraint couples a node to its parent, return a pair"
+      ],
+      "trap": "'Delete and earn: taking value v deletes all v-1 and v+1.' Count frequencies into an array indexed by value, then this is literally house robber. Spotting the transform is the test."
+    },
+    {
+      "id": "union-find",
+      "lane": "graphs",
+      "title": "Union Find (DSU)",
+      "patterns": ["Path compression", "Union by rank", "Component counting"],
+      "trigger": "Connectivity questions with no path needed, especially when edges arrive over time.",
+      "recall": "Write find and union with both optimisations from memory. Then answer: what is the actual complexity with both, and what does it degrade to with neither?",
+      "useWhen": [
+        "Count connected components as edges are added",
+        "Detect a cycle in an undirected graph",
+        "Kruskal's minimum spanning tree",
+        "Account or email merging, equations for equality",
+        "Anything phrased as 'are these two in the same group'"
+      ],
+      "template": [
+        "class DSU:",
+        "    def __init__(self, n):",
+        "        self.p = list(range(n))",
+        "        self.r = [0] * n",
+        "        self.count = n                    # live component count",
+        "",
+        "    def find(self, x):",
+        "        while self.p[x] != x:",
+        "            self.p[x] = self.p[self.p[x]]  # path halving",
+        "            x = self.p[x]",
+        "        return x",
+        "",
+        "    def union(self, a, b):",
+        "        ra, rb = self.find(a), self.find(b)",
+        "        if ra == rb: return False         # already joined -> a cycle",
+        "        if self.r[ra] < self.r[rb]: ra, rb = rb, ra",
+        "        self.p[rb] = ra",
+        "        if self.r[ra] == self.r[rb]: self.r[ra] += 1",
+        "        self.count -= 1",
+        "        return True"
+      ],
+      "complexity": { "time": "O(alpha(n)) per op, effectively O(1)", "space": "O(n)" },
+      "problem": { "lc": 547, "name": "Number of Provinces", "slug": "number-of-provinces", "diff": "medium" },
+      "keyInsights": [
+        "`union` returning False is your cycle detector, and Kruskal's edge filter, for free",
+        "Track `count` inside the structure so component counting is O(1) instead of a final sweep",
+        "With only one optimisation you are at O(log n). With neither you are at O(n) and it is a linked list"
+      ],
+      "trap": "'Now support undo.' Path compression makes rollback impossible. You need union by rank only, plus a change log. Knowing why compression is the blocker is the answer."
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "day": 14,
+  "title": "Retrieval: Week Two",
+  "kind": "retrieval",
+  "focus": "Half the month gone. Blank page again, then the thirty problems from Days 8 to 13 under a clock.",
+  "cards": [
+    {
+      "id": "r2-arrays",
+      "lane": "arrays",
+      "kind": "drill",
+      "title": "Arrays and Strings: blind recall",
+      "trigger": "Window or prefix. Sorted or not. Mutable or read-only. Three questions that pick the tool.",
+      "recall": "Paper first. Write: the longest-window skeleton, the shortest-window skeleton, Floyd on array indices, the three-region partition, expand-around-centre, and the fixed-window missing counter. Six openings, no notes.",
+      "drill": [
+        { "lc": 3, "name": "Longest Substring Without Repeating Characters", "slug": "longest-substring-without-repeating-characters", "diff": "medium", "cue": "shrink while invalid" },
+        { "lc": 287, "name": "Find the Duplicate Number", "slug": "find-the-duplicate-number", "diff": "medium", "cue": "index as pointer" },
+        { "lc": 75, "name": "Sort Colors", "slug": "sort-colors", "diff": "medium", "cue": "do not advance mid" },
+        { "lc": 136, "name": "Single Number", "slug": "single-number", "diff": "easy", "cue": "xor cancels" },
+        { "lc": 5, "name": "Longest Palindromic Substring", "slug": "longest-palindromic-substring", "diff": "medium", "cue": "2n-1 centres" },
+        { "lc": 438, "name": "Find All Anagrams in a String", "slug": "find-all-anagrams-in-a-string", "diff": "medium", "cue": "missing counter" }
+      ],
+      "template": [
+        "# Longest  -> while INVALID: shrink",
+        "# Shortest -> while VALID:   record, then shrink",
+        "# Fixed k  -> add right, conditionally remove index i-k. No while at all.",
+        "#",
+        "# Negatives in the array? Sliding window is dead. Prefix sum + map.",
+        "# Values in 1..n? Index-as-pointer or cyclic sort, O(1) space.",
+        "# Symmetry question? Expand around 2n-1 centres."
+      ],
+      "keyInsights": [
+        "The longest-versus-shortest shrink condition is the highest-frequency bug in this entire lane",
+        "The moment you see 'values are in the range 1 to n', constant space is being asked for",
+        "Bit tricks are not clever, they are the expected answer when the prompt says O(1) space and pairs"
+      ],
+      "trap": "Under a clock people reach for a hash set on 'find the duplicate' and eat O(n) space when the prompt forbade it. Read the constraint line first, every time."
+    },
+    {
+      "id": "r2-structures",
+      "lane": "structures",
+      "kind": "drill",
+      "title": "Structures and Design: blind recall",
+      "trigger": "This lane is where design questions live. LRU is the single most likely thing you will be asked to build.",
+      "recall": "Build LRU from an empty file, no notes, under twelve minutes. Then reverse a linked list, merge k lists with the heap tie-break, write the decode-string stack, and both heaps of the median finder.",
+      "drill": [
+        { "lc": 206, "name": "Reverse Linked List", "slug": "reverse-linked-list", "diff": "easy", "cue": "save nxt first" },
+        { "lc": 146, "name": "LRU Cache", "slug": "lru-cache", "diff": "medium", "cue": "node stores its key" },
+        { "lc": 155, "name": "Min Stack", "slug": "min-stack", "diff": "medium", "cue": "min-so-far per entry" },
+        { "lc": 23, "name": "Merge k Sorted Lists", "slug": "merge-k-sorted-lists", "diff": "hard", "cue": "counter breaks ties" },
+        { "lc": 394, "name": "Decode String", "slug": "decode-string", "diff": "medium", "cue": "push the outer frame" },
+        { "lc": 295, "name": "Find Median from Data Stream", "slug": "find-median-from-data-stream", "diff": "hard", "cue": "push then transfer" }
+      ],
+      "template": [
+        "# Design checklist, say it before you write the class:",
+        "#   1. what operations, and what complexity does each need",
+        "#   2. what structure gives O(1) lookup       -> hash map",
+        "#   3. what structure gives O(1) reordering   -> doubly linked list",
+        "#   4. what do the two share, and what does each store about the other",
+        "#   5. sentinels or dummy nodes to delete every None check",
+        "",
+        "dummy = ListNode(0, head)      # linked lists",
+        "self.head, self.tail = Node(), Node()   # LRU"
+      ],
+      "keyInsights": [
+        "LRU is hash map plus doubly linked list, and the node must carry its own key. If you can say that you can rebuild it",
+        "Every Python heap problem with objects needs a tie-break element in the tuple",
+        "Sentinels are not style. They remove branches, and branches are where you make mistakes under pressure"
+      ],
+      "trap": "Building LRU with a Python list and `remove()` gives you O(n) and looks fine on small tests. The interviewer is measuring exactly this."
+    },
+    {
+      "id": "r2-trees",
+      "lane": "trees",
+      "kind": "drill",
+      "title": "Trees: blind recall",
+      "trigger": "Levels means BFS. Structure means recursion. Order means inorder.",
+      "recall": "From memory: zigzag BFS, serialize with null markers plus the iterator rebuild, preorder-inorder construction, the max-path-sum record-versus-return, iterative inorder with early exit, and the right side view both ways.",
+      "drill": [
+        { "lc": 103, "name": "Binary Tree Zigzag Level Order", "slug": "binary-tree-zigzag-level-order-traversal", "diff": "medium", "cue": "appendleft" },
+        { "lc": 297, "name": "Serialize and Deserialize Binary Tree", "slug": "serialize-and-deserialize-binary-tree", "diff": "hard", "cue": "null markers" },
+        { "lc": 105, "name": "Construct from Preorder and Inorder", "slug": "construct-binary-tree-from-preorder-and-inorder-traversal", "diff": "medium", "cue": "left before right" },
+        { "lc": 124, "name": "Binary Tree Maximum Path Sum", "slug": "binary-tree-maximum-path-sum", "diff": "hard", "cue": "clamp to zero" },
+        { "lc": 230, "name": "Kth Smallest in a BST", "slug": "kth-smallest-element-in-a-bst", "diff": "medium", "cue": "O(h + k)" },
+        { "lc": 199, "name": "Binary Tree Right Side View", "slug": "binary-tree-right-side-view", "diff": "medium", "cue": "right-first DFS" }
+      ],
+      "template": [
+        "# The three shapes, again, because they are all of it:",
+        "#   push DOWN     preorder, parent gives context to child",
+        "#   pull UP       postorder, child returns an answer",
+        "#   pull UP + RECORD   answer bends at a node, parent gets only one arm",
+        "",
+        "# and the iterative inorder, which you should be able to type without thinking",
+        "while stack or node:",
+        "    while node: stack.append(node); node = node.left",
+        "    node = stack.pop(); visit(node); node = node.right"
+      ],
+      "keyInsights": [
+        "Max path sum and diameter are the same function with a different combine. Seeing that halves this lane",
+        "Serialisation with null markers is the only lossless single-traversal encoding. Know why",
+        "BFS space is O(width), DFS space is O(height). Which is worse depends entirely on the tree shape"
+      ],
+      "trap": "Initialising the max-path-sum global to 0 instead of negative infinity. It passes the sample and fails the all-negative test, every time."
+    },
+    {
+      "id": "r2-dp",
+      "lane": "dp",
+      "kind": "drill",
+      "title": "DP: blind recall",
+      "trigger": "State sentence, recurrence, base cases, loop order. In that order, out loud, before any code.",
+      "recall": "For all six, write the state sentence and the recurrence on paper before any code. Then code coin change both ways, combinations and permutations, and be sure you know which loop order gives which.",
+      "drill": [
+        { "lc": 322, "name": "Coin Change", "slug": "coin-change", "diff": "medium", "cue": "forwards = reuse" },
+        { "lc": 72, "name": "Edit Distance", "slug": "edit-distance", "diff": "medium", "cue": "min of three" },
+        { "lc": 647, "name": "Palindromic Substrings", "slug": "palindromic-substrings", "diff": "medium", "cue": "expand, O(1) space" },
+        { "lc": 139, "name": "Word Break", "slug": "word-break", "diff": "medium", "cue": "cap by max word length" },
+        { "lc": 91, "name": "Decode Ways", "slug": "decode-ways", "diff": "medium", "cue": "zero is the trap" },
+        { "lc": 494, "name": "Target Sum", "slug": "target-sum", "diff": "medium", "cue": "(total + target) / 2" }
+      ],
+      "template": [
+        "# The pair you must never mix up:",
+        "for c in range(cap, w - 1, -1):   # 0/1        each item at most once",
+        "for c in range(w, cap + 1):       # unbounded  unlimited copies",
+        "",
+        "# And the second pair:",
+        "for coin in coins:                # outer coin -> COMBINATIONS",
+        "    for a in range(coin, amt+1): dp[a] += dp[a-coin]",
+        "for a in range(1, amt+1):         # outer amount -> PERMUTATIONS",
+        "    for coin in coins: dp[a] += dp[a-coin]"
+      ],
+      "keyInsights": [
+        "Two loop-order facts carry most of the DP lane. Drill them until they are reflex, not reasoning",
+        "Target sum is knapsack after algebra. Spotting the transform is worth more than the DP itself",
+        "If a DP is not working, the state sentence is almost always the thing that is wrong"
+      ],
+      "trap": "Skipping the state sentence because the problem 'looks like' one you have done. The lookalike with a different state is how you lose forty minutes."
+    },
+    {
+      "id": "r2-graphs",
+      "lane": "graphs",
+      "kind": "drill",
+      "title": "Graphs: blind recall",
+      "trigger": "Edges as a resource means Euler. Vertices as a resource means something much harder.",
+      "recall": "From memory: Kahn with the cycle check, two-colour BFS over all components, Kruskal on top of your DSU, multi-source BFS seeding, Hierholzer with the reversal, and Tarjan's low-link.",
+      "drill": [
+        { "lc": 207, "name": "Course Schedule", "slug": "course-schedule", "diff": "medium", "cue": "count == n" },
+        { "lc": 785, "name": "Is Graph Bipartite?", "slug": "is-graph-bipartite", "diff": "medium", "cue": "loop all starts" },
+        { "lc": 1584, "name": "Min Cost to Connect All Points", "slug": "min-cost-to-connect-all-points", "diff": "medium", "cue": "Prim on dense" },
+        { "lc": 994, "name": "Rotting Oranges", "slug": "rotting-oranges", "diff": "medium", "cue": "seed every source" },
+        { "lc": 332, "name": "Reconstruct Itinerary", "slug": "reconstruct-itinerary", "diff": "hard", "cue": "append after, reverse" },
+        { "lc": 1192, "name": "Critical Connections", "slug": "critical-connections-in-a-network", "diff": "hard", "cue": "low[v] > disc[u]" }
+      ],
+      "template": [
+        "# Extended decision tree:",
+        "# unweighted shortest ........ BFS (multi-source if many starts)",
+        "# weights >= 0 ............... Dijkstra",
+        "# negative / hop-limited ..... Bellman-Ford",
+        "# all pairs, small V ......... Floyd-Warshall",
+        "# connectivity, streaming .... DSU",
+        "# ordering with dependencies . Kahn",
+        "# cheapest full connection ... Kruskal (sparse) / Prim (dense)",
+        "# every EDGE once ............ Hierholzer",
+        "# single points of failure ... Tarjan low-link"
+      ],
+      "keyInsights": [
+        "Nine algorithms, one decision tree. Reciting the tree is faster than pattern-matching from the problem text",
+        "Kruskal is DSU plus a sort. If DSU is solid you already know Kruskal",
+        "Every edge once is polynomial. Every vertex once is NP-complete. Never confuse the two on a whiteboard"
+      ],
+      "trap": "Tarjan's back-edge line using `low[v]` instead of `disc[v]`. It produces plausible output on small graphs and is wrong. Write it twice today."
+    }
+  ]
+}

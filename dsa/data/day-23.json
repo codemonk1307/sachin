@@ -1,0 +1,229 @@
+{
+  "day": 23,
+  "title": "Sets, Groups and Chunks",
+  "kind": "core",
+  "focus": "Linear where you expected n log n, list surgery in fixed-size blocks, and merging identities.",
+  "cards": [
+    {
+      "id": "longest-consecutive",
+      "lane": "arrays",
+      "title": "Longest Consecutive Sequence",
+      "patterns": ["Set membership", "Start only from a run's beginning", "Linear despite the inner loop"],
+      "trigger": "Consecutive runs in an unsorted array, and sorting is explicitly forbidden.",
+      "recall": "Write it from memory. Then answer the complexity question that decides whether you actually understand it: there is a while loop inside a for loop. Why is this O(n) and not O(n^2)?",
+      "useWhen": [
+        "Longest consecutive sequence in O(n)",
+        "Group numbers into consecutive ranges",
+        "Missing ranges, summary ranges",
+        "Any run-detection where sorting is banned or too slow",
+        "Union find alternative when the relation is 'differ by one'"
+      ],
+      "template": [
+        "def longest_consecutive(nums):",
+        "    s = set(nums)",
+        "    best = 0",
+        "    for x in s:",
+        "        if x - 1 in s:",
+        "            continue                 # not the start of a run, skip",
+        "        length = 1",
+        "        while x + length in s:       # walk the run once",
+        "            length += 1",
+        "        best = max(best, length)",
+        "    return best",
+        "",
+        "# The guard is everything. Without `if x - 1 in s: continue` this is O(n^2)",
+        "# because every element of a long run re-walks the whole run."
+      ],
+      "complexity": { "time": "O(n)", "space": "O(n)" },
+      "problem": { "lc": 128, "name": "Longest Consecutive Sequence", "slug": "longest-consecutive-sequence", "diff": "medium" },
+      "keyInsights": [
+        "Each run is walked exactly once, from its unique starting element. Total inner work is bounded by n, so the whole thing is linear",
+        "Iterating the set rather than the list avoids re-processing duplicates",
+        "This is the canonical 'inner loop that is still amortised linear' proof. Practise saying it in two sentences"
+      ],
+      "trap": "'Sort it, it is easier.' It is, and it is O(n log n), and the problem explicitly asks for linear. Offering the sort as a fallback is fine; leading with it is not."
+    },
+    {
+      "id": "reverse-k-group",
+      "lane": "structures",
+      "title": "Reverse Nodes in k-Group",
+      "patterns": ["Check length before reversing", "Reverse a bounded segment", "Reconnect with a dummy"],
+      "trigger": "Linked list surgery on fixed-size blocks, where a partial final block must be left alone.",
+      "recall": "Write it from memory. Then answer: the hard part is not the reversal, it is the reconnection. Which three pointers do you need to hold on to across each group?",
+      "useWhen": [
+        "Reverse nodes in k-group",
+        "Swap nodes in pairs, the k = 2 case",
+        "Rotate a list by k, or partition around a value",
+        "Reorder a list, odd-even linked list",
+        "Any block-wise list transformation"
+      ],
+      "template": [
+        "def reverse_k_group(head, k):",
+        "    dummy = ListNode(0, head)",
+        "    group_prev = dummy",
+        "",
+        "    while True:",
+        "        # 1. find the kth node from group_prev; stop if the group is short",
+        "        kth = group_prev",
+        "        for _ in range(k):",
+        "            kth = kth.next",
+        "            if not kth: return dummy.next",
+        "        group_next = kth.next",
+        "",
+        "        # 2. reverse the group, seeding prev with what comes AFTER it",
+        "        prev, cur = group_next, group_prev.next",
+        "        while cur is not group_next:",
+        "            nxt = cur.next",
+        "            cur.next = prev",
+        "            prev, cur = cur, nxt",
+        "",
+        "        # 3. reconnect: old head of the group is now its tail",
+        "        new_group_prev = group_prev.next",
+        "        group_prev.next = kth",
+        "        group_prev = new_group_prev"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 25, "name": "Reverse Nodes in k-Group", "slug": "reverse-nodes-in-k-group", "diff": "hard" },
+      "keyInsights": [
+        "Seeding `prev` with `group_next` instead of None is what wires the reversed block to the rest of the list automatically",
+        "The old first node of the group becomes the new `group_prev`, and you must capture it before you overwrite the link",
+        "Counting to k first is what leaves a short final group untouched. Reversing first and undoing is far messier"
+      ],
+      "trap": "'Do it recursively.' It is shorter to write and O(n/k) stack space. Say the space cost rather than presenting recursion as strictly better."
+    },
+    {
+      "id": "bst-lca",
+      "lane": "trees",
+      "title": "BST Lowest Common Ancestor",
+      "patterns": ["Walk down until values straddle", "No recursion needed", "O(h) not O(n)"],
+      "trigger": "LCA where the tree is a BST, so ordering tells you which way to go.",
+      "recall": "Write the iterative version from memory. Then answer why the split point is necessarily the LCA, in one sentence, using only the BST property.",
+      "useWhen": [
+        "LCA in a BST",
+        "Insert into a BST at the correct position",
+        "Closest value in a BST, or the k closest",
+        "Range sum of a BST, prune whole subtrees",
+        "Any BST query where a comparison discards a subtree"
+      ],
+      "template": [
+        "def lowest_common_ancestor(root, p, q):",
+        "    node = root",
+        "    while node:",
+        "        if p.val < node.val and q.val < node.val:",
+        "            node = node.left        # both strictly smaller: LCA is left",
+        "        elif p.val > node.val and q.val > node.val:",
+        "            node = node.right       # both strictly larger: LCA is right",
+        "        else:",
+        "            return node             # they straddle, or one IS this node",
+        "    return None",
+        "",
+        "# Range sum with pruning, same idea:",
+        "def range_sum(node, lo, hi):",
+        "    if not node: return 0",
+        "    if node.val < lo:  return range_sum(node.right, lo, hi)   # skip left entirely",
+        "    if node.val > hi:  return range_sum(node.left,  lo, hi)   # skip right entirely",
+        "    return node.val + range_sum(node.left, lo, hi) + range_sum(node.right, lo, hi)"
+      ],
+      "complexity": { "time": "O(h)", "space": "O(1) iterative" },
+      "problem": { "lc": 235, "name": "Lowest Common Ancestor of a Binary Search Tree", "slug": "lowest-common-ancestor-of-a-binary-search-tree", "diff": "medium" },
+      "keyInsights": [
+        "The first node where p and q fall on opposite sides is the deepest node containing both. That is the whole proof",
+        "It is O(1) space iteratively, which the general binary tree version cannot achieve",
+        "If they said BST and you wrote the general recursive LCA, you left the constraint on the table. They notice"
+      ],
+      "trap": "'What if one of the nodes is not in the tree?' The split-point walk happily returns a node anyway. You need a verification descent, and they will ask."
+    },
+    {
+      "id": "dp-coin-combinations",
+      "lane": "dp",
+      "title": "Counting Combinations",
+      "patterns": ["Coin outer loop", "dp[0] = 1", "Order does not matter"],
+      "trigger": "Count the ways to reach a total, where two orderings of the same multiset are the same way.",
+      "recall": "Write coin change II from memory. Then, without looking, write the permutation-counting version too, and say in one sentence what the loop order does.",
+      "useWhen": [
+        "Count ways to make an amount with unlimited coins",
+        "Combination sum IV, which is actually the permutation version",
+        "Count ways to climb stairs with variable step sizes",
+        "Dice roll sums, and any ordered-versus-unordered counting",
+        "Any 'how many ways' knapsack"
+      ],
+      "template": [
+        "# COMBINATIONS: {1,1,2} and {2,1,1} are the SAME. Coin outer.",
+        "def change(amount, coins):",
+        "    dp = [0] * (amount + 1)",
+        "    dp[0] = 1                       # one way to make zero: take nothing",
+        "    for c in coins:                 # fix an order on the coins",
+        "        for a in range(c, amount + 1):",
+        "            dp[a] += dp[a - c]",
+        "    return dp[amount]",
+        "",
+        "# PERMUTATIONS: {1,1,2} and {2,1,1} are DIFFERENT. Amount outer.",
+        "def combination_sum4(nums, target):",
+        "    dp = [0] * (target + 1)",
+        "    dp[0] = 1",
+        "    for t in range(1, target + 1):",
+        "        for x in nums:",
+        "            if x <= t: dp[t] += dp[t - x]",
+        "    return dp[target]"
+      ],
+      "complexity": { "time": "O(amount * len(coins))", "space": "O(amount)" },
+      "problem": { "lc": 518, "name": "Coin Change II", "slug": "coin-change-ii", "diff": "medium" },
+      "keyInsights": [
+        "Coin outer means each coin type is considered once and forever, which forces a canonical order on the multiset. That is what removes duplicates",
+        "Amount outer lets every coin be the last one added at every step, which is exactly counting orderings",
+        "LeetCode names Combination Sum IV misleadingly. It counts permutations. Read the examples, not the title"
+      ],
+      "trap": "'Now the coins are limited to one each.' That is 0/1 counting, so it is a backwards capacity loop again. Three loop patterns, all one line apart."
+    },
+    {
+      "id": "dsu-strings",
+      "lane": "graphs",
+      "title": "Union Find over Identities",
+      "patterns": ["Map arbitrary keys to integer ids", "Union within each group", "Collect by root at the end"],
+      "trigger": "Merge groups keyed by something that is not an index: emails, names, equations, currencies.",
+      "recall": "Sketch accounts merge from memory. Then answer the modelling question, which is the actual difficulty: what is a node, what is an edge, and why do you union every email to the first email of its account?",
+      "useWhen": [
+        "Accounts merge, synonymous names, similar sentences",
+        "Evaluate division, currency conversion graphs",
+        "Number of operations to make a network connected",
+        "Redundant connection, detect the edge that creates a cycle",
+        "Any grouping over non-integer keys"
+      ],
+      "template": [
+        "from collections import defaultdict",
+        "",
+        "def accounts_merge(accounts):",
+        "    parent = {}",
+        "    def find(x):",
+        "        parent.setdefault(x, x)",
+        "        while parent[x] != x:",
+        "            parent[x] = parent[parent[x]]",
+        "            x = parent[x]",
+        "        return x",
+        "    def union(a, b):",
+        "        parent[find(a)] = find(b)",
+        "",
+        "    owner = {}",
+        "    for acc in accounts:",
+        "        name, first = acc[0], acc[1]",
+        "        for email in acc[1:]:",
+        "            union(email, first)       # every email joins this account's group",
+        "            owner[email] = name",
+        "",
+        "    groups = defaultdict(list)",
+        "    for email in owner:",
+        "        groups[find(email)].append(email)",
+        "",
+        "    return [[owner[root]] + sorted(emails) for root, emails in groups.items()]"
+      ],
+      "complexity": { "time": "O(n * alpha) plus sorting", "space": "O(n)" },
+      "problem": { "lc": 721, "name": "Accounts Merge", "slug": "accounts-merge", "diff": "medium" },
+      "keyInsights": [
+        "Emails are nodes, and each account is a star of edges to its first email. That modelling step is the entire problem",
+        "Names cannot be nodes because two people can share a name. Only emails are unique identities",
+        "A dictionary-backed DSU with `setdefault` avoids a separate id-assignment pass and reads cleanly"
+      ],
+      "trap": "'Do it with DFS on a graph instead.' You can, and the graph construction is the same insight. If you cannot state the node and edge model, neither approach will work."
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "day": 25,
+  "title": "In Place and Inside Out",
+  "kind": "core",
+  "focus": "Using the array as its own hash table, a stack that ranks, and flooding from the wrong end.",
+  "cards": [
+    {
+      "id": "first-missing-positive",
+      "lane": "arrays",
+      "title": "Array as Hash Table",
+      "patterns": ["Place values at their own index", "Sign marking", "Answer lives in the first gap"],
+      "trigger": "O(1) space demanded, and the answer is about which small positive integers are present.",
+      "recall": "Write it from memory. Then answer the two-part question: why can the answer only ever be in the range 1 to n+1, and what makes the swap loop terminate?",
+      "useWhen": [
+        "First missing positive",
+        "Find all numbers disappeared or duplicated in an array",
+        "Set mismatch, one duplicated and one missing",
+        "Any 'values in 1..n' question with an O(1) space constraint",
+        "Where you would reach for a hash set but are not allowed one"
+      ],
+      "template": [
+        "def first_missing_positive(nums):",
+        "    n = len(nums)",
+        "    # Place each value v in 1..n at index v-1",
+        "    for i in range(n):",
+        "        while 1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]:",
+        "            j = nums[i] - 1",
+        "            nums[i], nums[j] = nums[j], nums[i]     # do NOT advance i",
+        "",
+        "    for i in range(n):",
+        "        if nums[i] != i + 1:",
+        "            return i + 1",
+        "    return n + 1",
+        "",
+        "# Sign-marking variant, when values are guaranteed in 1..n:",
+        "for x in nums:",
+        "    idx = abs(x) - 1",
+        "    if nums[idx] > 0: nums[idx] = -nums[idx]        # mark 'seen'",
+        "# any index still positive was never seen"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 41, "name": "First Missing Positive", "slug": "first-missing-positive", "diff": "hard" },
+      "keyInsights": [
+        "With n slots, the smallest missing positive is at most n+1. That bound is what makes constant space possible",
+        "The swap condition compares values, not indices, so duplicates do not cause an infinite loop",
+        "Every swap places at least one value correctly forever, so total swaps are bounded by n. That is the linear-time argument"
+      ],
+      "trap": "'Prove it is O(n) with that nested while loop.' Same amortised argument as longest-consecutive-sequence. Have it ready, they always ask."
+    },
+    {
+      "id": "freq-stack",
+      "lane": "structures",
+      "title": "Maximum Frequency Stack",
+      "patterns": ["Stack per frequency", "Track the maximum frequency", "Push into every level below"],
+      "trigger": "Pop the most frequent element, breaking ties by most recent.",
+      "recall": "Sketch it from memory. Then answer the design insight: when you push a value for the third time, why does it get added to the frequency-3 stack while remaining in the 1 and 2 stacks?",
+      "useWhen": [
+        "Maximum frequency stack",
+        "Any pop-by-count-then-recency policy",
+        "LFU-flavoured structures needing O(1) both ways",
+        "Undo systems ranked by usage",
+        "Where a heap would give log n and O(1) is required"
+      ],
+      "template": [
+        "from collections import defaultdict",
+        "",
+        "class FreqStack:",
+        "    def __init__(self):",
+        "        self.freq = defaultdict(int)      # value -> current count",
+        "        self.group = defaultdict(list)    # count -> stack of values at that count",
+        "        self.max_freq = 0",
+        "",
+        "    def push(self, val):",
+        "        f = self.freq[val] + 1",
+        "        self.freq[val] = f",
+        "        self.group[f].append(val)         # stays in groups 1..f-1 as well",
+        "        self.max_freq = max(self.max_freq, f)",
+        "",
+        "    def pop(self):",
+        "        val = self.group[self.max_freq].pop()",
+        "        self.freq[val] -= 1",
+        "        if not self.group[self.max_freq]:",
+        "            self.max_freq -= 1            # only ever decreases by one",
+        "        return val"
+      ],
+      "complexity": { "time": "O(1) push and pop", "space": "O(n)" },
+      "problem": { "lc": 895, "name": "Maximum Frequency Stack", "slug": "maximum-frequency-stack", "diff": "hard" },
+      "keyInsights": [
+        "Leaving the value in the lower groups is what makes pop correct: after popping, its earlier occurrence is already sitting in group f-1",
+        "`max_freq` decreases by exactly one when its group empties, so no scan is ever needed",
+        "Each group is a stack, which gives the most-recent tie-break for free"
+      ],
+      "trap": "'What is the space complexity?' O(n) total pushes, not O(n * max_freq), because each push adds exactly one entry. Count carefully before answering."
+    },
+    {
+      "id": "tree-path-collect",
+      "lane": "trees",
+      "title": "Collecting Root-to-Leaf Paths",
+      "patterns": ["Preorder with a live path list", "Backtrack the append", "Copy on record"],
+      "trigger": "Return the actual paths, not just a count or a maximum.",
+      "recall": "Write path sum II from memory. Then answer the two lines people forget: which copy, and which pop, and what happens if you drop each one.",
+      "useWhen": [
+        "Path sum II, all root-to-leaf paths",
+        "Binary tree paths as strings",
+        "Sum root-to-leaf numbers",
+        "Smallest string starting from a leaf",
+        "Any question asking for the paths themselves"
+      ],
+      "template": [
+        "def path_sum(root, target):",
+        "    out, path = [], []",
+        "",
+        "    def go(node, remaining):",
+        "        if not node: return",
+        "        path.append(node.val)",
+        "        remaining -= node.val",
+        "",
+        "        if not node.left and not node.right and remaining == 0:",
+        "            out.append(path[:])            # COPY, the live list keeps changing",
+        "        else:",
+        "            go(node.left,  remaining)",
+        "            go(node.right, remaining)",
+        "",
+        "        path.pop()                          # BACKTRACK on the way out",
+        "",
+        "    go(root, target)",
+        "    return out",
+        "",
+        "# Leaf test is 'no left AND no right'. A node with one child is NOT a leaf,",
+        "# which is the classic off-by-one in every path problem."
+      ],
+      "complexity": { "time": "O(n^2) worst case, from copying", "space": "O(h)" },
+      "problem": { "lc": 113, "name": "Path Sum II", "slug": "path-sum-ii", "diff": "medium" },
+      "keyInsights": [
+        "`path[:]` copies. Without it, every recorded path is the same list object and ends up empty",
+        "The pop must be outside every branch, so it runs on the record path too. Putting it in an else is the standard bug",
+        "Complexity is O(n^2) in the worst case because each recorded path can be O(n) long. Say that, do not claim O(n)"
+      ],
+      "trap": "'The path can start anywhere, not just the root.' That is path sum III, which wants prefix sums with a counter map. Different problem, similar name."
+    },
+    {
+      "id": "dp-max-product",
+      "lane": "dp",
+      "title": "Carry Both Extremes",
+      "patterns": ["Track max and min together", "A negative swaps them", "Restart at the element"],
+      "trigger": "A running optimum where a single operation can turn the worst candidate into the best.",
+      "recall": "Write maximum product subarray from memory. Then answer why tracking only the maximum is insufficient, with a three-element example.",
+      "useWhen": [
+        "Maximum product subarray",
+        "Maximum absolute sum of a subarray",
+        "Any Kadane variant where sign or direction can flip",
+        "Best sequence under a multiplicative or alternating rule",
+        "Where the worst-so-far is a candidate for best-next"
+      ],
+      "template": [
+        "def max_product(nums):",
+        "    hi = lo = best = nums[0]",
+        "    for x in nums[1:]:",
+        "        if x < 0:",
+        "            hi, lo = lo, hi          # a negative turns the smallest into the largest",
+        "        hi = max(x, hi * x)          # extend, or restart at x",
+        "        lo = min(x, lo * x)",
+        "        best = max(best, hi)",
+        "    return best",
+        "",
+        "# Why both: [2, -3, -4]",
+        "#   after 2   : hi=2   lo=2",
+        "#   after -3  : swap -> hi=2,lo=2; hi=max(-3,-6)=-3, lo=min(-3,-6)=-6",
+        "#   after -4  : swap -> hi=-6,lo=-3; hi=max(-4,24)=24   <- lo carried the answer"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 152, "name": "Maximum Product Subarray", "slug": "maximum-product-subarray", "diff": "medium" },
+      "keyInsights": [
+        "The most negative running product is a genuine candidate for the largest, one negative number later. That is why you carry both",
+        "Swap before you update, not after. Updating first uses the wrong pairing and silently gives wrong answers",
+        "Zeros reset both, and the `max(x, ...)` and `min(x, ...)` restarts handle that without a special case"
+      ],
+      "trap": "'What about integer overflow?' Python is fine, other languages are not. Mentioning the language-dependent caveat unprompted reads well."
+    },
+    {
+      "id": "reverse-flood",
+      "lane": "graphs",
+      "title": "Flood from the Destination",
+      "patterns": ["Start from the border, walk inward", "Invert the movement rule", "Intersect two reachable sets"],
+      "trigger": "'Which cells can reach X' where running a search from every cell would be quadratic.",
+      "recall": "Explain the inversion before revealing: the water flows downhill to the ocean, but the DFS goes uphill from the ocean. Say why that is equivalent and why it is faster.",
+      "useWhen": [
+        "Pacific Atlantic water flow",
+        "Surrounded regions, keep what touches the border",
+        "Number of enclaves, walls and gates",
+        "Any 'can reach the outside' question",
+        "Where a per-cell search would be O(cells^2)"
+      ],
+      "template": [
+        "def pacific_atlantic(heights):",
+        "    if not heights: return []",
+        "    rows, cols = len(heights), len(heights[0])",
+        "    pac, atl = set(), set()",
+        "",
+        "    def climb(r, c, seen, prev):",
+        "        if ((r, c) in seen or r < 0 or r >= rows or c < 0 or c >= cols",
+        "                or heights[r][c] < prev):        # INVERTED: only go uphill",
+        "            return",
+        "        seen.add((r, c))",
+        "        h = heights[r][c]",
+        "        climb(r+1, c, seen, h); climb(r-1, c, seen, h)",
+        "        climb(r, c+1, seen, h); climb(r, c-1, seen, h)",
+        "",
+        "    for c in range(cols):",
+        "        climb(0, c, pac, heights[0][c])",
+        "        climb(rows-1, c, atl, heights[rows-1][c])",
+        "    for r in range(rows):",
+        "        climb(r, 0, pac, heights[r][0])",
+        "        climb(r, cols-1, atl, heights[r][cols-1])",
+        "",
+        "    return [list(cell) for cell in pac & atl]     # reaches BOTH"
+      ],
+      "complexity": { "time": "O(rows * cols)", "space": "O(rows * cols)" },
+      "problem": { "lc": 417, "name": "Pacific Atlantic Water Flow", "slug": "pacific-atlantic-water-flow", "diff": "medium" },
+      "keyInsights": [
+        "Reversing the direction turns 'search from every cell' into 'search from every border cell', which visits each cell a constant number of times",
+        "The comparison flips from 'can flow down' to 'can climb up', and the equal case must be allowed in both",
+        "Two separate visited sets, intersected at the end, is the whole answer once the inversion is in place"
+      ],
+      "trap": "'Surrounded regions.' Same inversion: mark everything reachable from the border as safe, then flip the rest. Solving it directly, region by region, is far more code."
+    }
+  ]
+}

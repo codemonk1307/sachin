@@ -1,0 +1,226 @@
+{
+  "day": 2,
+  "title": "Lookups and Levels",
+  "kind": "core",
+  "focus": "Trading space for time, and the breadth-first way of seeing a structure.",
+  "cards": [
+    {
+      "id": "hashmap-lookup",
+      "lane": "arrays",
+      "title": "HashMap Lookup",
+      "patterns": ["Complement search", "Seen-before set", "Frequency count"],
+      "trigger": "You are about to write a nested loop that asks 'have I seen something related to this before'.",
+      "recall": "Write Two Sum in one pass from memory. Then answer the question that matters: why does the one-pass version check the map before inserting, and what bug appears if you swap those two lines?",
+      "useWhen": [
+        "Pair or complement search on unsorted input",
+        "Detect duplicates or first unique element",
+        "Group items by a computed key, sorted string, digit signature, root parent",
+        "Count frequencies before a heap or bucket pass",
+        "Index lookup, value to position, when you must return indices"
+      ],
+      "template": [
+        "# One pass: check before you insert",
+        "def two_sum(nums, target):",
+        "    seen = {}                       # value -> index",
+        "    for i, x in enumerate(nums):",
+        "        want = target - x",
+        "        if want in seen:",
+        "            return [seen[want], i]",
+        "        seen[x] = i                 # insert AFTER the check",
+        "    return []",
+        "",
+        "# Group by computed key",
+        "from collections import defaultdict",
+        "groups = defaultdict(list)",
+        "for w in words:",
+        "    groups[tuple(sorted(w))].append(w)",
+        "",
+        "# Frequency in one line",
+        "from collections import Counter",
+        "freq = Counter(nums)"
+      ],
+      "complexity": { "time": "O(n) average", "space": "O(n)" },
+      "problem": { "lc": 1, "name": "Two Sum", "slug": "two-sum", "diff": "easy" },
+      "keyInsights": [
+        "Check then insert. Insert then check lets an element pair with itself when target is 2x",
+        "Say 'O(n) average, O(n^2) worst case with adversarial hash collisions'. Interviewers notice",
+        "The key does not have to be the value. Sorted-string, digit-count and parent-id keys unlock whole problem families"
+      ],
+      "trap": "'The array is sorted, do it in O(1) space.' A hash map is now the wrong tool. Switch to opposite-end two pointers and say why."
+    },
+    {
+      "id": "queue-fifo",
+      "lane": "structures",
+      "title": "Queue (FIFO)",
+      "patterns": ["Level drain", "Ring buffer", "Producer / consumer"],
+      "trigger": "Order of arrival is the order of service, or you need to process one whole generation before the next.",
+      "recall": "Write the level-drain loop from memory. Then answer: what exactly does `for _ in range(len(q))` buy you, and what goes wrong if you drop it?",
+      "useWhen": [
+        "Any BFS, on trees, grids or graphs",
+        "Level-by-level or minute-by-minute simulation",
+        "Fixed-capacity buffer with wraparound",
+        "Sliding window that discards from the front",
+        "Rate limiters and recent-request windows"
+      ],
+      "template": [
+        "from collections import deque",
+        "q = deque()",
+        "q.append(x)       # enqueue  O(1)",
+        "q.popleft()       # dequeue  O(1)   NEVER use list.pop(0), that is O(n)",
+        "",
+        "# The level drain: snapshot the size, then drain exactly that many",
+        "while q:",
+        "    size = len(q)",
+        "    for _ in range(size):",
+        "        node = q.popleft()",
+        "        for child in children(node):",
+        "            q.append(child)",
+        "    depth += 1",
+        "",
+        "# Circular buffer with a fixed array",
+        "self.buf = [None] * k",
+        "self.head, self.count = 0, 0",
+        "tail = (self.head + self.count) % k"
+      ],
+      "complexity": { "time": "O(1) per op", "space": "O(n)" },
+      "problem": { "lc": 622, "name": "Design Circular Queue", "slug": "design-circular-queue", "diff": "medium" },
+      "keyInsights": [
+        "`list.pop(0)` is O(n) and turns a linear BFS into quadratic. Use `deque` every single time",
+        "Snapshotting `len(q)` is what separates levels. Without it you have a flat traversal, not a level order",
+        "A ring buffer stores head plus count, not head plus tail, because head == tail is ambiguous between full and empty"
+      ],
+      "trap": "'Implement a queue with two stacks and give amortised O(1) pop.' The amortised argument, each element moves between stacks at most once, is the actual question."
+    },
+    {
+      "id": "bst",
+      "lane": "trees",
+      "title": "Binary Search Tree",
+      "patterns": ["Inorder is sorted", "Range-bound validation", "Descend by comparison"],
+      "trigger": "A tree where left < node < right, so a comparison at each node discards half the remaining tree.",
+      "recall": "Write the validator from memory. Then answer the trap directly: why is checking `left.val < node.val < right.val` at every node wrong, and what is the smallest tree that proves it?",
+      "useWhen": [
+        "Validate BST structure",
+        "Kth smallest or largest, inorder with an early exit",
+        "Insert, delete or search in O(h)",
+        "Find the closest value to a target",
+        "Convert a sorted array into a balanced BST"
+      ],
+      "template": [
+        "# Validate: carry the allowed RANGE down, not the neighbours",
+        "def is_bst(node, lo=float('-inf'), hi=float('inf')):",
+        "    if not node: return True",
+        "    if not (lo < node.val < hi): return False",
+        "    return (is_bst(node.left,  lo, node.val) and",
+        "            is_bst(node.right, node.val, hi))",
+        "",
+        "# Inorder with early exit: kth smallest",
+        "def kth(root, k):",
+        "    stack, node = [], root",
+        "    while stack or node:",
+        "        while node:",
+        "            stack.append(node); node = node.left",
+        "        node = stack.pop()",
+        "        k -= 1",
+        "        if k == 0: return node.val",
+        "        node = node.right",
+        "",
+        "# Search: one comparison discards half",
+        "while node and node.val != target:",
+        "    node = node.left if target < node.val else node.right"
+      ],
+      "complexity": { "time": "O(h) search, O(n) validate", "space": "O(h)" },
+      "problem": { "lc": 98, "name": "Validate Binary Search Tree", "slug": "validate-binary-search-tree", "diff": "medium" },
+      "keyInsights": [
+        "The local check fails on [5,1,6,null,null,4,7]: 4 is a valid right child of 6 but sits left of 5. Ranges catch it, neighbours do not",
+        "Inorder traversal of a BST is sorted. Half of all BST problems are that sentence plus an early exit",
+        "O(h) is O(log n) only when balanced. Never say log n without saying balanced"
+      ],
+      "trap": "'What if values can repeat?' The definition changes and so does your comparison. Ask which side duplicates go on before writing anything."
+    },
+    {
+      "id": "dp-grid",
+      "lane": "dp",
+      "title": "Grid DP",
+      "patterns": ["dp[r][c] from top and left", "Row rolling", "Obstacle as a zero"],
+      "trigger": "A 2D table where each cell is computed from a fixed set of neighbours already computed.",
+      "recall": "State what `dp[r][c]` means in English, then write the recurrence and the first-row and first-column initialisation before revealing.",
+      "useWhen": [
+        "Count paths through a grid",
+        "Minimum or maximum cost path with only right and down moves",
+        "Two sequences compared cell by cell, which is the same shape",
+        "Largest square or rectangle of a given property",
+        "Any DP whose state needs two integer arguments"
+      ],
+      "template": [
+        "# dp[r][c] = number of distinct paths from (0,0) to (r,c)",
+        "def unique_paths(m, n):",
+        "    dp = [1] * n                       # row 0 is all 1s",
+        "    for _ in range(1, m):",
+        "        for c in range(1, n):",
+        "            dp[c] += dp[c - 1]         # dp[c] is 'above', dp[c-1] is 'left'",
+        "    return dp[-1]",
+        "",
+        "# Full table when you need to reconstruct the path",
+        "dp = [[0] * n for _ in range(m)]",
+        "dp[0][0] = grid[0][0]",
+        "for r in range(m):",
+        "    for c in range(n):",
+        "        if r == 0 and c == 0: continue",
+        "        best = min(dp[r-1][c] if r else INF,",
+        "                   dp[r][c-1] if c else INF)",
+        "        dp[r][c] = best + grid[r][c]"
+      ],
+      "complexity": { "time": "O(m * n)", "space": "O(n) rolled, O(m * n) table" },
+      "problem": { "lc": 62, "name": "Unique Paths", "slug": "unique-paths", "diff": "medium" },
+      "keyInsights": [
+        "Rolling one row works because you only ever read the row above and the cell to the left",
+        "In the rolled version `dp[c]` is still the old value, which is exactly 'above'. That aliasing is the whole trick",
+        "Obstacles are a zero, not a special case. Set the cell to 0 and let the recurrence handle it"
+      ],
+      "trap": "'Now you can also move diagonally, and one cell is blocked.' If you special-cased the borders instead of initialising them, this breaks you."
+    },
+    {
+      "id": "backtracking-subsets",
+      "lane": "graphs",
+      "title": "Backtracking",
+      "patterns": ["Choose, explore, un-choose", "Include / exclude", "Start-index to kill duplicates"],
+      "trigger": "You must enumerate every combination, and prune the ones that cannot lead anywhere.",
+      "recall": "Write the subsets generator from memory. Then answer: what is `start` for, and why does removing the un-choose line silently corrupt the output rather than crash?",
+      "useWhen": [
+        "All subsets, permutations or combinations",
+        "Constraint satisfaction, N-Queens, Sudoku, word search",
+        "Partition a collection into valid groups",
+        "Find any path satisfying a property, not the shortest",
+        "Any 'return all possible' phrasing"
+      ],
+      "template": [
+        "def subsets(nums):",
+        "    out, path = [], []",
+        "",
+        "    def walk(start):",
+        "        out.append(path[:])                # snapshot, not the live list",
+        "        for i in range(start, len(nums)):",
+        "            path.append(nums[i])           # choose",
+        "            walk(i + 1)                    # explore, i+1 forbids reuse",
+        "            path.pop()                     # un-choose",
+        "",
+        "    walk(0)",
+        "    return out",
+        "",
+        "# Skip duplicates: sort first, then skip equal siblings at the same depth",
+        "nums.sort()",
+        "for i in range(start, len(nums)):",
+        "    if i > start and nums[i] == nums[i - 1]:",
+        "        continue"
+      ],
+      "complexity": { "time": "O(n * 2^n) subsets, O(n * n!) permutations", "space": "O(n) recursion" },
+      "problem": { "lc": 78, "name": "Subsets", "slug": "subsets", "diff": "medium" },
+      "keyInsights": [
+        "`path[:]` copies. Appending `path` itself stores a reference that later mutations empty out",
+        "`start` prevents reuse and enforces order, which is what makes combinations combinations and not permutations",
+        "`i > start` is the duplicate skip, not `i > 0`. The difference is same-depth versus any-depth"
+      ],
+      "trap": "'Give me the time complexity.' Not 2^n. It is n * 2^n, because copying each subset costs O(n). Getting that right marks you out."
+    }
+  ]
+}

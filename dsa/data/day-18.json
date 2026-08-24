@@ -1,0 +1,229 @@
+{
+  "day": 18,
+  "title": "Prefix, Suffix, Greedy",
+  "kind": "core",
+  "focus": "Two sweeps instead of division, versioned storage, and the day greedy beats DP.",
+  "cards": [
+    {
+      "id": "prefix-suffix-product",
+      "lane": "arrays",
+      "title": "Prefix and Suffix Sweeps",
+      "patterns": ["Left pass then right pass", "Accumulate into the output", "Forbidden operation workaround"],
+      "trigger": "Every element needs an aggregate of everything except itself.",
+      "recall": "Write product-except-self from memory in O(1) extra space. Then answer: what does the output array hold after the first pass, and how does the running suffix variable finish the job?",
+      "useWhen": [
+        "Product or sum of the array except self, without division",
+        "Candy distribution, two passes for two constraints",
+        "Trapping rain water, the two-array version",
+        "Best time to buy and sell with a forward min and a backward max",
+        "Any 'for each i, use everything on both sides' question"
+      ],
+      "template": [
+        "def product_except_self(nums):",
+        "    n = len(nums)",
+        "    out = [1] * n",
+        "",
+        "    # Pass 1: out[i] = product of everything strictly LEFT of i",
+        "    left = 1",
+        "    for i in range(n):",
+        "        out[i] = left",
+        "        left *= nums[i]",
+        "",
+        "    # Pass 2: multiply in the product of everything strictly RIGHT of i",
+        "    right = 1",
+        "    for i in range(n - 1, -1, -1):",
+        "        out[i] *= right",
+        "        right *= nums[i]",
+        "",
+        "    return out          # output array does not count as extra space",
+        "",
+        "# Candy: same shape, two constraints",
+        "# left pass  : if rating[i] > rating[i-1], candy[i] = candy[i-1] + 1",
+        "# right pass : if rating[i] > rating[i+1], candy[i] = max(candy[i], candy[i+1] + 1)"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1) extra" },
+      "problem": { "lc": 238, "name": "Product of Array Except Self", "slug": "product-of-array-except-self", "diff": "medium" },
+      "keyInsights": [
+        "Assign before you accumulate. Doing it the other way round includes the element itself",
+        "Division fails on zeros and is usually explicitly banned. Two sweeps sidestep both problems",
+        "The candy problem shows the general form: one sweep per direction of constraint, then combine with max"
+      ],
+      "trap": "'Does the output array count as extra space?' Standard answer: no, output is not counted. Say it rather than assuming they agree."
+    },
+    {
+      "id": "time-based-store",
+      "lane": "structures",
+      "title": "Versioned Storage",
+      "patterns": ["Key to sorted list of versions", "Binary search the timestamp", "Append-only means already sorted"],
+      "trigger": "Values change over time and you must retrieve the state as of a given moment.",
+      "recall": "Sketch the structure from memory and write `get`. Then answer why binary search is valid here without any explicit sorting step.",
+      "useWhen": [
+        "Time-based key-value store, get the value at or before a timestamp",
+        "Snapshot arrays, get the value at a snapshot id",
+        "Version control style lookups",
+        "Interval or calendar bookings, find the applicable entry",
+        "Any 'as of time T' query"
+      ],
+      "template": [
+        "import bisect",
+        "from collections import defaultdict",
+        "",
+        "class TimeMap:",
+        "    def __init__(self):",
+        "        self.store = defaultdict(list)     # key -> [(timestamp, value)]",
+        "",
+        "    def set(self, key, value, timestamp):",
+        "        self.store[key].append((timestamp, value))   # timestamps arrive increasing",
+        "",
+        "    def get(self, key, timestamp):",
+        "        entries = self.store[key]",
+        "        # first index with timestamp > target, then step back one",
+        "        i = bisect.bisect_right(entries, (timestamp, chr(0x10FFFF)))",
+        "        return entries[i - 1][1] if i else ''"
+      ],
+      "complexity": { "time": "O(1) set, O(log n) get", "space": "O(n)" },
+      "problem": { "lc": 981, "name": "Time Based Key-Value Store", "slug": "time-based-key-value-store", "diff": "medium" },
+      "keyInsights": [
+        "The list is sorted because the problem guarantees increasing timestamps. If it did not, you would need a sorted container",
+        "`bisect_right` then step back is the standard 'largest value at or below' idiom. Learn that pairing",
+        "The sentinel high character makes the tuple compare correctly regardless of the value stored"
+      ],
+      "trap": "'Timestamps can arrive out of order.' Append-and-binary-search breaks. You need insort, which is O(n) per set, or a balanced tree. State the trade."
+    },
+    {
+      "id": "tree-symmetry",
+      "lane": "trees",
+      "title": "Mirror and Invert",
+      "patterns": ["Compare left against right", "Swap children top down", "Two-pointer on a tree"],
+      "trigger": "A question about a tree's reflection rather than its contents.",
+      "recall": "Write both invert and the symmetry check from memory. Then answer: symmetry compares `a.left` to `b.right`. Say why, and why comparing a tree to its own inversion is a worse solution.",
+      "useWhen": [
+        "Symmetric tree, invert a binary tree",
+        "Check if two trees are mirrors",
+        "Boundary traversal, left boundary and reversed right boundary",
+        "Flip equivalent binary trees",
+        "Any reflection or mirror-image question"
+      ],
+      "template": [
+        "def invert(node):",
+        "    if not node: return None",
+        "    node.left, node.right = invert(node.right), invert(node.left)",
+        "    return node",
+        "",
+        "def is_symmetric(root):",
+        "    def mirror(a, b):",
+        "        if not a and not b: return True",
+        "        if not a or not b:  return False",
+        "        return (a.val == b.val and",
+        "                mirror(a.left,  b.right) and     # outer pair",
+        "                mirror(a.right, b.left))         # inner pair",
+        "    return not root or mirror(root.left, root.right)",
+        "",
+        "# Iterative symmetry: a queue holding PAIRS",
+        "q = deque([(root.left, root.right)])",
+        "while q:",
+        "    a, b = q.popleft()",
+        "    ...",
+        "    q.append((a.left, b.right)); q.append((a.right, b.left))"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(h)" },
+      "problem": { "lc": 101, "name": "Symmetric Tree", "slug": "symmetric-tree", "diff": "easy" },
+      "keyInsights": [
+        "The cross comparison, left against right, is the whole idea. Comparing left to left checks equality, not symmetry",
+        "Inverting then comparing mutates the input and doubles the work. Say why the direct check is better",
+        "The iterative form queues pairs rather than nodes, which generalises to any two-tree comparison"
+      ],
+      "trap": "'Flip equivalent: you may swap children at any node.' Now you compare both pairings at each node and recurse into whichever matches. Strictly harder than symmetry."
+    },
+    {
+      "id": "greedy-jump",
+      "lane": "dp",
+      "title": "Greedy over DP",
+      "patterns": ["Furthest reachable", "Implicit BFS levels", "Prove the exchange argument"],
+      "trigger": "A DP is available, and a single sweep with one running maximum is provably just as good.",
+      "recall": "Write jump game II from memory in O(n). Then answer the question they will ask: why is greedy correct here, and what is the argument that you never miss a better choice?",
+      "useWhen": [
+        "Jump game, minimum jumps, can you reach the end",
+        "Gas station circuit",
+        "Assign cookies, task assignment by sorted matching",
+        "Partition labels, extend the boundary as you sweep",
+        "Any DP where the optimal choice is provably local"
+      ],
+      "template": [
+        "# Minimum jumps: each 'level' is one jump. This is BFS without a queue.",
+        "def jump(nums):",
+        "    jumps = current_end = furthest = 0",
+        "    for i in range(len(nums) - 1):        # stop before the last index",
+        "        furthest = max(furthest, i + nums[i])",
+        "        if i == current_end:              # exhausted this jump's range",
+        "            jumps += 1",
+        "            current_end = furthest",
+        "    return jumps",
+        "",
+        "# Can you reach the end at all?",
+        "reach = 0",
+        "for i, x in enumerate(nums):",
+        "    if i > reach: return False",
+        "    reach = max(reach, i + x)",
+        "return True",
+        "",
+        "# Partition labels: extend the current chunk to the last index of every char in it",
+        "last = {c: i for i, c in enumerate(s)}"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1)" },
+      "problem": { "lc": 45, "name": "Jump Game II", "slug": "jump-game-ii", "diff": "medium" },
+      "keyInsights": [
+        "`current_end` is the boundary of what the current jump count can reach. Crossing it means you spent another jump. That is BFS by levels",
+        "Looping to n-2 is deliberate. Standing on the last index means you have arrived and must not count another jump",
+        "Greedy needs an argument, not a vibe. Here: taking the furthest reach can never be worse, because reachability is a prefix"
+      ],
+      "trap": "'Prove your greedy is optimal.' If you cannot give the exchange argument in two sentences, write the O(n^2) DP instead and say you would prove it before shipping."
+    },
+    {
+      "id": "n-queens",
+      "lane": "graphs",
+      "title": "Constraint Backtracking",
+      "patterns": ["One choice per row", "O(1) conflict sets", "Diagonals by sum and difference"],
+      "trigger": "Place items under mutual-exclusion constraints, and you must find all valid placements.",
+      "recall": "Write N-Queens from memory. Then answer the encoding question that makes it fast: how do you identify the two diagonals of a cell with two integers?",
+      "useWhen": [
+        "N-Queens, N-Queens II",
+        "Sudoku solver, three constraint sets per digit",
+        "Graph colouring on a small graph",
+        "Any exact-cover style placement",
+        "Crossword or tiling fill under constraints"
+      ],
+      "template": [
+        "def solve_n_queens(n):",
+        "    cols, diag, anti = set(), set(), set()",
+        "    board, out = [], []",
+        "",
+        "    def go(row):",
+        "        if row == n:",
+        "            out.append(board[:]); return",
+        "        for c in range(n):",
+        "            if c in cols or (row - c) in diag or (row + c) in anti:",
+        "                continue",
+        "            cols.add(c); diag.add(row - c); anti.add(row + c)",
+        "            board.append(c)",
+        "            go(row + 1)",
+        "            board.pop()",
+        "            cols.remove(c); diag.remove(row - c); anti.remove(row + c)",
+        "",
+        "    go(0)",
+        "    return out",
+        "",
+        "# row - c is constant along a '\\' diagonal",
+        "# row + c is constant along a '/' diagonal"
+      ],
+      "complexity": { "time": "O(n!) bounded by pruning", "space": "O(n)" },
+      "problem": { "lc": 51, "name": "N-Queens", "slug": "n-queens", "diff": "hard" },
+      "keyInsights": [
+        "One queen per row is assumed by the structure, so rows never need checking. That single decision removes a whole constraint",
+        "`row - c` and `row + c` are constant along the two diagonals, which turns an O(n) scan into an O(1) set lookup",
+        "Un-choosing must undo all three sets. Forgetting one produces missing solutions rather than a crash, which is much harder to debug"
+      ],
+      "trap": "'Just count the solutions, do not list them.' Now you can use bitmasks instead of sets and it runs an order of magnitude faster. Know the bitmask version exists."
+    }
+  ]
+}

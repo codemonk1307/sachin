@@ -1,0 +1,230 @@
+{
+  "day": 17,
+  "title": "Broken Order",
+  "kind": "core",
+  "focus": "Binary search when the sort is rotated, prefix sums that update, and the DP that runs on intervals.",
+  "cards": [
+    {
+      "id": "rotated-search",
+      "lane": "arrays",
+      "title": "Rotated Sorted Search",
+      "patterns": ["One half is always sorted", "Decide which half, then bound-check", "Find the pivot first"],
+      "trigger": "A sorted array that has been rotated, and you still want O(log n).",
+      "recall": "Write it from memory. Then answer the claim the whole solution rests on: for any mid, at least one of the two halves is fully sorted. Why is that always true?",
+      "useWhen": [
+        "Search in a rotated sorted array",
+        "Find the minimum in a rotated sorted array",
+        "Find how many times the array was rotated",
+        "Peak element in a bitonic array",
+        "Any array with one break in monotonicity"
+      ],
+      "template": [
+        "def search(nums, target):",
+        "    lo, hi = 0, len(nums) - 1",
+        "    while lo <= hi:",
+        "        mid = (lo + hi) // 2",
+        "        if nums[mid] == target: return mid",
+        "",
+        "        if nums[lo] <= nums[mid]:              # LEFT half is sorted",
+        "            if nums[lo] <= target < nums[mid]:  lo, hi = lo, mid - 1",
+        "            else:                               lo, hi = mid + 1, hi",
+        "        else:                                   # RIGHT half is sorted",
+        "            if nums[mid] < target <= nums[hi]:  lo, hi = mid + 1, hi",
+        "            else:                               lo, hi = lo, mid - 1",
+        "    return -1",
+        "",
+        "# Minimum in a rotated array: compare mid against hi, never against lo",
+        "while lo < hi:",
+        "    mid = (lo + hi) // 2",
+        "    if nums[mid] > nums[hi]: lo = mid + 1     # minimum is strictly right",
+        "    else:                    hi = mid         # mid could be the minimum"
+      ],
+      "complexity": { "time": "O(log n)", "space": "O(1)" },
+      "problem": { "lc": 33, "name": "Search in Rotated Sorted Array", "slug": "search-in-rotated-sorted-array", "diff": "medium" },
+      "keyInsights": [
+        "The rotation point sits in exactly one half, so the other half is unbroken. Identify the sorted half, then a plain range test decides",
+        "For the minimum, compare mid against hi. Comparing against lo is ambiguous when the array is not rotated at all",
+        "`nums[lo] <= nums[mid]` uses `<=` so a two-element window still classifies correctly"
+      ],
+      "trap": "'Duplicates are allowed.' `nums[lo] == nums[mid] == nums[hi]` tells you nothing, you shrink by one, and the worst case degrades to O(n). Say that out loud, it is the expected answer."
+    },
+    {
+      "id": "fenwick-tree",
+      "lane": "structures",
+      "title": "Fenwick Tree (BIT)",
+      "patterns": ["Prefix sums with updates", "i += i & -i to walk up", "i -= i & -i to walk down"],
+      "trigger": "Prefix or range queries on an array that keeps changing.",
+      "recall": "Write both loops from memory. Then answer what makes it work: what does `i & -i` compute, and what range of the original array does index i of the tree cover?",
+      "useWhen": [
+        "Range sum with point updates",
+        "Count of smaller numbers after self, after coordinate compression",
+        "Count inversions in an array",
+        "Running rank or order statistics",
+        "Any prefix aggregate under updates, when a segment tree is more than you need"
+      ],
+      "template": [
+        "class BIT:",
+        "    def __init__(self, n):",
+        "        self.n = n",
+        "        self.t = [0] * (n + 1)          # 1-indexed",
+        "",
+        "    def update(self, i, delta):         # i is 1-based",
+        "        while i <= self.n:",
+        "            self.t[i] += delta",
+        "            i += i & -i                 # jump to the next covering node",
+        "",
+        "    def query(self, i):                 # prefix sum of [1, i]",
+        "        s = 0",
+        "        while i > 0:",
+        "            s += self.t[i]",
+        "            i -= i & -i                 # strip the lowest set bit",
+        "        return s",
+        "",
+        "    def range_sum(self, l, r):",
+        "        return self.query(r) - self.query(l - 1)",
+        "",
+        "# Count smaller after self: iterate right to left, query then update",
+        "# after compressing values into ranks 1..k"
+      ],
+      "complexity": { "time": "O(log n) update and query", "space": "O(n)" },
+      "problem": { "lc": 315, "name": "Count of Smaller Numbers After Self", "slug": "count-of-smaller-numbers-after-self", "diff": "hard" },
+      "keyInsights": [
+        "`i & -i` isolates the lowest set bit, which is exactly the length of the range that node covers",
+        "1-indexed is not a preference. `i & -i` is zero at index 0 and the loop never advances",
+        "A merge sort with a counting step solves the same problems in O(n log n) without any bit tricks. Offer both"
+      ],
+      "trap": "'Now support range updates as well as range queries.' You need two BITs and a small algebraic derivation. Know that it exists rather than inventing it live."
+    },
+    {
+      "id": "tree-flatten",
+      "lane": "trees",
+      "title": "Restructure In Place",
+      "patterns": ["Reverse preorder", "Rightmost of the left subtree", "Rewire, do not rebuild"],
+      "trigger": "Turn a tree into a different shape without allocating new nodes.",
+      "recall": "Write the flatten from memory using the predecessor method. Then answer why processing in reverse preorder, right then left then node, makes the naive version work in O(1) space.",
+      "useWhen": [
+        "Flatten a binary tree to a linked list",
+        "Convert a BST to a sorted doubly linked list",
+        "Increasing order search tree",
+        "Populate next right pointers",
+        "Any in-place structural rewiring"
+      ],
+      "template": [
+        "# O(1) space: for each node, splice the left subtree into the right chain",
+        "def flatten(root):",
+        "    node = root",
+        "    while node:",
+        "        if node.left:",
+        "            pred = node.left",
+        "            while pred.right:           # rightmost node of the left subtree",
+        "                pred = pred.right",
+        "            pred.right = node.right     # it inherits the current right chain",
+        "            node.right = node.left      # left subtree becomes the right chain",
+        "            node.left = None",
+        "        node = node.right",
+        "",
+        "# O(h) alternative: reverse preorder with a running 'previous'",
+        "prev = None",
+        "def go(node):",
+        "    nonlocal prev",
+        "    if not node: return",
+        "    go(node.right); go(node.left)       # RIGHT first",
+        "    node.right, node.left = prev, None",
+        "    prev = node"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(1) iterative" },
+      "problem": { "lc": 114, "name": "Flatten Binary Tree to Linked List", "slug": "flatten-binary-tree-to-linked-list", "diff": "medium" },
+      "keyInsights": [
+        "The rightmost node of the left subtree is the last node of the left chain, so it is exactly where the old right chain reattaches",
+        "Reverse preorder means every node is rewired only after everything that follows it is already a chain",
+        "Setting `node.left = None` is mandatory. Leaving it produces a structure that prints correctly and is still wrong"
+      ],
+      "trap": "'Do it as a doubly linked list, circular, from a BST.' Same idea, inorder instead of preorder, plus stitching the head to the tail at the end."
+    },
+    {
+      "id": "dp-interval-lps",
+      "lane": "dp",
+      "title": "Interval DP",
+      "patterns": ["dp[i][j] over a range", "Fill by increasing length", "Shrink from both ends"],
+      "trigger": "The state is a range of the input, and it is built from strictly shorter ranges.",
+      "recall": "Write longest palindromic subsequence from memory. Then answer the loop-order question: why must `i` descend, or equivalently why fill by increasing interval length?",
+      "useWhen": [
+        "Longest palindromic subsequence",
+        "Minimum insertions or deletions to make a palindrome",
+        "Matrix chain multiplication, burst balloons, stone games",
+        "Optimal binary search tree",
+        "Any DP where the state is a subarray or substring"
+      ],
+      "template": [
+        "# dp[i][j] = longest palindromic subsequence within s[i..j]",
+        "def lps(s):",
+        "    n = len(s)",
+        "    dp = [[0] * n for _ in range(n)]",
+        "    for i in range(n - 1, -1, -1):        # i DESCENDING",
+        "        dp[i][i] = 1                       # a single character",
+        "        for j in range(i + 1, n):          # j ascending",
+        "            if s[i] == s[j]:",
+        "                dp[i][j] = dp[i + 1][j - 1] + 2",
+        "            else:",
+        "                dp[i][j] = max(dp[i + 1][j], dp[i][j - 1])",
+        "    return dp[0][n - 1]",
+        "",
+        "# By-length form, identical, often clearer:",
+        "for length in range(2, n + 1):",
+        "    for i in range(n - length + 1):",
+        "        j = i + length - 1",
+        "        ...",
+        "",
+        "# Minimum insertions to make a palindrome = n - lps(s)"
+      ],
+      "complexity": { "time": "O(n^2)", "space": "O(n^2)" },
+      "problem": { "lc": 516, "name": "Longest Palindromic Subsequence", "slug": "longest-palindromic-subsequence", "diff": "medium" },
+      "keyInsights": [
+        "dp[i][j] reads dp[i+1][j-1], a strictly shorter interval, so shorter intervals must already be filled. That is the loop order",
+        "LPS of s equals LCS of s and its reverse. If you know one you know the other",
+        "The answer lives at dp[0][n-1], not at dp[n][n]. Interval DP answers sit in a corner, not on the diagonal"
+      ],
+      "trap": "'Burst balloons.' Same table, but the recurrence loops over which balloon is burst LAST, not first. That inversion is what makes the subproblems independent."
+    },
+    {
+      "id": "word-search-grid",
+      "lane": "graphs",
+      "title": "Grid Backtracking",
+      "patterns": ["Mark, recurse, unmark", "Early prune on mismatch", "Trie for many words"],
+      "trigger": "Find a path through a grid spelling something, where cells cannot be reused within a path.",
+      "recall": "Write word search from memory. Then answer the difference that matters: in flood fill you never unmark, here you must. Why?",
+      "useWhen": [
+        "Word search on a board",
+        "Word search II, many words, add a trie",
+        "Unique paths III, visit every open cell exactly once",
+        "Rat in a maze, all paths from corner to corner",
+        "Any grid path where the visited set is per-path, not global"
+      ],
+      "template": [
+        "def exist(board, word):",
+        "    rows, cols = len(board), len(board[0])",
+        "",
+        "    def go(r, c, i):",
+        "        if i == len(word): return True",
+        "        if r < 0 or r >= rows or c < 0 or c >= cols: return False",
+        "        if board[r][c] != word[i]: return False",
+        "",
+        "        board[r][c] = '#'                       # mark for THIS path only",
+        "        found = (go(r+1, c, i+1) or go(r-1, c, i+1) or",
+        "                 go(r, c+1, i+1) or go(r, c-1, i+1))",
+        "        board[r][c] = word[i]                   # unmark on the way out",
+        "        return found",
+        "",
+        "    return any(go(r, c, 0) for r in range(rows) for c in range(cols))"
+      ],
+      "complexity": { "time": "O(rows * cols * 4^L)", "space": "O(L) recursion" },
+      "problem": { "lc": 79, "name": "Word Search", "slug": "word-search", "diff": "medium" },
+      "keyInsights": [
+        "Flood fill asks 'is this cell in any region', so a global mark is correct. Path search asks 'is this cell on this path', so the mark must be undone",
+        "Restoring the original character rather than a placeholder means no extra storage at all",
+        "Checking the character before marking prunes three quarters of the branches for free"
+      ],
+      "trap": "'Now search a hundred words on the same board.' One DFS per word times out. Build a trie of all words and walk board and trie together, deleting words as you find them."
+    }
+  ]
+}

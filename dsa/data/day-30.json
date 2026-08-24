@@ -1,0 +1,174 @@
+{
+  "day": 30,
+  "title": "Mock: Full Loop, Then Close the Cycle",
+  "kind": "mock",
+  "focus": "Three back-to-back rounds the way an onsite actually runs, then the review that decides what next month looks like.",
+  "cards": [
+    {
+      "id": "m2-round-a",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Round A: Two Mediums, 45 Minutes",
+      "timerSec": 2700,
+      "trigger": "Two problems in one slot is the most common Google format. Pacing is the skill being tested.",
+      "recall": "Set forty-five minutes for both. Budget twenty for the first. If the first runs over, you must consciously decide to move on. That decision is the exercise.",
+      "drill": [
+        { "lc": 1, "name": "Two Sum", "slug": "two-sum", "diff": "easy", "cue": "target: 6 min" },
+        { "lc": 56, "name": "Merge Intervals", "slug": "merge-intervals", "diff": "medium", "cue": "target: 14 min" },
+        { "lc": 102, "name": "Binary Tree Level Order Traversal", "slug": "binary-tree-level-order-traversal", "diff": "medium", "cue": "target: 12 min" },
+        { "lc": 39, "name": "Combination Sum", "slug": "combination-sum", "diff": "medium", "cue": "target: 13 min" }
+      ],
+      "template": [
+        "# Two-problem pacing:",
+        "#   the interviewer has a second problem queued and wants to reach it",
+        "#   finishing one perfectly and never seeing the second scores WORSE",
+        "#   than solid work on both",
+        "#",
+        "# So at the halfway mark, if you are not close, say:",
+        "#   'I want to make sure we get to the second problem. Shall I finish",
+        "#    this one, or move on and come back if there is time?'",
+        "#",
+        "# That sentence is a senior signal. It shows you are managing the session,",
+        "# not just the problem."
+      ],
+      "keyInsights": [
+        "Pacing is graded, silently. Running out of time on problem one is a common and avoidable failure",
+        "Asking to move on hands the decision back to the interviewer, which is exactly right, and costs you nothing",
+        "The easy problem in a two-problem slot is a warm-up. Spending fifteen minutes on it is the actual mistake"
+      ],
+      "trap": "Optimising problem one from O(n log n) to O(n) while problem two sits untouched. Good enough, then move, is the correct strategy."
+    },
+    {
+      "id": "m2-round-b",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Round B: One Hard, 45 Minutes",
+      "timerSec": 2700,
+      "trigger": "The differentiating round. Hards are usually a medium plus one insight.",
+      "recall": "Pick a hard you have not touched in two weeks. Before starting, write down which medium it resembles and what the extra insight probably is. Then check yourself against the real solution.",
+      "drill": [
+        { "lc": 297, "name": "Serialize and Deserialize Binary Tree", "slug": "serialize-and-deserialize-binary-tree", "diff": "hard", "cue": "preorder + markers" },
+        { "lc": 23, "name": "Merge k Sorted Lists", "slug": "merge-k-sorted-lists", "diff": "hard", "cue": "heap of heads" },
+        { "lc": 312, "name": "Burst Balloons", "slug": "burst-balloons", "diff": "hard", "cue": "k bursts last" },
+        { "lc": 127, "name": "Word Ladder", "slug": "word-ladder", "diff": "hard", "cue": "implicit graph" },
+        { "lc": 41, "name": "First Missing Positive", "slug": "first-missing-positive", "diff": "hard", "cue": "array as hash" }
+      ],
+      "template": [
+        "# The 'which medium is this' reduction, for the five above:",
+        "#   serialize     -> tree DFS, plus null markers to fix ambiguity",
+        "#   merge k       -> merge two, plus a heap to pick the smallest head",
+        "#   burst         -> interval DP, plus the LAST-move reframing",
+        "#   word ladder   -> BFS, plus the graph is computed rather than stored",
+        "#   first missing -> cyclic sort, plus the 1..n+1 bound",
+        "#",
+        "# Every hard in this program reduces this way. Find the reduction and",
+        "# you have found the solution."
+      ],
+      "keyInsights": [
+        "Naming the underlying medium is faster and more reliable than trying to derive a hard from scratch",
+        "The 'extra insight' is usually a reframing, not extra code. Last-move, inverted search, implicit graph",
+        "If forty-five minutes pass with no insight, the brute force plus a clear statement of what is missing is a genuine partial pass"
+      ],
+      "trap": "Treating hards as a separate category to be memorised. They are compositions. Learn the reductions, not the solutions."
+    },
+    {
+      "id": "m2-round-c",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Round C: Design and Complexity, 45 Minutes",
+      "timerSec": 2700,
+      "trigger": "Build a data structure to a stated complexity contract, then defend every choice.",
+      "recall": "Pick one. Before coding, write the operation table: every method, its required complexity, and which structure provides it. Then build. Then defend each choice as if challenged.",
+      "drill": [
+        { "lc": 146, "name": "LRU Cache", "slug": "lru-cache", "diff": "medium", "cue": "map + DLL" },
+        { "lc": 460, "name": "LFU Cache", "slug": "lfu-cache", "diff": "hard", "cue": "buckets + min_freq" },
+        { "lc": 295, "name": "Find Median from Data Stream", "slug": "find-median-from-data-stream", "diff": "hard", "cue": "two heaps" },
+        { "lc": 380, "name": "Insert Delete GetRandom O(1)", "slug": "insert-delete-getrandom-o1", "diff": "medium", "cue": "array + index map" },
+        { "lc": 208, "name": "Implement Trie", "slug": "implement-trie-prefix-tree", "diff": "medium", "cue": "map of children" }
+      ],
+      "template": [
+        "# The operation table. Write it BEFORE any code.",
+        "#",
+        "#   method        required      structure providing it",
+        "#   ------------  ------------  ---------------------------",
+        "#   get(k)        O(1)          hash map",
+        "#   put(k, v)     O(1)          hash map + list splice",
+        "#   evict()       O(1)          doubly linked list tail",
+        "#",
+        "# Then the three questions they will ask:",
+        "#   'What happens at capacity zero?'",
+        "#   'What is the memory overhead per entry?'",
+        "#   'How would you make it thread safe / distributed?'"
+      ],
+      "keyInsights": [
+        "The operation table forces the design before the syntax, and it is what the interviewer is actually evaluating",
+        "Memory overhead per entry is a real question at Google scale, and almost nobody has an answer ready",
+        "Thread safety is usually 'a lock around the whole thing, then shard by key hash to reduce contention'. Have that sentence"
+      ],
+      "trap": "Answering 'how would you scale this' with vague distributed-systems words. Say sharding by key hash, say what breaks (global LRU ordering), and say the trade you would accept."
+    },
+    {
+      "id": "m2-weak-spots",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Weak Spot Sweep",
+      "timerSec": 1800,
+      "trigger": "Thirty minutes on the concepts still marked shaky. This is the highest-value half hour of the entire month.",
+      "recall": "Open the weak-spots list. For every concept still marked shaky, write its template from memory right now. The ones that fail are the ones that start next month.",
+      "drill": [],
+      "template": [
+        "# What 'shaky' actually costs you:",
+        "#   a shaky concept is not a concept you might get wrong.",
+        "#   it is a concept you will spend eight minutes rediscovering,",
+        "#   in a twenty-five minute round, while the clock runs.",
+        "#",
+        "# The rule for next month:",
+        "#   shaky twice  -> write it out three times on paper this week",
+        "#   shaky three times -> the underlying idea is missing, not the code.",
+        "#                        Go back and learn the idea, not the template.",
+        "#",
+        "# Everything solid twice in a row is safe to run at speed next cycle."
+      ],
+      "keyInsights": [
+        "Spaced repetition only works if the weak items actually resurface. That is what the shaky marking is for",
+        "Three failures on the same concept means you are memorising code without the idea. Stop drilling and go learn it",
+        "The list should shrink every month. If it does not, you are running the cycle without acting on it"
+      ],
+      "trap": "Marking things solid because you recognised them. Recognition is not recall. If your pen did not move, it is shaky."
+    },
+    {
+      "id": "m2-cycle-close",
+      "lane": "mock",
+      "kind": "mock",
+      "title": "Close the Cycle",
+      "timerSec": 900,
+      "trigger": "Cycle complete. 150 problems, 150 concept touches. Now decide what the next one looks like.",
+      "recall": "Write the four answers below. Then start Day 1 tomorrow, and notice how much faster it goes than it did this month.",
+      "drill": [],
+      "template": [
+        "# Four questions, in writing:",
+        "#",
+        "#   1. Which lane was slowest this cycle? (arrays / design / trees / dp / graphs)",
+        "#   2. How many concepts are still shaky, and is that fewer than last month?",
+        "#   3. What was my average clean-recall rate, and did the combo streaks get longer?",
+        "#   4. What is the ONE process fix carried into next cycle?",
+        "#",
+        "# Then reset and run it again. Same 30 days, same 150 problems.",
+        "#",
+        "# Cycle 1: you are learning the patterns.",
+        "# Cycle 2: you are recognising them.",
+        "# Cycle 3: you are writing them without thinking.",
+        "# Cycle 4: the interview is a formality.",
+        "#",
+        "# The repetition IS the method. Do not swap in new problems because",
+        "# these feel familiar. Familiar is the entire objective."
+      ],
+      "keyInsights": [
+        "Same content every month is the design, not a limitation. Novelty feels productive and builds nothing durable",
+        "The metric that matters is clean-recall rate, not problems solved. Solved-while-peeking is a lookup, not a memory",
+        "By cycle three the templates should come out faster than you can read the problem statement"
+      ],
+      "trap": "Getting bored and swapping in a fresh problem set. That resets you to cycle one on every pattern, and boredom is the feeling of something becoming automatic."
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "day": 21,
+  "title": "Retrieval: Week Three",
+  "kind": "retrieval",
+  "focus": "The hardest week to recall, which is exactly why it is the most valuable retrieval day of the month.",
+  "cards": [
+    {
+      "id": "r3-arrays",
+      "lane": "arrays",
+      "kind": "drill",
+      "title": "Arrays and Strings: blind recall",
+      "trigger": "Binary search stopped being about arrays this week. That reframing is the thing to keep.",
+      "recall": "Paper: the feasibility-search skeleton, the bucket-by-frequency loop, the rotated-array half test, the two-sweep prefix and suffix, quickselect's partition, and the trapping-water two-pointer. Then say which of the six is the one you would still fumble.",
+      "drill": [
+        { "lc": 875, "name": "Koko Eating Bananas", "slug": "koko-eating-bananas", "diff": "medium", "cue": "search the answer" },
+        { "lc": 347, "name": "Top K Frequent Elements", "slug": "top-k-frequent-elements", "diff": "medium", "cue": "bucket by count" },
+        { "lc": 33, "name": "Search in Rotated Sorted Array", "slug": "search-in-rotated-sorted-array", "diff": "medium", "cue": "one half is sorted" },
+        { "lc": 238, "name": "Product of Array Except Self", "slug": "product-of-array-except-self", "diff": "medium", "cue": "assign then accumulate" },
+        { "lc": 215, "name": "Kth Largest Element", "slug": "kth-largest-element-in-an-array", "diff": "medium", "cue": "recurse one side" },
+        { "lc": 42, "name": "Trapping Rain Water", "slug": "trapping-rain-water", "diff": "hard", "cue": "move the smaller side" }
+      ],
+      "template": [
+        "# Binary search, three faces:",
+        "#   1. index in a sorted array          -> lower_bound",
+        "#   2. index in a ROTATED array         -> find the sorted half first",
+        "#   3. a VALUE, via feasible(x)         -> minimise the maximum",
+        "",
+        "# Selection, three faces:",
+        "#   sorted output needed  -> sort, O(n log n)",
+        "#   top k, any order      -> quickselect, O(n) average",
+        "#   streaming             -> size-k heap, O(n log k)"
+      ],
+      "keyInsights": [
+        "Binary search on the answer is the highest-leverage pattern of the whole month. It converts hard problems into easy predicates",
+        "Quickselect mutates and does not order. Heap does neither. Read the constraints and pick deliberately",
+        "Two-sweep prefix and suffix replaces division, and generalises to any 'everything except me' aggregate"
+      ],
+      "trap": "Saying binary search on the answer is O(log n). It is O(n log(range)). This is the follow-up you will actually be asked."
+    },
+    {
+      "id": "r3-structures",
+      "lane": "structures",
+      "kind": "drill",
+      "title": "Structures and Design: blind recall",
+      "trigger": "This week's structures are the ones people skip. Skipping them is why they fail the hard round.",
+      "recall": "From memory: the swap-with-last removal, wildcard trie DFS, both Fenwick loops, the timestamp binary search, and the histogram stack with its width formula. The Fenwick loops and the histogram width are the two most forgettable lines in the entire program.",
+      "drill": [
+        { "lc": 380, "name": "Insert Delete GetRandom O(1)", "slug": "insert-delete-getrandom-o1", "diff": "medium", "cue": "fix pos[last]" },
+        { "lc": 211, "name": "Design Add and Search Words", "slug": "design-add-and-search-words-data-structure", "diff": "medium", "cue": "branch on dot" },
+        { "lc": 315, "name": "Count of Smaller Numbers After Self", "slug": "count-of-smaller-numbers-after-self", "diff": "hard", "cue": "right to left" },
+        { "lc": 981, "name": "Time Based Key-Value Store", "slug": "time-based-key-value-store", "diff": "medium", "cue": "bisect then step back" },
+        { "lc": 84, "name": "Largest Rectangle in Histogram", "slug": "largest-rectangle-in-histogram", "diff": "hard", "cue": "i - left - 1" },
+        { "lc": 307, "name": "Range Sum Query - Mutable", "slug": "range-sum-query-mutable", "diff": "medium", "cue": "leaves in the second half" }
+      ],
+      "template": [
+        "i += i & -i    # BIT update: walk up",
+        "i -= i & -i    # BIT query:  walk down",
+        "",
+        "width = i - stack[-1] - 1   # histogram, after popping, with -1 if empty",
+        "",
+        "# Range query decision:",
+        "#   static, sums only ......... prefix array",
+        "#   point update, sums ........ Fenwick",
+        "#   point update, min/max/gcd . segment tree",
+        "#   range update .............. segment tree with lazy propagation"
+      ],
+      "keyInsights": [
+        "The range-query decision table is four lines and it answers a whole category of interview questions",
+        "The histogram width formula is the single most error-prone line this week. Write it three times today",
+        "Fenwick is half the code of a segment tree and covers most real questions. Default to it when the aggregate is a sum"
+      ],
+      "trap": "Writing a Fenwick tree 0-indexed. `i & -i` is zero at index 0 and the update loop never terminates its first step. It must be 1-indexed."
+    },
+    {
+      "id": "r3-trees",
+      "lane": "trees",
+      "kind": "drill",
+      "title": "Trees: blind recall",
+      "trigger": "This week the tree stopped being rooted. Distance from an arbitrary node needs parent edges.",
+      "recall": "From memory: is_same plus is_subtree, BST delete's three cases, the flatten predecessor splice, the mirror cross-comparison, the parent-map BFS, and coordinate traversal with its tie-break.",
+      "drill": [
+        { "lc": 572, "name": "Subtree of Another Tree", "slug": "subtree-of-another-tree", "diff": "easy", "cue": "None checks in order" },
+        { "lc": 450, "name": "Delete Node in a BST", "slug": "delete-node-in-a-bst", "diff": "medium", "cue": "leftmost of right" },
+        { "lc": 114, "name": "Flatten Binary Tree to Linked List", "slug": "flatten-binary-tree-to-linked-list", "diff": "medium", "cue": "rightmost of left" },
+        { "lc": 101, "name": "Symmetric Tree", "slug": "symmetric-tree", "diff": "easy", "cue": "left vs right" },
+        { "lc": 863, "name": "All Nodes Distance K", "slug": "all-nodes-distance-k-in-binary-tree", "diff": "medium", "cue": "three neighbours" },
+        { "lc": 987, "name": "Vertical Order Traversal", "slug": "vertical-order-traversal-of-a-binary-tree", "diff": "hard", "cue": "tie-break by value" }
+      ],
+      "template": [
+        "# Two symmetric facts worth pairing in memory:",
+        "#   BST delete   -> LEFTMOST of the RIGHT subtree (inorder successor)",
+        "#   tree flatten -> RIGHTMOST of the LEFT subtree (preorder predecessor)",
+        "",
+        "# And the fourth tree shape, added this week:",
+        "#   convert to an undirected graph (parent map), then ordinary BFS"
+      ],
+      "keyInsights": [
+        "The successor and predecessor pairing is easy to confuse and easy to remember once paired deliberately",
+        "The moment the question says 'distance from node X', build parent links. Do not try to be clever",
+        "Coordinate traversals are BFS carrying extra numbers. The only hard part is the tie-break rule"
+      ],
+      "trap": "Assuming BFS order resolves ties in vertical order traversal. That is the easier lookalike problem. Read which one you are on."
+    },
+    {
+      "id": "r3-dp",
+      "lane": "dp",
+      "kind": "drill",
+      "title": "DP: blind recall",
+      "trigger": "Three new shapes this week: state machine, interval, and bitmask. Name the shape before the state.",
+      "recall": "For each, name the shape first, then the state sentence, then the recurrence. Draw the stock state machine. Say why burst balloons loops over the last move. Say what n makes bitmask viable.",
+      "drill": [
+        { "lc": 309, "name": "Best Time to Buy and Sell with Cooldown", "slug": "best-time-to-buy-and-sell-stock-with-cooldown", "diff": "medium", "cue": "three states" },
+        { "lc": 64, "name": "Minimum Path Sum", "slug": "minimum-path-sum", "diff": "medium", "cue": "borders are prefix sums" },
+        { "lc": 516, "name": "Longest Palindromic Subsequence", "slug": "longest-palindromic-subsequence", "diff": "medium", "cue": "i descending" },
+        { "lc": 45, "name": "Jump Game II", "slug": "jump-game-ii", "diff": "medium", "cue": "greedy is BFS levels" },
+        { "lc": 312, "name": "Burst Balloons", "slug": "burst-balloons", "diff": "hard", "cue": "k bursts last" },
+        { "lc": 698, "name": "Partition to K Equal Sum Subsets", "slug": "partition-to-k-equal-sum-subsets", "diff": "medium", "cue": "mask is the state" }
+      ],
+      "template": [
+        "# The DP shape catalogue so far:",
+        "#   linear        dp[i]        from a fixed lookback",
+        "#   grid          dp[r][c]     from already-computed neighbours",
+        "#   two-sequence  dp[i][j]     over two prefixes",
+        "#   knapsack      dp[capacity] loop direction decides reuse",
+        "#   state machine dp[mode]     named modes, simultaneous update",
+        "#   interval      dp[i][j]     over a RANGE, fill by increasing length",
+        "#   bitmask       dp[mask]     subset as an integer, n <= ~20",
+        "",
+        "# Name the shape first. The state sentence follows from the shape."
+      ],
+      "keyInsights": [
+        "Seven shapes cover essentially every DP you will be asked. Naming the shape is faster than deriving from scratch",
+        "Interval DP fills by increasing length. Every other shape fills by increasing index. That is the thing to remember",
+        "When greedy works, you must be able to prove it. When you cannot prove it, write the DP"
+      ],
+      "trap": "Reaching for interval DP on burst balloons but framing it as first-move. It compiles, it runs, and it is wrong. The last-move framing is the problem."
+    },
+    {
+      "id": "r3-graphs",
+      "lane": "graphs",
+      "kind": "drill",
+      "title": "Graphs and Backtracking: blind recall",
+      "trigger": "Backtracking is a graph search where the graph is your choices. Same skeleton, four times this week.",
+      "recall": "From memory: the permutation used-array plus the duplicate skip, combination sum's reuse index, word search's mark and unmark, N-Queens' three sets, the clone map registered before recursing, and the wildcard bucket BFS.",
+      "drill": [
+        { "lc": 46, "name": "Permutations", "slug": "permutations", "diff": "medium", "cue": "not used[i-1]" },
+        { "lc": 39, "name": "Combination Sum", "slug": "combination-sum", "diff": "medium", "cue": "go(i) allows reuse" },
+        { "lc": 79, "name": "Word Search", "slug": "word-search", "diff": "medium", "cue": "unmark on the way out" },
+        { "lc": 51, "name": "N-Queens", "slug": "n-queens", "diff": "hard", "cue": "row-c and row+c" },
+        { "lc": 133, "name": "Clone Graph", "slug": "clone-graph", "diff": "medium", "cue": "register before recursing" },
+        { "lc": 127, "name": "Word Ladder", "slug": "word-ladder", "diff": "hard", "cue": "wildcard buckets" }
+      ],
+      "template": [
+        "# One backtracking skeleton, four dressings:",
+        "def go(state):",
+        "    if complete(state): record(); return",
+        "    for choice in options(state):",
+        "        if not allowed(choice): continue     # PRUNE here, not after",
+        "        apply(choice)",
+        "        go(next_state)",
+        "        undo(choice)                         # every apply needs an undo",
+        "",
+        "# subsets/combinations -> options start at `start`, no undo of a used-array",
+        "# permutations         -> used[] array, undo it",
+        "# grid path            -> mark the cell, undo the mark",
+        "# constraints          -> conflict sets, undo all of them"
+      ],
+      "keyInsights": [
+        "Every apply needs exactly one undo. Missing one gives wrong output rather than an error, which is the worst kind of bug",
+        "Prune inside the loop before recursing. Pruning after the recursive call does nothing",
+        "Implicit graphs, word ladder and lock puzzles, are ordinary BFS. Do not let the lack of an adjacency list disguise them"
+      ],
+      "trap": "Permutations with duplicates using `used[i-1]` instead of `not used[i-1]`. Both produce output. Only one is correct."
+    }
+  ]
+}

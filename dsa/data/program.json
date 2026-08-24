@@ -1,0 +1,31 @@
+{
+  "title": "DSA Mastery",
+  "tagline": "A 30-day loop you run every month until the patterns are muscle memory.",
+  "cycleDays": 30,
+  "cardTimerSec": 240,
+  "lanes": {
+    "arrays":     { "name": "Arrays & Strings",     "short": "Arrays",  "color": "#5AA9E6" },
+    "structures": { "name": "Structures & Design",  "short": "Design",  "color": "#B295F0" },
+    "trees":      { "name": "Trees & Hierarchies",  "short": "Trees",   "color": "#4FC98A" },
+    "dp":         { "name": "Dynamic Programming",  "short": "DP",      "color": "#F0A93C" },
+    "graphs":     { "name": "Graphs & Search",      "short": "Graphs",  "color": "#EE6E8E" },
+    "mock":       { "name": "Simulation",           "short": "Mock",    "color": "#E4713F" }
+  },
+  "xp": {
+    "clean": 100,
+    "peek": 25,
+    "speedBonusSec": 60,
+    "speedBonus": 50,
+    "perfectDay": 250,
+    "comboStep": 0.2,
+    "comboCap": 2.0
+  },
+  "ranks": [
+    { "at": 0,     "name": "Cold Start",     "note": "Day one of the loop. Everything is a lookup." },
+    { "at": 2500,  "name": "Warming Up",     "note": "You recognise the shapes. You still reach for the template." },
+    { "at": 8000,  "name": "Screen Ready",   "note": "Phone screen problems come out clean, first try." },
+    { "at": 18000, "name": "Onsite Ready",   "note": "You pick the pattern before you finish reading the prompt." },
+    { "at": 35000, "name": "L4 Ready",       "note": "Template is gone. You just write the solution." },
+    { "at": 60000, "name": "Muscle Memory",  "note": "This is the point of the whole thing." }
+  ]
+}

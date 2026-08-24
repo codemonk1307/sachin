@@ -1,0 +1,221 @@
+{
+  "day": 6,
+  "title": "Sorting the Problem",
+  "kind": "core",
+  "focus": "Sort first and half the problem disappears. Then the week's hardest idea: patience sorting.",
+  "cards": [
+    {
+      "id": "merge-intervals",
+      "lane": "arrays",
+      "title": "Interval Merging",
+      "patterns": ["Sort by start", "Extend or append", "Insert into a sorted set"],
+      "trigger": "A list of [start, end] pairs and a question about overlap, coverage or conflict.",
+      "recall": "Write the merge from memory. Then answer: you sorted by start, so what is the single comparison that decides merge versus append, and why is `>=` versus `>` a question you must ask the interviewer?",
+      "useWhen": [
+        "Merge overlapping intervals",
+        "Insert an interval into a sorted non-overlapping list",
+        "Count how many intervals a point is covered by",
+        "Remove the fewest intervals to remove all overlap, sort by END for that one",
+        "Meeting room conflicts and calendar booking"
+      ],
+      "template": [
+        "def merge(intervals):",
+        "    intervals.sort(key=lambda iv: iv[0])       # by START",
+        "    out = []",
+        "    for start, end in intervals:",
+        "        if out and start <= out[-1][1]:        # overlap or touch",
+        "            out[-1][1] = max(out[-1][1], end)  # max, not end",
+        "        else:",
+        "            out.append([start, end])",
+        "    return out",
+        "",
+        "# Non-overlapping: keep the most intervals -> greedy by EARLIEST END",
+        "intervals.sort(key=lambda iv: iv[1])",
+        "kept, last_end = 0, float('-inf')",
+        "for s, e in intervals:",
+        "    if s >= last_end:",
+        "        kept += 1; last_end = e",
+        "return len(intervals) - kept"
+      ],
+      "complexity": { "time": "O(n log n)", "space": "O(n)" },
+      "problem": { "lc": 56, "name": "Merge Intervals", "slug": "merge-intervals", "diff": "medium" },
+      "keyInsights": [
+        "`max(out[-1][1], end)` matters because a fully contained interval must not shrink the merged one",
+        "Sort by start to merge. Sort by end to schedule the most. Two different problems, two different keys",
+        "Whether [1,2] and [2,3] overlap is a real ambiguity. Ask, do not assume"
+      ],
+      "trap": "'Intervals arrive one at a time and you must answer after each.' Sorting is gone. You need an ordered structure keyed by start, and that is the real question."
+    },
+    {
+      "id": "heap-scheduling",
+      "lane": "structures",
+      "title": "Heap Scheduling",
+      "patterns": ["Greedy by frequency", "Cooldown queue", "Rooms as a heap of end times"],
+      "trigger": "Assign a stream of jobs to slots or resources, always taking the currently most urgent.",
+      "recall": "Write the meeting rooms solution with a min-heap of end times from memory. Then answer: why does the heap size at any moment equal the number of concurrent meetings?",
+      "useWhen": [
+        "Minimum meeting rooms, maximum concurrency",
+        "Task scheduler with a cooldown between identical tasks",
+        "CPU or worker assignment by shortest job or highest priority",
+        "Reorganise a string so no two identical characters are adjacent",
+        "Merge k streams by next-available timestamp"
+      ],
+      "template": [
+        "import heapq",
+        "from collections import Counter",
+        "",
+        "# Minimum rooms: heap holds END times of live meetings",
+        "def min_rooms(intervals):",
+        "    intervals.sort(key=lambda iv: iv[0])",
+        "    live = []",
+        "    for start, end in intervals:",
+        "        if live and live[0] <= start:",
+        "            heapq.heappop(live)        # a room freed up before this start",
+        "        heapq.heappush(live, end)",
+        "    return len(live)",
+        "",
+        "# Task scheduler, closed form: the most frequent task sets the skeleton",
+        "def least_interval(tasks, n):",
+        "    freq = Counter(tasks)",
+        "    top = max(freq.values())",
+        "    ties = sum(1 for v in freq.values() if v == top)",
+        "    return max(len(tasks), (top - 1) * (n + 1) + ties)"
+      ],
+      "complexity": { "time": "O(n log n)", "space": "O(n)" },
+      "problem": { "lc": 253, "name": "Meeting Rooms II", "slug": "meeting-rooms-ii", "diff": "medium" },
+      "keyInsights": [
+        "The heap holds end times, so its size is exactly the number of overlapping meetings. The answer is the maximum size",
+        "Popping at most one per iteration is enough, because you only need one room for the one meeting starting now",
+        "The chalkboard alternative is a sweep line over sorted start and end events. Know both and say which is cleaner here"
+      ],
+      "trap": "'Which rooms specifically?' The count version throws away identity. You need to store (end, room_id) and recycle ids, and that is a real design change."
+    },
+    {
+      "id": "tree-balanced",
+      "lane": "trees",
+      "title": "Balance and Height",
+      "patterns": ["Sentinel for early exit", "Bottom-up height check", "Sorted array to balanced BST"],
+      "trigger": "A question about tree shape rather than tree contents.",
+      "recall": "Write the balanced check that runs in O(n) from memory. Then answer: the naive version calls height inside isBalanced and is O(n^2), so what does the sentinel return buy you?",
+      "useWhen": [
+        "Is this tree height balanced",
+        "Build a balanced BST from a sorted array",
+        "Minimum depth, careful, a one-child node is not a leaf",
+        "Check completeness or perfectness for a heap-backed tree",
+        "Any question about the O(h) guarantee holding"
+      ],
+      "template": [
+        "# O(n): return -1 as 'already unbalanced below me'",
+        "def is_balanced(root):",
+        "    def height(node):",
+        "        if not node: return 0",
+        "        l = height(node.left)",
+        "        if l == -1: return -1",
+        "        r = height(node.right)",
+        "        if r == -1: return -1",
+        "        if abs(l - r) > 1: return -1",
+        "        return 1 + max(l, r)",
+        "    return height(root) != -1",
+        "",
+        "# Sorted array -> balanced BST: the middle is always the root",
+        "def build(lo, hi):",
+        "    if lo > hi: return None",
+        "    mid = (lo + hi) // 2",
+        "    node = TreeNode(arr[mid])",
+        "    node.left  = build(lo, mid - 1)",
+        "    node.right = build(mid + 1, hi)",
+        "    return node"
+      ],
+      "complexity": { "time": "O(n)", "space": "O(h)" },
+      "problem": { "lc": 110, "name": "Balanced Binary Tree", "slug": "balanced-binary-tree", "diff": "easy" },
+      "keyInsights": [
+        "The sentinel fuses 'compute height' and 'check balance' into one pass, turning O(n^2) into O(n)",
+        "Minimum depth is the classic off-by-one: a node with one child is not a leaf, so you cannot just take min of both",
+        "Every self-balancing tree, AVL and red-black, exists to keep this height invariant so O(h) stays O(log n)"
+      ],
+      "trap": "'What does a real AVL do on insert?' Rotations. You do not need to code them, but you must be able to say single versus double and which case triggers which."
+    },
+    {
+      "id": "dp-lis",
+      "lane": "dp",
+      "title": "Longest Increasing Subsequence",
+      "patterns": ["O(n^2) dp[i]", "O(n log n) patience piles", "Binary search the tails array"],
+      "trigger": "Longest chain under an ordering constraint, where the elements need not be adjacent.",
+      "recall": "Write the O(n log n) version from memory. Then answer the thing nearly everyone gets wrong: is the `tails` array itself a valid LIS, and if not, why is its length still correct?",
+      "useWhen": [
+        "Longest increasing or decreasing subsequence",
+        "Russian doll envelopes, after sorting one dimension",
+        "Maximum chain of pairs",
+        "Minimum deletions to make an array sorted, n minus LIS",
+        "Box stacking and any 2D dominance chain"
+      ],
+      "template": [
+        "# O(n^2): dp[i] = LIS length ending exactly at i",
+        "dp = [1] * n",
+        "for i in range(n):",
+        "    for j in range(i):",
+        "        if nums[j] < nums[i]:",
+        "            dp[i] = max(dp[i], dp[j] + 1)",
+        "return max(dp)",
+        "",
+        "# O(n log n): tails[k] = smallest possible tail of an increasing run of length k+1",
+        "import bisect",
+        "def lis(nums):",
+        "    tails = []",
+        "    for x in nums:",
+        "        i = bisect.bisect_left(tails, x)   # bisect_right for non-decreasing",
+        "        if i == len(tails): tails.append(x)",
+        "        else:               tails[i] = x",
+        "    return len(tails)",
+        "",
+        "# Envelopes: sort by width asc, height DESC on ties, then LIS on heights"
+      ],
+      "complexity": { "time": "O(n log n)", "space": "O(n)" },
+      "problem": { "lc": 300, "name": "Longest Increasing Subsequence", "slug": "longest-increasing-subsequence", "diff": "medium" },
+      "keyInsights": [
+        "`tails` is not an actual subsequence. Only its length is meaningful. Claiming otherwise is a common and visible error",
+        "`bisect_left` gives strictly increasing, `bisect_right` gives non-decreasing. That one word in the prompt picks the function",
+        "The height-descending tie-break on envelopes is what stops equal widths from chaining. Without it the answer is too large"
+      ],
+      "trap": "'Reconstruct the subsequence.' You must record a predecessor index per element alongside the tails array. The length-only version cannot be retrofitted."
+    },
+    {
+      "id": "floyd-warshall",
+      "lane": "graphs",
+      "title": "All-Pairs Shortest Path",
+      "patterns": ["Triple loop, k outermost", "Transitive closure", "Dense small graphs"],
+      "trigger": "You need distances between every pair, and the vertex count is small, roughly under 400.",
+      "recall": "Write the triple loop from memory. Then answer the one thing that matters: why must `k` be the outermost loop, and what does the algorithm compute if you put it innermost?",
+      "useWhen": [
+        "All-pairs shortest path on a dense small graph",
+        "Find the city with the fewest reachable neighbours within a threshold",
+        "Transitive closure, who can reach whom, with booleans",
+        "Detect a negative cycle, any dist[i][i] below zero",
+        "Precompute a distance matrix once and answer many queries"
+      ],
+      "template": [
+        "# dist is V x V, dist[i][i] = 0, dist[u][v] = w, everything else INF",
+        "for k in range(V):                 # k MUST be outermost",
+        "    dk = dist[k]",
+        "    for i in range(V):",
+        "        dik = dist[i][k]",
+        "        if dik == INF: continue",
+        "        di = dist[i]",
+        "        for j in range(V):",
+        "            if dik + dk[j] < di[j]:",
+        "                di[j] = dik + dk[j]",
+        "",
+        "# Negative cycle: any i with dist[i][i] < 0",
+        "# Transitive closure: replace + with and, min with or"
+      ],
+      "complexity": { "time": "O(V^3)", "space": "O(V^2)" },
+      "problem": { "lc": 1334, "name": "Find the City With the Smallest Number of Neighbors", "slug": "find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance", "diff": "medium" },
+      "keyInsights": [
+        "After iteration k, dist holds shortest paths using only vertices 0..k as intermediates. k outermost is what makes that induction hold",
+        "It handles negative edges. It does not handle negative cycles, it only detects them",
+        "V^3 at V = 400 is 64 million, which is the practical ceiling. Above that, run Dijkstra from every source"
+      ],
+      "trap": "'The graph has 10,000 nodes.' V^3 is a trillion. Say the number out loud and switch to V rounds of Dijkstra."
+    }
+  ]
+}
