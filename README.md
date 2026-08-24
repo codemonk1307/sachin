@@ -1,13 +1,105 @@
-### personal_website_sachin_mishra
-Developed personal website using HTML | CSS | bootstrap | jquery | javascript 
-Learned how to make Responsive Websites
-Advanced Styling of various components such as 
-Styling the image-sizes, headings, texts and paragraphs according to the device width
-Modify the Navigation bars to wrap up and get expanded as the window size varies
+# Sachin Mishra - personal site
 
-Used lots n lots of Bootstrap here and it was quite fun
+A single-page portfolio plus two generated study apps, served as static files.
+No framework, no bundler, no build step for the site itself. Open `index.html`
+and it runs.
 
-Feel free to contribute for any changes !!!
-Please let me know if there can be any other modifications
+## What is in here
 
-Thankyou so much for visiting !!!
+| file | what it is | hand-written? |
+|------|------------|---------------|
+| `index.html` | the portfolio: about, experience, skills, projects, achievements, certifications, clients, interests, contact. CSS and JS are inline | yes |
+| `war-room.html` | **War Room**, an interview revision guide | **generated** |
+| `dsa-master.html` | **DSA Mastery**, a 30-day revision loop | **generated** |
+| `css/war-room.css` | War Room styling | yes |
+| `css/dsa-master.css` | DSA Mastery styling | yes |
+| `guide/` | the War Room content pipeline (JSON -> `build.py` -> HTML) | yes |
+| `dsa/` | the DSA Mastery content pipeline (JSON -> `build.py` -> HTML) | yes |
+| `images/` | portfolio imagery and skill icons | - |
+
+`css/styles.css` is left over from the earlier version of the site and is not
+linked by anything.
+
+## The two labs
+
+Both open inside the portfolio in a full-screen iframe overlay. `index.html`
+has one `.lab` overlay reused by every lab, and each trigger carries its own
+target:
+
+```html
+<a href="#war-room" data-lab-open="war-room.html"
+   data-lab-title="War Room: interview revision guide">War Room</a>
+```
+
+`openLab(src, title)` only reloads the iframe when the source actually changes,
+so returning to a lab keeps your place.
+
+### War Room
+
+9 tracks, 56 modules, 223 concepts. Each concept is a card with a one-breath
+definition and, where they help, an analogy, mechanism bullets, a code panel,
+"they will ask" accordions, the trap, and the sentence to say out loud.
+Confidence ratings persist in `localStorage`.
+
+Pipeline and content schema: [guide/README.md](guide/README.md).
+
+### DSA Mastery
+
+A 30-day loop you run **every month**, not a course you finish once. 30 days x
+5 cards = 150 concepts, each tied to a real LeetCode problem. The day is
+computed as `((day of month - 1) % 30) + 1`, so the page always opens on today.
+24 core days, 4 retrieval days, 2 mock days. Every card is gated behind a
+recall prompt: you commit before you see the answer. XP, combos, ranks, a
+streak and a 13-week heatmap sit on top.
+
+Pipeline and content schema: [dsa/README.md](dsa/README.md).
+
+## Rebuilding the generated pages
+
+Both generators are plain Python 3, no dependencies. Edit the JSON under
+`guide/data/` or `dsa/data/`, then:
+
+```bash
+python guide/build.py
+```
+
+```bash
+python dsa/build.py
+```
+
+Each prints a summary and fails loudly on malformed data: missing keys,
+duplicate ids, a bad tier or lane, a day without exactly five cards, or an em
+dash anywhere in the output. Never hand-edit `war-room.html` or
+`dsa-master.html`; the next build overwrites them.
+
+## Local preview
+
+Serve over HTTP rather than opening the files directly, because the lab
+stylesheets are separate files and the labs load in an iframe.
+
+```bash
+python -m http.server 8899
+```
+
+Then open <http://localhost:8899/>. `.claude/launch.json` defines the same
+server as a `portfolio` configuration.
+
+## Conventions
+
+- **Theme.** The portfolio shell writes `localStorage.theme`. Both labs read it
+  before first paint via an inline script in `<head>`, so there is no flash,
+  and a `storage` listener picks up changes made in the parent tab.
+- **Every colour is a token**, defined for both themes. No hex values in
+  component rules.
+- **Every flex/grid child gets `min-width: 0`**, and anything that can be wide
+  scrolls inside its own `overflow-x: auto` box. The page body never scrolls
+  sideways.
+- **Syntax highlighting happens at build time** in Python. No client-side
+  library, nothing to fail at runtime.
+- **No em dashes.** Both builds refuse to write a page containing one.
+
+## Stack
+
+HTML, CSS and vanilla JavaScript for everything shipped. Python 3 only as a
+content generator and a static file server. Fonts are Inter and JetBrains Mono
+from Google Fonts.
